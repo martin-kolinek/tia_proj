@@ -12,9 +12,11 @@ import models.partdef.PartDefinitionDesc
 import models.partdef.PartDefinitionDesc
 
 object PartDefinitions extends Controller with ObjectController[PartDefinitionDesc]{
+    type ModelType = DBAccessConf with DBPartDef
+
 	def model = new DBAccessConf with DBPartDef
 	
-	val form = Form(mapping(
+	def form(m:ModelType)(implicit session:m.profile.simple.Session) = Form(mapping(
 			"name" -> nonEmptyText,
 			"filter" -> text,
 			"file" -> TemporaryFileManager.tempFileMapping)

@@ -35,6 +35,8 @@ object Semiproducts extends Controller with ObjectController[PackDesc] {
 		    }
 		}
 	}*/
+
+    type ModelType = DBAccessConf with DBSemiprods
 	
 	def model = new DBAccessConf with DBSemiprods
 	
@@ -96,7 +98,7 @@ object Semiproducts extends Controller with ObjectController[PackDesc] {
 		case _ => None
 	}
 			
-	val form = Form(packMapping)
+	def form(m:ModelType)(implicit session:m.profile.simple.Session) = Form(packMapping)
 	
 	def template = semiprod_form.apply
 	

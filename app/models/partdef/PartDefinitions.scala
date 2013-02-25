@@ -9,10 +9,16 @@ trait PartDefinitions extends Tables with ObjectModel[PartDefinitionDesc] {
 	this:DBAccess =>
 	import profile.simple._
 	
+    def idQuery(id:Int) = for(pd<-PartDefinition if pd.id === id) yield (pd.name, pd.filter, pd.file)
+
 	def get(id:Int)(implicit session:Session) = {
-		val q = for(pd<-PartDefinition if pd.id === id) yield (pd.name, pd.filter, pd.file)
+		val q = idQuery(id)
 		q.firstOption.map(PartDefinitionDesc.tupled)
 	}
+
+    def exists(id:Int)(implicit session:Session) = {
+        idQuery(id).exists
+    }
 	
 	def listPartDefinitions(implicit session:Session) = {
 		val q = for(pd<-PartDefinition) yield (pd.id, (pd.name, pd.filter, pd.file))

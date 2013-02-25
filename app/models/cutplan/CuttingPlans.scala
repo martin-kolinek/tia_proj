@@ -4,9 +4,9 @@ import models.DBAccess
 import models.basic.Tables
 import models.ObjectModel
 
-case class CuttingPlanDesc(name:String, filter:String, file:Array[Byte], partdefs:List[PartDefInCutPlanDesc])
+case class CuttingPlanDesc(name:String, filter:String, file:Array[Byte], partdefs:List[PartDefInCutPlan])
 
-case class PartDefInCutPlanDesc(partDefID:Int, count:Int)
+case class PartDefInCutPlan(partDefId:Int, count:Int)
 
 trait CuttingPlans extends Tables with ObjectModel[CuttingPlanDesc] {
 	self:DBAccess =>
@@ -26,12 +26,12 @@ trait CuttingPlans extends Tables with ObjectModel[CuttingPlanDesc] {
 	def getPartDefs(cutPlanId:Int)(implicit session:Session) = {
 		(for {
 			pdef <- PartDefinitionInCuttingPlan if pdef.cutPlanId === cutPlanId
-		} yield pdef.partDefId -> pdef.count).list.map(PartDefInCutPlanDesc.tupled)
+		} yield pdef.partDefId -> pdef.count).list.map(PartDefInCutPlan.tupled)
 	}
 	
 	def insert(cp:CuttingPlanDesc)(implicit session:Session) = {
 		val id = CuttingPlan.forInsert.insert((cp.name, cp.filter, cp.file, false))
-		PartDefinitionInCuttingPlan.insertAll(cp.partdefs.map(x=>(id, x.partDefID, x.count)):_*)
+		PartDefinitionInCuttingPlan.insertAll(cp.partdefs.map(x=>(id, x.partDefId, x.count)):_*)
 		id
 	}
 	
@@ -41,16 +41,16 @@ trait CuttingPlans extends Tables with ObjectModel[CuttingPlanDesc] {
 		(for{
 			pdef <- PartDefinitionInCuttingPlan 
 			if pdef.cutPlanId === id
-			if !pdef.partDefId.inSet(cp.partdefs.map(_.partDefID))
+			if !pdef.partDefId.inSet(cp.partdefs.map(_.partDefId))
 		} yield pdef).delete
 		for(pdef <- cp.partdefs) {
 			val upd = for{
 				dbpdef <- PartDefinitionInCuttingPlan
-				if dbpdef.cutPlanId===id && dbpdef.partDefId===pdef.partDefID
+				if dbpdef.cutPlanId===id && dbpdef.partDefId===pdef.partDefId
 			} yield dbpdef.count
 			
 			if(upd.update(pdef.count) == 0) {
-				PartDefinitionInCuttingPlan.insert(id, pdef.partDefID, pdef.count)
+				PartDefinitionInCuttingPlan.insert(id, pdef.partDefId, pdef.count)
 			}
 		}
 	}

@@ -12,6 +12,7 @@ class BasicModelsTest extends FunSuite {
 	test("getTables function works") {
 		val r = running(FakeApplication(additionalConfiguration = inMemorySlick)) {
 			val tbls = getTables
+            import tbls.profile.simple._
 			assert(tbls.profile.isInstanceOf[scala.slick.driver.H2Driver])
 		}
 	}

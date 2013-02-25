@@ -16,6 +16,7 @@ trait Tables { this:DBAccess =>
         def dueDate = column[Option[DateTime]]("due_date")
         def status = column[OrderStatusType]("status")
         def * = id ~ name ~ fillingDate ~ dueDate ~ status
+        def forInsert = name ~ fillingDate ~ dueDate ~ status returning id
     }
     
     object Part extends Table[(Int, Option[Int], Int, Int, Boolean)]("part") {

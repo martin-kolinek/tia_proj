@@ -10,31 +10,38 @@ import models.DBAccess
 
 trait ObjectController[ObjectType] {
 	self:Controller =>
-	def form:Form[ObjectType]
+	def form(m:ModelType)(implicit session:m.profile.simple.Session):Form[ObjectType]
 	
 	def template: (Form[ObjectType], Call) => Html
 	
-	def model:DBAccess with ObjectModel[ObjectType]
+    type ModelType <: DBAccess with ObjectModel[ObjectType]
+
+	def model:ModelType
 	
 	def saveRoute:Call
 	
 	def updateRoute:Int => Call
 	
 	def add = Action{
-		Ok(template(form, saveRoute))
+        val m = model
+        m.withTransaction {
+            implicit s=>
+		    Ok(template(form(m), saveRoute))
+        }
 	}
 	
 	def save = Action{ implicit request =>
-		val binding = form.bindFromRequest
-		binding.fold(
-			errFrm => BadRequest(template(form, saveRoute)),
-			obj => {
-				val m = model
-				m.withTransaction { implicit session =>
+        val m = model
+        m.withTransaction { 
+            implicit session =>
+		    val binding = form(m).bindFromRequest
+		    binding.fold(
+			    errFrm => BadRequest(template(form(m), saveRoute)),
+			    obj => {
 					m.insert(obj)
 					Ok("inserted")
-				}
-			})
+			    })
+        }
 	}
 	
 	def edit(id:Int) = Action {
@@ -42,21 +49,22 @@ trait ObjectController[ObjectType] {
 		m.withTransaction { implicit session =>
 			m.get(id) match {
 				case None => BadRequest("Unknown id")
-				case Some(obj) => Ok(template(form.fill(obj), updateRoute(id)))
+				case Some(obj) => Ok(template(form(m).fill(obj), updateRoute(id)))
 			}
 		}
 	}
 	
 	def update(id:Int) = Action { implicit request =>
-		val binding = form.bindFromRequest
-		binding.fold(
+        val m = model
+		m.withTransaction { 
+            implicit session =>
+		    val binding = form(m).bindFromRequest
+		    binding.fold(
 				errFrm => BadRequest(template(errFrm, updateRoute(id))),
 				obj => {
-					val m = model
-					m.withTransaction { implicit session =>
-						m.update(id, obj)
-						Ok("updated")
-					}
+				    m.update(id, obj)
+				    Ok("updated")
 				})
-	}
+	    }
+    }
 }
