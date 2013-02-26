@@ -57,6 +57,13 @@ object Semiproducts extends Controller with ObjectController[PackDesc] with Obje
 		}
 		case _ => None
 	} 
+
+	val spMapping = mapping(
+			"id" -> optional(number),
+			"serial" -> nonEmptyText)((id, serial)=>WithID(id, SemiproductDesc(serial))){
+		case WithID(id, SemiproductDesc(serial)) => Some((id, serial))
+		case _ => None
+	}
 	
 	val packMapping = mapping(
 			"heat" -> nonEmptyText,
@@ -70,13 +77,6 @@ object Semiproducts extends Controller with ObjectController[PackDesc] with Obje
 			"semiproducts" -> play.api.data.Forms.list(spMapping)
 			)(formPackExtract)(packFormExtract)
 			
-	val spMapping = mapping(
-			"id" -> optional(number),
-			"serial" -> nonEmptyText)((id, serial)=>WithID(id, SemiproductDesc(serial))){
-		case WithID(id, SemiproductDesc(serial)) => Some((id, serial))
-		case _ => None
-	}
-			
 	def form(implicit session:scala.slick.session.Session) = Form(packMapping)
 	
 	def template = semiprod_form.apply
@@ -84,6 +84,14 @@ object Semiproducts extends Controller with ObjectController[PackDesc] with Obje
 	def saveRoute = routes.Semiproducts.save
 	
 	def updateRoute = routes.Semiproducts.update
+
+    def listRoute = routes.Semiproducts.list
 	
 	def listTemplate = views.html.semiproduct.list.apply
+
+    def listSemiproducts(id:Int) = Action {
+        model.withTransaction { implicit s=>
+            Ok(views.html.semiproduct.list_semiprod(model.listSemiproducts(id)))
+        }
+    }
 }

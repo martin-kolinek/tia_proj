@@ -3,5 +3,7 @@
 @helper.form(action = replyTo) {
 	@helper.inputText(frm("name"))
 	@helper.inputText(frm("filter"))
-	@tempFileInput(frm(""))
+	@tempFileInput(frm("file"))
+
+	<input type="submit" value="Submit" />
 }

@@ -41,6 +41,8 @@ object OrderController extends Controller with ObjectController[OrderDesc]
 	def saveRoute = routes.OrderController.save
 	
 	def updateRoute = routes.OrderController.update _
+
+    def listRoute = routes.OrderController.list
 	
 	def listTemplate = views.html.order.list.apply
 }

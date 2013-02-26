@@ -1,0 +1,26 @@
+@(sps:List[models.semiproduct.SemiproductForList])
+
+<h3>
+	Semiproduct list
+</h3>
+
+<table>
+	<tr>
+		<th>
+			ID
+		</th>
+		<th>
+			serial no
+		</th>
+	</tr>
+	@for(sp <- sps) {
+		<tr>
+			<td>
+				@sp.id
+			</td>
+			<td>
+				@sp.serialNo
+			</td>
+		</tr>
+	}
+</table>

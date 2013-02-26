@@ -29,6 +29,7 @@ object PartDefinitions extends Controller with ObjectController[PartDefinitionDe
 	
 	def saveRoute = routes.PartDefinitions.save
 	def updateRoute = routes.PartDefinitions.update
+    def listRoute = routes.PartDefinitions.list
 	
 	def template = partdef_form.apply
 	

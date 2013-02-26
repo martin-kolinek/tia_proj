@@ -5,7 +5,7 @@
 # Home page
 GET     /                           controllers.Application.index
 
-#GET     /semiproduct/	            controllers.Semiproducts.list
+GET     /semiproduct	            controllers.Semiproducts.list
 
 GET		/semiproduct/add			controllers.Semiproducts.add
 
@@ -15,9 +15,9 @@ GET		/semiproduct/:pack/edit		controllers.Semiproducts.edit(pack:Int)
 
 POST	/semiproduct/:pack/edit		controllers.Semiproducts.update(pack:Int)
 
-#GET     /semiproduct/:pack         controllers.Semiproducts.details(pack:Int)
+GET     /semiproduct/:pack/semiproducts  controllers.Semiproducts.listSemiproducts(pack:Int)
 
-#GET	/partdef					controllers.PartDefinitions.list
+GET	    /partdef					controllers.PartDefinitions.list
 
 GET		/partdef/add				controllers.PartDefinitions.add
 
@@ -27,6 +27,8 @@ GET		/partdef/:id/edit			controllers.PartDefinitions.edit(id:Int)
 
 POST	/partdef/:id/edit			controllers.PartDefinitions.update(id:Int)
 
+GET     /cuttingplan                controllers.CuttingPlans.list
+
 GET		/cuttingplan/add			controllers.CuttingPlans.add
 
 POST	/cuttingplan/add			controllers.CuttingPlans.save
@@ -35,6 +37,8 @@ GET		/cuttingplan/:id/edit		controllers.CuttingPlans.edit(id:Int)
 
 POST	/cuttingplan/:id/edit		controllers.CuttingPlans.update(id:Int)
 
+GET     /order/                     controllers.OrderController.list
+        
 GET		/order/add					controllers.OrderController.add
 
 POST	/order/add					controllers.OrderController.save
@@ -43,6 +47,8 @@ GET		/order/:id/edit				controllers.OrderController.edit(id:Int)
 
 POST	/order/:id/edit				controllers.OrderController.update(id:Int)
         
+GET     /cutting                    controllers.CuttingController.list
+        
 GET     /cutting/add                controllers.CuttingController.add
 
 POST	/cuntting/add				controllers.CuttingController.save
@@ -50,6 +56,12 @@ POST	/cuntting/add				controllers.CuttingController.save
 GET		/cutting/:id/edit			controllers.CuttingController.edit(id:Int)
 
 POST	/cutting/:id/edit			controllers.CuttingController.update(id:Int)
+        
+GET     /file/:ref                  controllers.TemporaryFileManager.download(ref)
+        
+POST    /file/upload                controllers.TemporaryFileManager.upload
 
+GET     /assets/javascripts/tempFileRoutes.js controllers.JSRoutes.tempFileRoutes
+        
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

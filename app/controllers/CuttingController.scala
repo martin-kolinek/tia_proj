@@ -41,6 +41,8 @@ object CuttingController extends Controller with ObjectController[CuttingDesc]
     def saveRoute = routes.CuttingController.save
 
     def updateRoute = routes.CuttingController.update _
+
+    def listRoute = routes.CuttingController.list
     
     def listTemplate = views.html.cutting.list.apply
 }

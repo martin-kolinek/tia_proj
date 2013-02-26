@@ -21,6 +21,8 @@ trait ObjectController[ObjectType] {
 	def saveRoute:Call
 	
 	def updateRoute:Int => Call
+
+    def listRoute:Call
 	
 	def add = Action{
         val m = model
@@ -36,10 +38,10 @@ trait ObjectController[ObjectType] {
             implicit session =>
 		    val binding = form.bindFromRequest
 		    binding.fold(
-			    errFrm => BadRequest(template(form, saveRoute)),
+			    errFrm => BadRequest(template(errFrm, saveRoute)),
 			    obj => {
 					m.insert.apply(obj)
-					Ok("inserted")
+					Redirect(listRoute)
 			    })
         }
 	}
@@ -48,7 +50,7 @@ trait ObjectController[ObjectType] {
 		val m = model
 		m.withTransaction { implicit session =>
 			m.get.apply(id) match {
-				case None => BadRequest("Unknown id")
+				case None => NotFound
 				case Some(obj) => Ok(template(form.fill(obj), updateRoute(id)))
 			}
 		}
@@ -63,7 +65,7 @@ trait ObjectController[ObjectType] {
 				errFrm => BadRequest(template(errFrm, updateRoute(id))),
 				obj => {
 				    m.update.apply(id, obj)
-				    Ok("updated")
+				    Redirect(listRoute)
 				})
 	    }
     }

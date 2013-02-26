@@ -38,6 +38,8 @@ object CuttingPlans extends Controller with ObjectController[CuttingPlanDesc]
 	def saveRoute = routes.CuttingPlans.save
 	
 	def updateRoute = routes.CuttingPlans.update
+
+    def listRoute = routes.CuttingPlans.list
 	
 	def listTemplate = views.html.cutplan.list.apply 
 }

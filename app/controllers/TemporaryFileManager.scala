@@ -31,10 +31,7 @@ object TemporaryFileStorage {
 	}
 	
 	def retrieveFile(ref:String) = synchronized {
-		val res = for{
-			file <- hm.get(ref)
-			manag = managed(scala.io.Source.fromFile(file.file))
-		} yield manag.acquireAndGet(_.map(_.toByte).toArray)
+		val res = getFile(ref)
 		deleteFile(ref)
 		res
 	}
@@ -54,12 +51,23 @@ object TemporaryFileStorage {
 			res
 		}
 	}
+  
+    def getFile(ref:String) = synchronized {
+        for{
+			file <- hm.get(ref)
+			manag = managed(scala.io.Source.fromFile(file.file))
+		} yield manag.acquireAndGet(_.map(_.toByte).toArray)
+    }
 }
 
 object TemporaryFileManager extends Controller {	
 	def upload = Action(parse.temporaryFile){ request =>
 		Ok(TemporaryFileStorage.addFile(request.body))
 	}
+  
+    def download(ref:String) = Action{
+        TemporaryFileStorage.getFile(ref).map(x=>Ok(x)).getOrElse(NotFound)
+    }
 	
 	val tempFileMapping = nonEmptyText.
 			transform(TemporaryFileStorage.retrieveFile, {

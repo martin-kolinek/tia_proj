@@ -1,4 +1,16 @@
-@(field:Field)
+@(field: play.api.data.Field, args: (Symbol,Any)*)(implicit handler: helper.FieldConstructor, lang: play.api.i18n.Lang)
 
-<input type="file" id="TODO" />
-<input type="hidden" id="@field.id" name="@field.name" value="@field.value" />
+@helper.input(field, args:_*) { (id, name, value, htmlArgs) =>
+    <input type="hidden" id="@id" name="@name" value="@value" />
+    @defining(id+"_file") { fileId =>
+        <input type="file" id="@fileId" @toHtmlArgs(htmlArgs) />
+    
+        <a href='@routes.TemporaryFileManager.download(value.getOrElse(""))'>current</a>
+        @helper.requireJs(core = routes.Assets.at("javascripts/require.js").url, module = routes.Assets.at("javascripts/main").url)
+        <script type="text/javascript">
+          require(["tempFileUpload"], function(upl) {
+            upl.upload("@fileId")
+          })
+        </script>
+    }
+}
