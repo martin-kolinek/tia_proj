@@ -10,5 +10,8 @@ trait SemiproductList extends ObjectListModel[PackForList] {
 	self:DBAccess with Semiproducts =>
 	import profile.simple._
 	
-	//def list(implicit s:Session) = packQuery.list
+    def extractPackForList(shp:OptionShape, pck:DBPack, mat:DBMaterial) = 
+        PackForList(pck.id, pck.heatNo, pck.deliveryDate, pck.unlimited, MaterialDesc(mat.name), extractShape(shp))
+
+	def list(implicit s:Session) = packQuery.list.map((extractPackForList _).tupled)
 }
