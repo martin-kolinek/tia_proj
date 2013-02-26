@@ -18,7 +18,7 @@ create sequence "shape_id_seq";
 create sequence "sheet_id_seq";
 create sequence "square_pipe_id_seq";
 create table "circle_pipe" ("id" int NOT NULL DEFAULT nextval('circle_pipe_id_seq') PRIMARY KEY,"shape_id" INTEGER NOT NULL,"thickness" DECIMAL(21,2) NULL,"radius" DECIMAL(21,2) NULL);
-create table "cutting" ("id" int NOT NULL DEFAULT nextval('cutting_id_seq') PRIMARY KEY,"finish_time" TIMESTAMP,"semiproduct_id" INTEGER NOT NULL);
+create table "cutting" ("id" int NOT NULL DEFAULT nextval('cutting_id_seq') PRIMARY KEY,"finish_time" TIMESTAMP,"semiproduct_id" INTEGER NOT NULL, "cutplan_id" INTEGER NOT NULL);
 create table "cutting_plan" ("id" int NOT NULL DEFAULT nextval('cutting_plan_id_seq') PRIMARY KEY,"name" VARCHAR(254) NOT NULL,"file" BYTEA NOT NULL,"hidden" BOOLEAN NOT NULL,"filter" VARCHAR(254) NOT NULL);
 create table "extended_circle_pipe" ("id" int NOT NULL DEFAULT nextval('extended_circle_pipe_id_seq') PRIMARY KEY,"circle_pipe_id" INTEGER NOT NULL,"length" DECIMAL(21,2) NULL);
 create table "extended_sheet" ("id" int NOT NULL DEFAULT nextval('extended_sheet_id_seq') PRIMARY KEY,"sheet_id" INTEGER NOT NULL,"width" DECIMAL(21,2) NULL,"height" DECIMAL(21,2) NULL);
@@ -32,7 +32,7 @@ create table "part_def_in_cut_plan" ("cut_plan_id" INTEGER NOT NULL,"part_def_id
 alter table "part_def_in_cut_plan" add constraint "pk_part_def_in_cut_plan" primary key("cut_plan_id","part_def_id");
 create table "part_def_in_order" ("order_id" INTEGER NOT NULL,"part_def_id" INTEGER NOT NULL,"count" INTEGER NOT NULL,"filter" VARCHAR(254) NOT NULL);
 alter table "part_def_in_order" add constraint "pk_part_def_in_order" primary key("order_id","part_def_id");
-create table "semiproduct" ("id" int NOT NULL DEFAULT nextval('semiproduct_id_seq') PRIMARY KEY,"serial_no" VARCHAR(254) NOT NULL);
+create table "semiproduct" ("id" int NOT NULL DEFAULT nextval('semiproduct_id_seq') PRIMARY KEY, "pack_id" int NOT NULL, "serial_no" VARCHAR(254) NOT NULL);
 create table "shape" ("id" int NOT NULL DEFAULT nextval('shape_id_seq') PRIMARY KEY);
 create table "sheet" ("id" int NOT NULL DEFAULT nextval('sheet_id_seq') PRIMARY KEY,"shape_id" INTEGER NOT NULL,"thickness" DECIMAL(21,2) NULL);
 create table "square_pipe" ("id" int NOT NULL DEFAULT nextval('square_pipe_id_seq') PRIMARY KEY,"shape_id" INTEGER NOT NULL,"thickness" DECIMAL(21,2) NULL,"diameter" DECIMAL(21,2) NULL);
@@ -49,10 +49,11 @@ alter table "part_def_in_cut_plan" add constraint "fk_part_def_in_cut_plan_part_
 alter table "part_def_in_cut_plan" add constraint "fk_part_def_in_cut_plan_cut_plan" foreign key("cut_plan_id") references "cutting_plan"("id") on update NO ACTION on delete NO ACTION;
 alter table "part_def_in_order" add constraint "fk_part_def_in_order_order" foreign key("order_id") references "order"("id") on update NO ACTION on delete NO ACTION;
 alter table "part_def_in_order" add constraint "fk_part_def_in_order_part_def" foreign key("part_def_id") references "part_definition"("id") on update NO ACTION on delete NO ACTION;
-alter table "semiproduct" add constraint "fk_semiproduct_pack" foreign key("id") references "pack"("id") on update NO ACTION on delete NO ACTION;
+alter table "semiproduct" add constraint "fk_semiproduct_pack" foreign key("pack_id") references "pack"("id") on update NO ACTION on delete NO ACTION;
 alter table "sheet" add constraint "fk_sheet_shape" foreign key("shape_id") references "shape"("id") on update NO ACTION on delete NO ACTION;
 alter table "square_pipe" add constraint "fk_square_pipe_shape" foreign key("shape_id") references "shape"("id") on update NO ACTION on delete NO ACTION;
-
+alter table "cutting" add constraint "fk_cutting_semiproduct" foreign key("semiproduct_id") references "semiproduct"("id") on update NO ACTION on delete NO ACTION;
+alter table "cutting" add constraint "fk_cutting_cutting_plan" foreign key("cutplan_id") references "cutting_plan"("id") on update NO ACTION on delete NO ACTION;
 # --- !Downs
 
 alter table "circle_pipe" drop constraint "fk_circle_pipe_shape";
@@ -71,6 +72,8 @@ alter table "part_def_in_order" drop constraint "fk_part_def_in_order_part_def";
 alter table "semiproduct" drop constraint "fk_semiproduct_pack";
 alter table "sheet" drop constraint "fk_sheet_shape";
 alter table "square_pipe" drop constraint "fk_square_pipe_shape";
+alter table "cutting" drop constraint "fk_cutting_semiproduct";
+alter table "cutting" drop constraint "fk_cutting_cutting_plan";
 drop table "circle_pipe";
 drop table "cutting";
 drop table "cutting_plan";

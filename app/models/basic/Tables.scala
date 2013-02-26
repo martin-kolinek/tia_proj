@@ -161,7 +161,7 @@ trait Tables { this:DBAccess =>
     
     object Semiproduct extends Table[(Int, Int, String)]("semiproduct") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    	def packId = column[Int]("id")
+    	def packId = column[Int]("pack_id")
     	def serialNo = column[String]("serial_no")
     	def * = id ~ packId ~ serialNo
     	def pack = foreignKey("fk_semiproduct_pack", packId, Pack)(_.id)
@@ -172,7 +172,10 @@ trait Tables { this:DBAccess =>
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def finishTime = column[Option[DateTime]]("finish_time")
     	def semiproductId = column[Int]("semiproduct_id")
+        def cuttingPlanId = column[Int]("cutplan_id")
     	def * = id ~ finishTime ~ semiproductId
+        def semiproduct = foreignKey("fk_cutting_semiproduct", semiproductId, Semiproduct)(_.id)
+        def cuttingPlan = foreignKey("fk_cutting_cutting_plan", cuttingPlanId, CuttingPlan)(_.id)
     }
 }
 
