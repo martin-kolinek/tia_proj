@@ -1,4 +1,4 @@
-@(frm:Form[models.cutplan.CuttingPlanDesc], replyTo:Call)
+@(frm:Form[models.cutplan.CuttingPlanDesc], replyTo:Call, header:String)
 
 @pdefInput(fld:Field, cls:String) = {
     <div class="@cls">
@@ -10,6 +10,10 @@
 
 @main("Cutting plans") {
 
+    <h3>
+      @header cutting plan
+    </h3>
+    
 	@helper.form(action = replyTo) {
 		@helper.inputText(frm("name"))
 		@helper.inputText(frm("filter"))

@@ -1,5 +1,9 @@
-@(frm:Form[models.cutting.CuttingDesc], replyTo:Call)
+@(frm:Form[models.cutting.CuttingDesc], replyTo:Call, header:String)
 
+@main("Cutting plan") {
+<h3>
+  @header cutting plan
+</h3>
 @helper.form(action = replyTo) {
 	@helper.inputText(frm("semiproduct"))
 	@helper.inputText(frm("cuttin_plan"))
@@ -12,4 +16,6 @@
 	}
     
   	<input type="submit" value="Submit" />
+}
+
 }

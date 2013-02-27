@@ -1,5 +1,5 @@
 @(sps:Seq[models.semiproduct.PackForList])
-
+@main("Pack list") {
 <h3>
 	Pack list
 </h3>
@@ -46,7 +46,10 @@
 			</td>
 			<td>
 				<a href="@routes.Semiproducts.edit(sp.id)">edit</a>
+                <a href="@routes.Semiproducts.listSemiproducts(sp.id)">semiproducts</a>
 			</td>
 		</tr>
 	}
 </table>
+
+}

@@ -57,6 +57,10 @@ GET		/cutting/:id/edit/			controllers.CuttingController.edit(id:Int)
 
 POST	/cutting/:id/edit/			controllers.CuttingController.update(id:Int)
         
+GET     /cutting/:id/finish/        controllers.CuttingController.finish(id:Int)
+        
+POST    /cutting/:id/finish/        controllers.CuttingController.updateFinish(id:Int)
+        
 GET     /file/:ref                  controllers.TemporaryFileManager.download(ref)
         
 POST    /file/upload/               controllers.TemporaryFileManager.upload

@@ -1,4 +1,4 @@
-@(frm:Form[models.semiproduct.PackDesc], replyTo:Call)
+@(frm:Form[models.semiproduct.PackDesc], replyTo:Call, header:String)
 
 @import views.html.main
 
@@ -11,7 +11,9 @@
 }
 
 @main("Semiproducts") {
-
+    <h3>
+      @header semiproduct
+    </h3>
 	@helper.form(action = replyTo) {
 		@helper.inputText(frm("heat"))
 		@helper.inputDate(frm("delivery"))

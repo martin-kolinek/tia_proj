@@ -9,7 +9,7 @@ import shapeless._
 import shapeless.HList._
 import shapeless.Tuples._
 
-case class OrderDesc(name:String, fillingDate:DateTime, dueDate:Option[DateTime], status:OrderStatus, partdefs:List[PartDefInOrder])
+case class OrderDesc(name:String, fillingDate:DateTime, dueDate:Option[DateTime], partdefs:List[PartDefInOrder])
 
 case class PartDefInOrder(partDefId:Int, filter:String, count:Int)
 
@@ -23,7 +23,7 @@ trait Orders extends Tables {
     def getOrder(id:Int)(implicit session:Session) = {
         val q = for {
             ord <- Order
-        } yield (ord.name, ord.fillingDate, ord.dueDate, ord.status)
+        } yield (ord.name, ord.fillingDate, ord.dueDate)
         val q2 = for {
             pdef <- PartDefinitionInOrder if pdef.orderId === id
         } yield (pdef.partDefId, pdef.filter, pdef.count)
@@ -36,7 +36,7 @@ trait Orders extends Tables {
         Query(Order).filter(_.id === id).firstOption.isDefined
 
     def insertOrder(ord:OrderDesc)(implicit session:Session) = {
-        val id:Int = Order.forInsert.insert((ord.name, ord.fillingDate, ord.dueDate, ord.status))
+        val id:Int = Order.forInsert.insert((ord.name, ord.fillingDate, ord.dueDate, Accepted))
         PartDefinitionInOrder.insertAll(ord.partdefs.map(x=>(id, x.partDefId, x.count, x.filter)):_*) 
         id
     }
@@ -44,8 +44,8 @@ trait Orders extends Tables {
     def updateOrder(id:Int, ord:OrderDesc)(implicit session:Session) = {
     	val q = for {
     		dbo <- Order if dbo.id === id
-    	} yield dbo.name ~ dbo.fillingDate ~ dbo.dueDate ~ dbo.status
-    	q.update(ord.name, ord.fillingDate, ord.dueDate, ord.status)
+    	} yield dbo.name ~ dbo.fillingDate ~ dbo.dueDate
+    	q.update(ord.name, ord.fillingDate, ord.dueDate)
     	(for {
     		pdef <- PartDefinitionInOrder
     		if pdef.orderId === id

@@ -12,7 +12,7 @@ trait ObjectController[ObjectType] {
 	self:Controller =>
 	def form(implicit session:scala.slick.session.Session):Form[ObjectType]
 	
-	def template: (Form[ObjectType], Call) => Html
+	def template: (Form[ObjectType], Call, String) => Html
 	
     type ModelType <: DBAccess with ObjectModel[ObjectType]
 
@@ -28,7 +28,7 @@ trait ObjectController[ObjectType] {
         val m = model
         m.withTransaction {
             implicit s=>
-		    Ok(template(form, saveRoute))
+		    Ok(template(form, saveRoute, "Add"))
         }
 	}
 	
@@ -38,7 +38,7 @@ trait ObjectController[ObjectType] {
             implicit session =>
 		    val binding = form.bindFromRequest
 		    binding.fold(
-			    errFrm => BadRequest(template(errFrm, saveRoute)),
+			    errFrm => BadRequest(template(errFrm, saveRoute, "Add")),
 			    obj => {
 					m.insert.apply(obj)
 					Redirect(listRoute)
@@ -51,7 +51,7 @@ trait ObjectController[ObjectType] {
 		m.withTransaction { implicit session =>
 			m.get.apply(id) match {
 				case None => NotFound
-				case Some(obj) => Ok(template(form.fill(obj), updateRoute(id)))
+				case Some(obj) => Ok(template(form.fill(obj), updateRoute(id), "Edit"))
 			}
 		}
 	}
@@ -62,7 +62,7 @@ trait ObjectController[ObjectType] {
             implicit session =>
 		    val binding = form.bindFromRequest
 		    binding.fold(
-				errFrm => BadRequest(template(errFrm, updateRoute(id))),
+				errFrm => BadRequest(template(errFrm, updateRoute(id), "Edit")),
 				obj => {
 				    m.update.apply(id, obj)
 				    Redirect(listRoute)

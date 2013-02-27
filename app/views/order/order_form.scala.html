@@ -1,4 +1,4 @@
-@(frm:Form[models.order.OrderDesc], replyTo:Call)
+@(frm:Form[models.order.OrderDesc], replyTo:Call, header:String)
 
 @pdefInput(fld:Field, cls:String) = {
     <div class="@cls">
@@ -10,7 +10,9 @@
 }
 
 @main("Order") {
-
+    <h3>
+      @header order
+    </h3>
 	@helper.form(action = replyTo) {
 		@helper.inputText(frm("name"))
 		@helper.inputDate(frm("filling_date"))

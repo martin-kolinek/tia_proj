@@ -17,6 +17,8 @@ case class CuttingDesc(semiprodId:Int, cutPlanId:Int, parts:List[PartInCuttingDe
 
 case class PartInCuttingDesc(partDefId:Int, orderId:Int, count:Int)
 
+case class FinishedPartInCutting(partDefId:Int, orderId:Int, dmgCount:Int)
+
 case class CuttingForList(id:Int, cutPlan:CuttingPlanForList, semiproduct:SemiproductForList, pack:PackForList)
 
 trait Cuttings extends CuttingPlans {
@@ -30,6 +32,11 @@ trait Cuttings extends CuttingPlans {
         val parts = getPartCounts(id) 
         cutting.map(x=>(x.hlisted ::: parts :: HNil).tupled).map(CuttingDesc.tupled)
     }
+
+    def getDamagedPartCounts(id:Int)(implicit session:Session) = 
+        Query(Part).filter(_.cuttingId === id).groupBy(x=>x.partDefId -> x.orderId).map {
+            case ((partDefId, orderId), rows) => (partDefId, orderId, rows.length)
+        }.list.map(FinishedPartInCutting)
     
     private def getPartCounts(id:Int)(implicit session:Session) = 
     	Query(Part).filter(_.cuttingId === id).filter(_.orderId.isNotNull).groupBy(x=>x.partDefId -> x.orderId).map{
@@ -83,7 +90,6 @@ trait Cuttings extends CuttingPlans {
     }
     
     def updateCutting(id:Int, cut:CuttingDesc)(implicit s:Session) {
-    	
         Cutting.filter(_.id === id).map(x=>x.semiproductId ~ x.cuttingPlanId).update(cut.semiprodId, cut.cutPlanId)
         val parts = Query(Part).filter(_.cuttingId === id).sortBy(_.partDefId).
             map(x=> x.id ~ x.partDefId ~ x.orderId).list
@@ -113,6 +119,12 @@ trait Cuttings extends CuttingPlans {
         			counts
         		}
         	}
+        }
+    }
+
+    def updateFinished(cutId:Int, fin:List[FinishedPartInCutting])(implicit s:Session) {
+        for(p<-fin) {
+            val q = Query(Part).filter(if(p.orderId.isEmpty) x => x.isNull else x=>x===p.orderId)
         }
     }
 }

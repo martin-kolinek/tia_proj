@@ -30,9 +30,6 @@ object OrderController extends Controller with ObjectController[OrderDesc]
 			"name" -> nonEmptyText,
 			"filling_date" -> jodaDate,
 			"due_date" -> optional(jodaDate),
-			"status" -> number.
-			    verifying("status out of bounds", OrderStatus.values.map(_.id).contains _).
-			    transform(OrderStatus.apply, (x:OrderStatusType) => x.id),
 			"pdefs" -> play.api.data.Forms.list(pdefMapping))
 			(OrderDesc)(OrderDesc.unapply))
 			

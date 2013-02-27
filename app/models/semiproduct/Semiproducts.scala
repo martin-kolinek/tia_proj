@@ -85,4 +85,6 @@ trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     }
 
     def existsSemiproduct(id:Int)(implicit session:Session) = Query(Semiproduct).filter(_.id === id).firstOption.isDefined
+
+    
 }

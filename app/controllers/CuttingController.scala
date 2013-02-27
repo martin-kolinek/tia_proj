@@ -17,6 +17,7 @@ import views.html.cutting.cutting_form
 import models.cutting.CuttingModel
 import models.cutting.CuttingForList
 import models.cutting.CuttingList
+import models.cutting.FinishedPartInCutting
 
 object CuttingController extends Controller with ObjectController[CuttingDesc] 
 		with ObjectListController[CuttingForList] {
@@ -45,4 +46,31 @@ object CuttingController extends Controller with ObjectController[CuttingDesc]
     def listRoute = routes.CuttingController.list
     
     def listTemplate = views.html.cutting.list.apply
+
+    def finishForm = Form(tuple(
+        "parts" -> play.api.data.Forms.list(mapping(
+            "partdefid" -> number,
+            "order" -> number,
+            "dmgcount" -> number
+            )(FinishedPartInCutting)(FinishedPartInCutting.unapply)
+        )))
+
+    def finish(id:Int) = Action {
+        model.withTransaction {implicit s =>
+            Ok(views.html.cutting.finish_form(model.getDamagedPartCounts(id)))
+        }
+    }
+
+    def updateFinish(id:Int) = Action { 
+        implicit req =>
+        val binding = finishForm.bindFromRequest
+        binding.fold(
+            errFrm => BadRequest(views.html.cutting.finish_form(errFrm)),
+            cnts => {
+                model.withTransaction { implicit s =>
+                    model.updateFinished(id, cnts)
+                }
+                Redirect(listRoute)
+            })
+    }
 }
