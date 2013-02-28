@@ -39,7 +39,13 @@ trait Cuttings extends CuttingPlans {
 
     def getDamagedPartCounts(id:Int)(implicit session:Session) =
     	sql"""
-    	SELECT part_def_id, order_id, count(id) FROM part where 
+    	SELECT part_def_id, order_id, c.cnt FROM part p,
+          (SELECT count(id) as cnt from part p2 
+            where p.part_def_id = p2.part_def_id and p.order_id=p2.order_id and p2.damaged=true and p.cutting_id=p2.cutting_id) c on
+        where 
+    	p.cutting_id = $id group by p.cutting_id, p.part_def_id, p.order_id 
+        UNION
+        SELECT part_def_id, order_id, count(id) FROM part where 
     	cutting_id = $id and damaged = true group by cutting_id, part_def_id, order_id 
     	""".as[(Int, Option[Int], Int)].list.map(FinishedPartInCutting.tupled)
     
