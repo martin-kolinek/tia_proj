@@ -1,14 +1,13 @@
-require(["jquery.dataTables", "semiproductRoutes", "bootstrap"], ->
+#require([], ->
     $(document).ready ->
         $("#main_list").dataTable(
             bFilter:false
-            bAutoWidth:false
             aoColumns: [
                 null,
                 null,
                 null,
                 null,
-                {bSortable:false, sWidth:"9em"}
+                {bSortable:false}
             ]
         )
 
@@ -17,8 +16,9 @@ require(["jquery.dataTables", "semiproductRoutes", "bootstrap"], ->
             $(this).click ->
                 semiproductRoutes.controllers.Semiproducts.listSemiproducts(pckid).ajax
                     success : (data, status, xhr) ->
-                        $("#sp_div").html(data)
+                        $("#sp_content_div").html(data)
                         $("#sp_div").modal("show")
+                        $("#semiprod_list").dataTable()
                     error : (xhr, status, err) ->
                         alert("error retrieving data" + status + " " + err)
-)
+#)

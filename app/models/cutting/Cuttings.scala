@@ -23,7 +23,7 @@ case class PartInCuttingDesc(partDefId:Int, orderDefId:Int, count:Int)
 
 case class FinishedPartInCutting(partDefId:Int, orderDefId:Option[Int], dmgCount:Int)
 
-case class CuttingForList(id:Int, cutPlan:CuttingPlanForList, semiproduct:SemiproductForList, pack:PackForList, finishTime:Option[DateTime]) {
+case class CuttingForList(id:Int, cutPlan:CuttingPlanForList, semiproductSerial:String, pack:PackForList, finishTime:Option[DateTime]) {
 	def finished = finishTime.isDefined
 }
 

@@ -1,27 +1,27 @@
 @(sps:List[models.semiproduct.SemiproductForList])
 
-<h3>
-	Semiproduct list
-</h3>
-
-<table>
+<table id="semiprod_list">
+  <thead>
 	<tr>
 		<th>
-			ID
+			Serial no.
 		</th>
-		<th>
-			serial no
-		</th>
+        <th>
+          Status
+        </th>
 	</tr>
+  </thead>
+  <tbody>
 	@for(sp <- sps) {
 		<tr>
 			<td>
-				@sp.id
-			</td>
-			<td>
 				@sp.serialNo
 			</td>
+            <td>
+              @sp.status
+            </td>
 		</tr>
 	}
+  </tbody>
 </table>
 
