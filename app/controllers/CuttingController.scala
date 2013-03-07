@@ -49,6 +49,12 @@ object CuttingController extends Controller with ObjectController[CuttingDesc]
         case _ => views.html.cutting.list.apply
     }
 
+    def addWithCP(cutPlanId:Int) = Action {
+        model.withTransaction{ implicit s =>
+            Ok(views.html.cutting.cutting_form(form.bind(Map("cutting_plan" -> cutPlanId.toString)), saveRoute, "Add"))
+        }
+    }
+
     def finMapping = mapping(
             "partdefid" -> number,
             "order" -> optional(number),

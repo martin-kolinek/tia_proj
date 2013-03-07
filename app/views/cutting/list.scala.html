@@ -1,15 +1,16 @@
 @(cuts:Seq[models.cutting.CuttingForList])
 
 @main("Cuttings", views.ObjectType.Cutting) {
+@helper.requireJs(core = routes.Assets.at("javascripts/require-jquery.js").url, 
+    module = routes.Assets.at("javascripts/cutting_list.js").url)
 } {
 
 <h3>
 	Cuttings
 </h3>
 
-<a href="@routes.CuttingController.add">new</a>
-
-<table>
+<table id="main_list">
+  <thead>
 	<tr>
 		<th>
 			Cutting plan name
@@ -33,6 +34,8 @@
 			Actions
 		</th>
 	</tr>
+  </thead>
+  <tbody>
 	@for(c<-cuts) {
 		<tr>
 			<td>
@@ -45,25 +48,25 @@
 				@c.semiproductSerial
 			</td>
 			<td>
-				@c.pack.material
+				@c.pack.material.name
 			</td>
 			<td>
-				@c.pack.shape
+				@c.pack.shape.description
 			</td>
 			<td>
 			    @c.finishTime
 			</td>
 			<td>
 			    @if(c.finished) {
-				    <a href="@routes.CuttingController.finish(c.id)">edit</a>
-                    <a href="@routes.CuttingController.listParts(c.id)">parts</a>
+				    <a class="btn" href="@routes.CuttingController.finish(c.id)">edit</a>
 				} else {
-				    <a href="@routes.CuttingController.edit(c.id)">edit</a>
-				    <a href="@routes.CuttingController.finish(c.id)">finish</a>
+				    <a class="btn" href="@routes.CuttingController.edit(c.id)">edit</a>
+				    <a class="btn" href="@routes.CuttingController.finish(c.id)">finish</a>
 				}
 			</td>
 		</tr>
 	}
+  </tbody>
 </table>
 
 }

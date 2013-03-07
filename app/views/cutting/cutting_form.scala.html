@@ -1,36 +1,38 @@
 @(frm:Form[models.cutting.CuttingDesc], replyTo:Call, header:String)
 
-@partInput(part:Field, cls:String) = {
-    <div class="@cls">
-        @helper.inputText(part("partdef"))
-        @helper.inputText(part("count"))
-        @helper.inputText(part("order_def"))
-        <a class="removePart">remove</a>
-    </div>
-}
+@import views.HorizontalForm._
 
 @main("Cutting", views.ObjectType.Cutting) {
+@helper.requireJs(core = routes.Assets.at("javascripts/require-jquery.js").url, 
+    module = routes.Assets.at("javascripts/cutting_form.js").url)
 } {
 <h3>
   @header cutting
 </h3>
-@helper.form(action = replyTo) {
-	@helper.inputText(frm("semiproduct"))
-	@helper.inputText(frm("cutting_plan"))
+@helper.form(action = replyTo, 'class -> "form-horizontal") {
+	@helper.input(frm("semiproduct"), '_label -> "Semiproduct") { (id, name, value, htmlArgs) =>
+        <input type="hidden" id="@id" name="@name" value="@value" @toHtmlArgs(htmlArgs) />
+        <div class="uneditable-input">
+        </div>
+    }
+	@helper.input(frm("cutting_plan"), '_label -> "Cutting plan") { (id, name, value, htmlArgs) =>
+        <input type="hidden" id="@id" name="@name" value="@value" @toHtmlArgs(htmlArgs) />
+        <div class="uneditable-input">
+        </div>
+    }
 	
 	<h4>Parts</h4>
-	@helper.repeat(frm("parts"), 0) { part =>
-		@partInput(part, "part")
-	}
+    @repeatingHelper(frm.apply, "parts", "Add part", "part_handle") { (part, remove) =>
+        @helper.inputText(part("partdef"), '_label -> "Part definition")
+        @helper.inputText(part("count"), '_label -> "Count")
+        @helper.inputText(part("order_def"), '_label -> "Order")
+        @horizontalInput(remove)
+    }    
     
-    @partInput(frm("parts[x]"), "partTemplate hidden")
-    
-    <br />
-    <a class="addButton" >Add part</a>
-    <br />
-    
-  	<input type="submit" value="Submit" />
-  	@helper.requireJs(core = routes.Assets.at("javascripts/require.js").url, module = routes.Assets.at("javascripts/cuttingForm").url)
+    <div class="form-horizontal">
+  	  <input class="btn btn-primary" type="submit" value="Submit" >Submit</input>
+      <a class="btn" href="@routes.CuttingController.list()">Cancel</a>
+    </div>
 }
 
 }

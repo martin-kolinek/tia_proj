@@ -60,6 +60,8 @@ GET     /cutting/                   controllers.CuttingController.list(template 
 GET     /cutting/add/               controllers.CuttingController.add
 
 POST	/cutting/add/				controllers.CuttingController.save
+        
+GET     /cutting/add/:cutplan       controllers.CuttingController.addWithCP(cutplan:Int)
 
 GET		/cutting/:id/edit/			controllers.CuttingController.edit(id:Int)
 

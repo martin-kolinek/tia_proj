@@ -17,7 +17,9 @@ case class PackDesc(heatNo:String,
 
 case class SemiproductDesc(serialNo:String) {}
 
-case class PackForList(id:Int, heatNo:String, deliveryDate:DateTime, unlimited:Boolean, material:MaterialDesc, shape:ShapeDesc)
+case class PackForList(id:Int, heatNo:String, deliveryDate:DateTime, unlimited:Boolean, material:MaterialDesc, shape:ShapeDesc) {
+    def description = s"${material.name} ${shape.description} $heatNo"
+}
 
 case class SemiproductForList(id:Int, serialNo:String, status:SemiproductStatusType)
 
@@ -84,6 +86,4 @@ trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     }
 
     def existsSemiproduct(id:Int)(implicit session:Session) = Query(Semiproduct).filter(_.id === id).firstOption.isDefined
-
-    
 }

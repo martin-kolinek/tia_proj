@@ -88,11 +88,13 @@ object Semiproducts extends Controller with ObjectController[PackDesc] with Obje
     def listRoute = routes.Semiproducts.list()
 	
 	def listTemplates = {
+        case "table" => views.html.semiproduct.list_select.apply
         case _ => views.html.semiproduct.list.apply
     }
 
     def spListTemplates: String => Seq[models.semiproduct.SemiproductForList] => Html = {
         case "table" => views.html.semiproduct.list_semiprod.apply
+        case "dropdown" => views.html.semiproduct.list_semiprod_dropdown.apply
         case "_" => views.html.semiproduct.list_semiprod_main.apply
     }
 

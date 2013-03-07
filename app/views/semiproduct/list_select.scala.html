@@ -19,7 +19,7 @@
   </thead>
   <tbody>
     @for(sp <- sps) {
-	  <tr data-pack-id="@sp.id">
+	  <tr data-pack-id="@sp.id" data-description="@sp.description">
 		<td>
 		  @sp.heatNo
 		</td>
@@ -36,3 +36,12 @@
     }
   </tbody>
 </table>
+
+<div id="sel-list-modal" class="hide modal fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>Pick semiproduct</h3>
+  </div>
+  <div id="sel-list-modal-content">
+  </div>
+</div>

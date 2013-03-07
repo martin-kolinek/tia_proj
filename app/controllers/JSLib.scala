@@ -13,6 +13,7 @@ object JSLib extends Controller {
               TemporaryFileManager.upload,
               TemporaryFileManager.download,
               Semiproducts.listSemiproducts,
+              Semiproducts.list,
               PartDefinitions.list,
               PartDefinitions.partDefDescription
           )

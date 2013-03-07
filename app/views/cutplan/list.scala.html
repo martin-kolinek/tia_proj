@@ -36,7 +36,7 @@
 				</td>
 				<td>
 					<a class="btn" href="@routes.CuttingPlans.edit(cp.id)">Edit</a>
-                    <a class="btn add_cutting" data-cpid="@cp.id">Create cutting</a>
+                    <a class="btn add_cutting" href="@routes.CuttingController.addWithCP(cp.id)">Create cutting</a>
 				</td>
 			</tr>
 		}
