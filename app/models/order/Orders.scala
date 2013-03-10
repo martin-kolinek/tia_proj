@@ -11,6 +11,8 @@ import shapeless.Tuples._
 import scalaz.std.option._
 import org.joda.time.format.DateTimeFormat
 import models.partdef.PartDefinitionForList
+import scala.slick.jdbc.{GetResult, StaticQuery => Q}
+import Q.interpolation
 
 case class OrderDesc(name:String, fillingDate:DateTime, dueDate:Option[DateTime], defs:List[OrderDefinitionDesc])
 
@@ -23,7 +25,7 @@ case class OrderForList(id:Int, name:String, fillingDate:DateTime, dueDate:Optio
 
 case class OrderDefStatus(odefId:Int, parts:List[PartInOrder])
 
-case class PartInOrder(partId:Int)
+case class PartInOrder(basicShapeId:Int, materialId:Int, count:Int)
 
 case class OrderDefForList(id:Int, orderName:String, partDefName:String, filter:String, count:Int) {
 	def description = s"$orderName - $partDefName ($filter)"
@@ -83,27 +85,37 @@ trait Orders extends Tables {
     	val defs = Query(OrderDefinition).filter(_.orderId === id).map(_.id).list
         Query(Part).filter(_.orderDefId.inSet(defs)).map(_.orderDefId).update(None)
         val partCounts = Query(OrderDefinition).filter(_.orderId === id).map(x=>x.id -> x.count).list.toMap
-        for(status<-statuses) {
-            val toAdd = math.min(partCounts(status.odefId), status.parts.size)
-            for(part<-status.parts.take(toAdd)) {
-                Query(Part).filter(_.id === part.partId).map(_.orderDefId).update(some(status.odefId))
+        for{
+            status <- statuses
+            partStatus <- status.parts
+        } {
+            val have = Query(Query(Part).filter(_.orderDefId === status.odefId).length).first
+            val toAdd = math.min(partCounts(status.odefId) - have, partStatus.count)
+            val q = for {
+                p <- Part if !p.damaged && p.orderDefId.isNull
+                c <- Cutting if p.cuttingId === c.id
+                sp <- Pack if sp.id === c.semiproductId && sp.materialId === partStatus.materialId
+                shp <- Shape if shp.id === sp.shapeId && shp.basicShapeId === partStatus.basicShapeId
+            } yield p.id
+            q.take(toAdd).list.foreach { id =>
+                Query(Part).filter(_.id === id).map(_.orderDefId).update(some(status.odefId))
             }
         }
         tryFinishOrders(Query(Order).filter(_.id===id))
     }
 
-    def orderDefParts(orderDefId:Int)(implicit s:Session) = {
-        val q = for {
-            p <- Part
-            c <- Cutting if p.cuttingId === c.id && p.orderDefId === some(orderDefId) && 
-                c.finishTime.isNotNull && p.damaged === false
-        } yield p.id
-        q.list.map(PartInOrder)
-    }
-
     def orderStatus(id:Int)(implicit s:Session) = {
-        Query(OrderDefinition).filter(_.orderId === id).map(_.id).list.map(x=> x -> orderDefParts(x)).
-            map(OrderDefStatus.tupled)
+        sql"""
+        select od.id, count(p.id), sp.material_id, shp.basic_id from "order" o 
+          inner join order_definition od on o.id = od.order_id 
+          inner join part p on p.order_def_id = od.id
+          inner join cutting c on c.id = p.cutting_id
+          inner join pack sp on sp.id = c.semiproduct_id
+          inner join shape shp on shp.id = sp.shape_id
+        where o.id=$id
+        group by shp.basic_id, sp.material_id, od.id""".as[(Int, Int, Int, Int)].list.groupBy(_._1).map {
+            case (odid, lst) => OrderDefStatus(odid, lst.map(x=>(x._2, x._3, x._4)).map(PartInOrder.tupled))
+        }.toList
     }
 
     def tryFinishOrders[E](orders:Query[Order.type, E])(implicit s:Session) {

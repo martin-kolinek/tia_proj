@@ -16,9 +16,8 @@
     </h3>
 	@helper.form(action = replyTo, 'class -> "form-horizontal") {
         @helper.repeat(frm("statuses"), 0) { st =>
-            <div>
-              <h5>Order definition </h5>
-              <input type="hidden" id="@{st("odefid").id}" name="@{st("odefid").name}" value="@{st("odefid").value}" />
+            <div class="well">
+              @odefInput(st("odefid"), "odefhandle")
               @helper.repeat(st("parts"), 0) { part =>
                   @partField(part, "part")
               }

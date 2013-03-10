@@ -55,7 +55,9 @@ object OrderController extends Controller with ObjectController[OrderDesc]
         "statuses" -> play.api.data.Forms.list(mapping(
             "odefid" -> number,
             "parts" -> play.api.data.Forms.list(mapping(
-                "part" -> number
+                "semiproduct" -> number,
+                "material" -> number,
+                "count" -> number
             )(PartInOrder)(PartInOrder.unapply))
         )(OrderDefStatus)(OrderDefStatus.unapply))))
 
