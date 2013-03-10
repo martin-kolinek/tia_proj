@@ -13,11 +13,8 @@ object ShapeOptionTypes {
 
 import ShapeOptionTypes._
 
-class ShapeDesc protected() {
-	def description = "something" 
-}
-
-object ShapeDesc extends ShapeDesc {
+trait ShapeDesc {
+	def description:String
 }
 
 object ShapeHelpers {
@@ -28,16 +25,20 @@ object ShapeHelpers {
 
 import ShapeHelpers._
 
+case object UnknownShapeDesc extends ShapeDesc {
+    def description = "something"
+}
+
 case class SheetDesc(thickness:Option[BigDecimal], width:Option[BigDecimal], height:Option[BigDecimal]) extends ShapeDesc {
-	override def description = opt"sheet - $thickness mm, $width x $height"
+    def description = opt"sheet - $thickness mm, $width x $height"
 }
 
 case class CirclePipeDesc(thickness:Option[BigDecimal], radius:Option[BigDecimal], length:Option[BigDecimal]) extends ShapeDesc {
-	override def description = opt"circle pipe - $thickness, R=$radius, L=$length" 
+    def description = opt"circle pipe - $thickness, R=$radius, L=$length" 
 } 
 
 case class SquarePipeDesc(thickness:Option[BigDecimal], diameter:Option[BigDecimal], length:Option[BigDecimal]) extends ShapeDesc {
-	override def description = opt"square pipe - $thickness, D=$diameter, L=$length"
+    def description = opt"square pipe - $thickness, D=$diameter, L=$length"
 }
 
 trait Shapes extends Tables { this:DBAccess =>
@@ -53,56 +54,80 @@ trait Shapes extends Tables { this:DBAccess =>
 		
 	def optionExtendedPipe(p:ExtendedPipe.type) = p.id.? ~ p.length //<> (OptionExtendedPipe, OptionExtendedPipe.unapply _)
 		
-    def basicShapeJoin = for{
-    	((((((shape, sheet), circ), square), extSheet), extCirc), extSquare) <- Shape leftJoin 
-    	    Sheet on (_.id === _.shapeId) leftJoin 
-    	    CirclePipe on (_._1.id === _.shapeId) leftJoin
-    	    SquarePipe on (_._1._1.id === _.shapeId) leftJoin
-    	    ExtendedSheet on (_._1._1._2.id === _.sheetId) leftJoin
-    	    ExtendedCirclePipe on (_._1._1._2.id === _.circlePipeId) leftJoin
-    	    ExtendedSquarePipe on (_._1._1._2.id === _.squarePipeId)
-    } yield (shape.id, optionSheet(sheet), optionCirclePipe(circ), optionSquarePipe(square), optionExtendedSheet(extSheet), optionExtendedCirclePipe(extCirc), optionExtendedSquarePipe(extSquare))
+    def basicShapeJoin = for {
+        (((shape, sheet), circ), square) <- CommonShape leftJoin
+            Sheet on (_.id === _.commonShapeId) leftJoin
+            CirclePipe on (_._1.id === _.commonShapeId) leftJoin
+            SquarePipe on (_._1._1.id === _.commonShapeId)
+    } yield (shape.id, optionSheet(sheet), optionCirclePipe(circ), optionSquarePipe(square))
 
-    type OptionShape = (Int, OptionSheet, OptionCirclePipe, OptionSquarePipe, OptionExtendedSheet, OptionExtendedPipe, OptionExtendedPipe)
+    def extendedShapeJoin = for {
+        ((shape, extSheet), extPipe) <- CommonShape leftJoin
+            ExtendedSheet on (_.id === _.commonShapeId) leftJoin
+            ExtendedPipe on (_.id === _.commonShapeId)
+    } yield (shape.id, optionExtendedSheet(extSheet), optionExtendedPipe(extPipe))
+
+    def shapeQuery = for {
+        shp <- Shape
+        (bid, sheet, circ, square) <- basicShapeJoin if bid === shp.basicShapeId
+        (eid, extSheet, extPipe) <- extendedShapeJoin if eid === shp.extendedShapeId
+    } yield (shp, sheet, circ, square, extSheet, extPipe)
+
+    type OptionShape = ((Int, Int, Option[Int]), 
+                        OptionSheet, OptionCirclePipe, OptionSquarePipe, OptionExtendedSheet, OptionExtendedPipe)
     
-    def extractShape: OptionShape => ShapeDesc = {
-    	case (_, (Some(_), thick), _, _, (_, width, height), _, _) => SheetDesc(thick, width, height)
-    	case (_, _, (Some(_), rad, thick), _, _, (_, len), _) => CirclePipeDesc(thick, rad, len)
-    	case (_, _, _, (Some(_), diam, thick), _, _, (_, len)) => SquarePipeDesc(thick, diam, len)
-    	case _ => ShapeDesc
+    def extractShape: ((
+    	case (_, (Some(_), thick), _, _, (_, width, height), _) => SheetDesc(thick, width, height)
+    	case (_, _, (Some(_), thick, rad), _, _, (_, len)) => CirclePipeDesc(thick, rad, len)
+    	case (_, _, _, (Some(_), thick, diam), _, (_, len)) => SquarePipeDesc(thick, diam, len)
+    	case _ => UnknownShapeDesc
     }
     
     private val nextval = SimpleFunction.unary[String, Int]("nextval")
     
-    private def insertEmptyShape()(implicit session:Session) = Shape.forInsert.insert(Query(nextval("shape_id_seq"))).head
+    private def insertEmptyCommonShape()(implicit session:Session) = CommonShape.forInsert.insert(Query(nextval("common_shape_id_seq"))).head
     
     private def optionEqualDec(c1:Column[Option[BigDecimal]], c2:Column[Option[BigDecimal]]) = c1 === c2 || (c1.isNull && c2.isNull)
+
+    private def optionEqual[T](c1:Column[Option[T]], c2:Column[Option[T]]) = c1 === c2 || (c1.isNull && c2.isNull)
     
-    private def getShapeId(shp:ShapeDesc)(implicit session:Session) = {
-    	val q = for {
-    		(id, sheet, circ, square, extSheet, extCirc, extSquare) <- basicShapeJoin
-    		if (shp match {
-    			case SheetDesc(thick, None, None) => sheet._1.isNotNull && extSheet._1.isNull &&
-    					optionEqualDec(thick, sheet._2)
-    			case SheetDesc(t, w, h) => optionEqualDec(t, sheet._2) &&
-    			        optionEqualDec(w, extSheet._2) && optionEqualDec(h, extSheet._3)
-    			        
-    			case CirclePipeDesc(thick, rad, None) => circ._1.isNotNull && extCirc._1.isNull &&
-    			        optionEqualDec(thick, circ._3) && optionEqualDec(rad, circ._2)
-    			case CirclePipeDesc(thick, rad, len) => optionEqualDec(thick, circ._3) &&
-    			        optionEqualDec(rad, circ._2) && optionEqualDec(len, extCirc._2)
-    			
-    			case SquarePipeDesc(thick, diam, None) => square._1.isNotNull && extSquare._1.isNull &&
-    			        optionEqualDec(thick, square._3) && optionEqualDec(diam, square._2)
-    			case SquarePipeDesc(thick, diam, len) => optionEqualDec(thick, square._3) &&
-    			        optionEqualDec(diam, square._2) && optionEqualDec(len, extSquare._2)
-    			case _ => sheet._1.isNull && circ._1.isNull && square._1.isNull.?
-    		})
-    	} yield id
-    	q.firstOption
+    private def getBasicShapeId(shp:ShapeDesc)(implicit s:Session) = {
+        val q = for {
+            (bid, (sheetId, sheetThick), (circId, circThick, circRad), (squareId, squareThick, squareDiam)) <- basicShapeJoin
+            if(shp match {
+                case SheetDesc(thick, _, _) => sheetId.isNotNull && optionEqualDec(thick, sheetThick)
+                case CirclePipeDesc(thick, rad, _) => circId.isNotNull && optionEqualDec(thick, circThick) && optionEqualDec(rad, circRad)
+                case SquarePipeDesc(thick, diam, _) => squareId.isNotNull && optionEqualDec(thick, squareThick) && optionEqualDec(diam, squareDiam)
+            })
+        } yield bid
+        q.firstOption
     }
-    
+
+    private def getExtendedShapeId(shp:ShapeDesc)(implicit s:Session) = {
+        val q = for {
+            (eid, (sheetId, sheetWidth, sheetHeight), (pipeId, pipeLength)) <- extendedShapeId
+            if(shp match {
+                case SheetDesc(_, width, height) => sheetId.isNotNull && optionEqualDesc(width, sheetWidth), optionEqualDesc(height, sheetHeight)
+                case CirclePipeDesc(_, _, len) | SquarePipeDesc(_, _, len) => pipeId.isNotNull && optionEqualDesc(len, pipeLength)
+            })
+        }
+        q.firstOption
+    }
+
+    private def isExtended: ShapeDesc => Boolean = {
+        case SheetDesc(_, None, None) | CirclePipeDesc(_, _, None) | SquarePipeDesc(_, _, None) => false
+        case _ => true
+    }
+
+    private def getShapeId(basicId:Int, extendedId:Option[Int]) = {
+        val q = for {
+            shp <- Shape
+            if shp.basicShapeId === basicId && 
+        }
+    }
+
     private def insertShape(shp:ShapeDesc)(implicit session:Session) = {
+        
     	val shpId = insertEmptyShape()
     	val basicId = shp match {
     		case SheetDesc(thick, _, _) => Sheet.forInsert.insert(shpId, thick)
