@@ -3,6 +3,8 @@ package models.semiproduct
 import models.basic.Tables
 import models.DBAccess
 import models.SlickExtensions._
+import slick.lifted.Projection2
+import slick.lifted.Projection3
 
 object ShapeOptionTypes {
 	type OptionSheet = (Option[Int], Option[BigDecimal])
@@ -80,11 +82,13 @@ trait Shapes extends Tables { this:DBAccess =>
             ExtendedPipe on (_._1.id === _.commonShapeId)
     } yield (shape.id, optionExtendedSheet(extSheet), optionExtendedPipe(extPipe))
 
-    def shapeQuery = for {
+    def shapeQuery:ShapeQueryType = for {
         shp <- Shape
         (bid, sheet, circ, square) <- basicShapeJoin if bid === shp.basicShapeId
         (eid, extSheet, extPipe) <- extendedShapeJoin if eid === shp.extendedShapeId
     } yield (shp, sheet, circ, square, extSheet, extPipe)
+
+   type ShapeQueryType = Query[(Shape.type, Projection2[Option[Int],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection2[Option[Int],Option[BigDecimal]]),((Int, Int, Option[Int]), (Option[Int], Option[BigDecimal]), (Option[Int], Option[BigDecimal], Option[BigDecimal]), (Option[Int], Option[BigDecimal], Option[BigDecimal]), (Option[Int], Option[BigDecimal], Option[BigDecimal]), (Option[Int], Option[BigDecimal]))]
 
     type OptionShape = ((Int, Int, Option[Int]), 
                         OptionSheet, OptionCirclePipe, OptionSquarePipe, OptionExtendedSheet, OptionExtendedPipe)

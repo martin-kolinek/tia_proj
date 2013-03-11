@@ -7,6 +7,8 @@ import org.joda.time.DateTime
 import models.WithID
 import models.ObjectModel
 import models.enums._
+import slick.lifted.Projection2
+import slick.lifted.Projection3
 
 case class PackDesc(heatNo:String, 
 		deliveryDate:DateTime, 
@@ -31,6 +33,8 @@ trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     		pack <- Pack if pack.shapeId === shp._1.id
     		mat <- pack.material
         } yield (shp, pack, mat)
+
+    type PackQueryType = Query[((Shape.type, Projection2[Option[Int],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection2[Option[Int],Option[BigDecimal]]), Pack.type, Material.type),(((Int, Int, Option[Int]), (Option[Int], Option[BigDecimal]), (Option[Int], Option[BigDecimal], Option[BigDecimal]), (Option[Int], Option[BigDecimal], Option[BigDecimal]), (Option[Int], Option[BigDecimal], Option[BigDecimal]), (Option[Int], Option[BigDecimal])), DBPack, DBMaterial)]
         
     def extractPackDesc(shp:OptionShape, pack:DBPack, mat:DBMaterial, semiprods:List[WithID[SemiproductDesc]]) = {
     	PackDesc(pack.heatNo, pack.deliveryDate, pack.unlimited, MaterialDesc(mat.name), extractShape(shp), semiprods)
