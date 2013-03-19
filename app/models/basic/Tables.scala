@@ -1,15 +1,10 @@
-package model.basic
+package models.basic
 
-import scala.slick.driver.ExtendedProfile
 import models._
 import java.sql.Date
 import java.sql.Blob
 import models.enums.OrderStatusType
 import models.mappers._
-
-trait WithProfile {
-    val profile:ExtendedProfile
-}
 
 trait Tables { this:WithProfile =>
     import profile.simple._
@@ -164,3 +159,4 @@ trait Tables { this:WithProfile =>
     	def * = id ~ finishTime ~ semiproductId
     }
 }
+
