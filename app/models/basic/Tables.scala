@@ -5,7 +5,6 @@ import models._
 import java.sql.Date
 import java.sql.Blob
 import models.enums.OrderStatusType
-import models.enums.PartStatusType
 import models.mappers._
 
 trait WithProfile {
@@ -24,14 +23,16 @@ trait Tables { this:WithProfile =>
         def * = id ~ name ~ fillingDate ~ dueDate ~ status
     }
     
-    object Part extends Table[(Int, Option[Int], Int, PartStatusType)]("part") {
+    object Part extends Table[(Int, Option[Int], Int, Int, Boolean)]("part") {
     	def id = column[Int]("id", O.PrimaryKey)
     	def orderId = column[Option[Int]]("order_id")
     	def partDefId = column[Int]("part_def_id")
-    	def status = column[PartStatusType]("status")
-    	def * = id ~ orderId ~ partDefId ~ status
+    	def cutPlanId = column[Int]("cut_plan_id")
+    	def damaged = column[Boolean]("damaged")
+    	def * = id ~ orderId ~ partDefId ~ cutPlanId ~ damaged
     	def order = foreignKey("fk_part_order", orderId, Order)(_.id)
     	def partDefinition = foreignKey("fk_part_part_def", partDefId, PartDefinition)(_.id)
+    	def cuttingPlan = foreignKey("fk_part_cut_plan", cutPlanId, CuttingPlan)(_.id)
     }
     
     object PartDefinition extends Table[(Int, Blob, String, String, Boolean)]("part_definition") {
@@ -136,5 +137,30 @@ trait Tables { this:WithProfile =>
     	def sheet = foreignKey("fk_extended_square_pipe_square_pipe", squarePipeId, Sheet)(_.id)
     }
     
-    //ject Cutting extends Table[(Int, Date, )]
+    object Pack extends Table[(Int, Int, Int, Boolean, Date, String)]("pack") {
+    	def id = column[Int]("id", O.PrimaryKey)
+    	def materialId = column[Int]("material_id")
+    	def shapeId = column[Int]("shape_id")
+    	def unlimited = column[Boolean]("unlimited")
+    	def deliveryDate = column[Date]("delivery_date")
+    	def heatNo = column[String]("heat_no")
+    	def * = id ~ materialId ~ shapeId ~ unlimited ~ deliveryDate ~ heatNo
+    	def shape = foreignKey("fk_pack_shape", shapeId, Shape)(_.id)
+    	def material = foreignKey("fk_pack_material", materialId, Material)(_.id)
+    }
+    
+    object Semiproduct extends Table[(Int, Int, String)]("semiproduct") {
+    	def id = column[Int]("id", O.PrimaryKey)
+    	def packId = column[Int]("id")
+    	def serialNo = column[String]("serial_no")
+    	def * = id ~ packId ~ serialNo
+    	def pack = foreignKey("fk_semiproduct_pack", packId, Pack)(_.id)
+    }
+    
+    object Cutting extends Table[(Int, Option[Date], Int)]("cutting") {
+    	def id = column[Int]("id", O.PrimaryKey)
+    	def finishTime = column[Option[Date]]("finish_time")
+    	def semiproductId = column[Int]("semiproduct_id")
+    	def * = id ~ finishTime ~ semiproductId
+    }
 }
