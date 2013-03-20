@@ -17,9 +17,9 @@ class BasicModelsTest extends FunSuite {
 	}
 	
 	test("getTables function works with different configuration") {
-		val r = running(FakeApplication(additionalConfiguration = Map(SlickConf.slickDriverConfigOption->"scala.slick.driver.SQLiteDriver"))) {
+		val r = running(FakeApplication(additionalConfiguration = Map(SlickConf.slickDriverConfigOption->"scala.slick.driver.PostgresDriver"))) {
 			val tbls = getTables
-			assert(tbls.profile.isInstanceOf[scala.slick.driver.SQLiteDriver])
+			assert(tbls.profile.isInstanceOf[scala.slick.driver.PostgresDriver])
 		}
 	}
 }

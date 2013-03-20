@@ -30,9 +30,9 @@ trait Tables { this:WithProfile =>
     	def cuttingPlan = foreignKey("fk_part_cut_plan", cutPlanId, CuttingPlan)(_.id)
     }
     
-    object PartDefinition extends Table[(Int, Blob, String, String, Boolean)]("part_definition") {
+    object PartDefinition extends Table[(Int, Array[Byte], String, String, Boolean)]("part_definition") {
     	def id = column[Int]("id", O.PrimaryKey)
-    	def file = column[Blob]("file")
+    	def file = column[Array[Byte]]("file")
     	def filter = column[String]("filter")
     	def name = column[String]("name")
     	def hidden = column[Boolean]("hidden")
@@ -47,13 +47,13 @@ trait Tables { this:WithProfile =>
     	def * = orderId ~ partDefId ~ count ~ filter
     	def pk = primaryKey("pk_part_def_in_order", (orderId, partDefId))
     	def order = foreignKey("fk_part_def_in_order_order", orderId, Order)(_.id)
-    	def partDefinition = foreignKey("fk_part_def_in_order_", partDefId, PartDefinition)(_.id)
+    	def partDefinition = foreignKey("fk_part_def_in_order_part_def", partDefId, PartDefinition)(_.id)
     }
     
-    object CuttingPlan extends Table[(Int, String, Blob, Boolean, String)]("cutting_plan") {
+    object CuttingPlan extends Table[(Int, String, Array[Byte], Boolean, String)]("cutting_plan") {
     	def id = column[Int]("id", O.PrimaryKey)
     	def name = column[String]("name")
-    	def file = column[Blob]("file")
+    	def file = column[Array[Byte]]("file")
     	def hidden = column[Boolean]("hidden")
     	def filter = column[String]("filter")
     	def * = id ~ name ~ file ~ hidden ~ filter
@@ -104,7 +104,7 @@ trait Tables { this:WithProfile =>
     	def thickness = column[Double]("thickness")
     	def diameter = column[Double]("diameter")
     	def * = id ~ shapeId ~ thickness ~ diameter
-    	def shape = foreignKey("fk_circle_pipe_shape", shapeId, Sheet)(_.id)
+    	def shape = foreignKey("fk_square_pipe_shape", shapeId, Sheet)(_.id)
     }
     
     object ExtendedSheet extends Table[(Int, Int, Double, Double)]("extended_sheet") {
