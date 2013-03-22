@@ -4,7 +4,7 @@ import org.specs2.mutable._
 
 import play.api.test._
 import play.api.test.Helpers._
-
+import models.Helpers._
 /**
  * Add your spec here.
  * You can mock out a whole application including requests, plugins etc.
@@ -15,13 +15,13 @@ class ApplicationSpec extends Specification {
   "Application" should {
     
     "send 404 on a bad request" in {
-      running(FakeApplication()) {
+      running(FakeApplication(additionalConfiguration = inMemorySlick)) {
         route(FakeRequest(GET, "/boum")) must beNone        
       }
     }
     
     "render the index page" in {
-      running(FakeApplication()) {
+      running(FakeApplication(additionalConfiguration = inMemorySlick)) {
         val home = route(FakeRequest(GET, "/")).get
         
         status(home) must equalTo(OK)

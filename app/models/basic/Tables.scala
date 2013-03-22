@@ -10,7 +10,7 @@ trait Tables { this:WithProfile =>
     import profile.simple._
     
     object Order extends Table[(Int, String, Date, Option[Date], OrderStatusType)]("order") {
-        def id = column[Int]("id", O.PrimaryKey)
+        def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
         def name = column[String]("name")
         def fillingDate = column[Date]("filling_date")
         def dueDate = column[Option[Date]]("due_date")
@@ -19,7 +19,7 @@ trait Tables { this:WithProfile =>
     }
     
     object Part extends Table[(Int, Option[Int], Int, Int, Boolean)]("part") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def orderId = column[Option[Int]]("order_id")
     	def partDefId = column[Int]("part_def_id")
     	def cutPlanId = column[Int]("cut_plan_id")
@@ -31,7 +31,7 @@ trait Tables { this:WithProfile =>
     }
     
     object PartDefinition extends Table[(Int, Array[Byte], String, String, Boolean)]("part_definition") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def file = column[Array[Byte]]("file")
     	def filter = column[String]("filter")
     	def name = column[String]("name")
@@ -51,7 +51,7 @@ trait Tables { this:WithProfile =>
     }
     
     object CuttingPlan extends Table[(Int, String, Array[Byte], Boolean, String)]("cutting_plan") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def name = column[String]("name")
     	def file = column[Array[Byte]]("file")
     	def hidden = column[Boolean]("hidden")
@@ -70,19 +70,19 @@ trait Tables { this:WithProfile =>
     }
     
     object Material extends Table[(Int, String)]("material") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def name = column[String]("name")
     	def * = id ~ name
     }
     
     object Shape extends Table[(Int, String)]("shape") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def textDescription = column[String]("text_description")
     	def * = id ~ textDescription
     }
     
     object Sheet extends Table[(Int, Int, Double)]("sheet") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def shapeId = column[Int]("shape_id")
     	def thickness = column[Double]("thickness")
     	def * = id ~ shapeId ~ thickness
@@ -90,7 +90,7 @@ trait Tables { this:WithProfile =>
     }
     
     object CirclePipe extends Table[(Int, Int, Double, Double)]("circle_pipe") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def shapeId = column[Int]("shape_id")
     	def thickness = column[Double]("thickness")
     	def radius = column[Double]("radius")
@@ -99,7 +99,7 @@ trait Tables { this:WithProfile =>
     }
     
     object SquarePipe extends Table[(Int, Int, Double, Double)]("square_pipe") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def shapeId = column[Int]("shape_id")
     	def thickness = column[Double]("thickness")
     	def diameter = column[Double]("diameter")
@@ -108,7 +108,7 @@ trait Tables { this:WithProfile =>
     }
     
     object ExtendedSheet extends Table[(Int, Int, Double, Double)]("extended_sheet") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def sheetId = column[Int]("sheet_id")
     	def width = column[Double]("width")
     	def height = column[Double]("height")
@@ -117,7 +117,7 @@ trait Tables { this:WithProfile =>
     }
     
     object ExtendedCirclePipe extends Table[(Int, Int, Double)]("extended_circle_pipe") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def circlePipeId = column[Int]("circle_pipe_id")
     	def length = column[Double]("length")
     	def * = id ~ circlePipeId ~ length
@@ -125,7 +125,7 @@ trait Tables { this:WithProfile =>
     }
     
     object ExtendedSquarePipe extends Table[(Int, Int, Double)]("extended_square_pipe") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def squarePipeId = column[Int]("square_pipe_id")
     	def length = column[Double]("length")
     	def * = id ~ squarePipeId ~ length
@@ -133,7 +133,7 @@ trait Tables { this:WithProfile =>
     }
     
     object Pack extends Table[(Int, Int, Int, Boolean, Date, String)]("pack") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def materialId = column[Int]("material_id")
     	def shapeId = column[Int]("shape_id")
     	def unlimited = column[Boolean]("unlimited")
@@ -145,7 +145,7 @@ trait Tables { this:WithProfile =>
     }
     
     object Semiproduct extends Table[(Int, Int, String)]("semiproduct") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def packId = column[Int]("id")
     	def serialNo = column[String]("serial_no")
     	def * = id ~ packId ~ serialNo
@@ -153,7 +153,7 @@ trait Tables { this:WithProfile =>
     }
     
     object Cutting extends Table[(Int, Option[Date], Int)]("cutting") {
-    	def id = column[Int]("id", O.PrimaryKey)
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def finishTime = column[Option[Date]]("finish_time")
     	def semiproductId = column[Int]("semiproduct_id")
     	def * = id ~ finishTime ~ semiproductId
