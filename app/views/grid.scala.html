@@ -1,0 +1,20 @@
+@(header: Seq[Html], values: Seq[Seq[Html]])
+
+<table>
+	<tr>
+		@for(h<-header) {
+			<th>
+				@h
+			</th>
+		}
+	</tr>
+	@for(row<-values) {
+		<tr>
+			@for(v<-row) {
+				<td>
+					@v
+				</td>
+			}
+		</tr>
+	}
+</table>
