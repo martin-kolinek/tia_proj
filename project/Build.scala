@@ -16,7 +16,8 @@ object ApplicationBuild extends Build {
     "org.scalaz" %% "scalaz-core" % "7.0.0-M8",
     "org.slf4j" % "slf4j-nop" % "1.6.6",
     "org.xerial" % "sqlite-jdbc" % "3.7.2",
-    "postgresql" % "postgresql" % "9.1-901.jdbc4"
+    "postgresql" % "postgresql" % "9.1-901.jdbc4",
+    "com.github.nscala-time" %% "nscala-time" % "0.2.0"
   )
 
 

@@ -18,14 +18,14 @@ create sequence "shape_id_seq";
 create sequence "sheet_id_seq";
 create sequence "square_pipe_id_seq";
 create table "circle_pipe" ("id" int NOT NULL DEFAULT nextval('circle_pipe_id_seq') PRIMARY KEY,"shape_id" INTEGER NOT NULL,"thickness" DOUBLE PRECISION NULL,"radius" DOUBLE PRECISION NULL);
-create table "cutting" ("id" int NOT NULL DEFAULT nextval('cutting_id_seq') PRIMARY KEY,"finish_time" DATE,"semiproduct_id" INTEGER NOT NULL);
+create table "cutting" ("id" int NOT NULL DEFAULT nextval('cutting_id_seq') PRIMARY KEY,"finish_time" TIMESTAMP,"semiproduct_id" INTEGER NOT NULL);
 create table "cutting_plan" ("id" int NOT NULL DEFAULT nextval('cutting_plan_id_seq') PRIMARY KEY,"name" VARCHAR(254) NOT NULL,"file" BYTEA NOT NULL,"hidden" BOOLEAN NOT NULL,"filter" VARCHAR(254) NOT NULL);
 create table "extended_circle_pipe" ("id" int NOT NULL DEFAULT nextval('extended_circle_pipe_id_seq') PRIMARY KEY,"circle_pipe_id" INTEGER NOT NULL,"length" DOUBLE PRECISION NULL);
 create table "extended_sheet" ("id" int NOT NULL DEFAULT nextval('extended_sheet_id_seq') PRIMARY KEY,"sheet_id" INTEGER NOT NULL,"width" DOUBLE PRECISION NULL,"height" DOUBLE PRECISION NULL);
 create table "extended_square_pipe" ("id" int NOT NULL DEFAULT nextval('extended_square_pipe_id_seq') PRIMARY KEY,"square_pipe_id" INTEGER NOT NULL,"length" DOUBLE PRECISION NULL);
 create table "material" ("id" int NOT NULL DEFAULT nextval('material_id_seq') PRIMARY KEY,"name" VARCHAR(254) NOT NULL);
-create table "order" ("id" int NOT NULL DEFAULT nextval('order_id_seq') PRIMARY KEY,"name" VARCHAR(254) NOT NULL,"filling_date" DATE NOT NULL,"due_date" DATE,"status" INTEGER NOT NULL);
-create table "pack" ("id" int NOT NULL DEFAULT nextval('pack_id_seq') PRIMARY KEY,"material_id" INTEGER NOT NULL,"shape_id" INTEGER NOT NULL,"unlimited" BOOLEAN NOT NULL,"delivery_date" DATE NOT NULL,"heat_no" VARCHAR(254) NOT NULL);
+create table "order" ("id" int NOT NULL DEFAULT nextval('order_id_seq') PRIMARY KEY,"name" VARCHAR(254) NOT NULL,"filling_date" TIMESTAMP NOT NULL,"due_date" TIMESTAMP,"status" INTEGER NOT NULL);
+create table "pack" ("id" int NOT NULL DEFAULT nextval('pack_id_seq') PRIMARY KEY,"material_id" INTEGER NOT NULL,"shape_id" INTEGER NOT NULL,"unlimited" BOOLEAN NOT NULL,"delivery_date" TIMESTAMP NOT NULL,"heat_no" VARCHAR(254) NOT NULL);
 create table "part" ("id" int NOT NULL DEFAULT nextval('part_id_seq') PRIMARY KEY,"order_id" INTEGER,"part_def_id" INTEGER NOT NULL,"cut_plan_id" INTEGER NOT NULL,"damaged" BOOLEAN NOT NULL);
 create table "part_definition" ("id" int NOT NULL DEFAULT nextval('part_definition_id_seq') PRIMARY KEY,"file" BYTEA NOT NULL,"filter" VARCHAR(254) NOT NULL,"name" VARCHAR(254) NOT NULL,"hidden" BOOLEAN NOT NULL);
 create table "part_def_in_cut_plan" ("cut_plan_id" INTEGER NOT NULL,"part_def_id" INTEGER NOT NULL,"count" INTEGER NOT NULL);
@@ -33,13 +33,13 @@ alter table "part_def_in_cut_plan" add constraint "pk_part_def_in_cut_plan" prim
 create table "part_def_in_order" ("order_id" INTEGER NOT NULL,"part_def_id" INTEGER NOT NULL,"count" INTEGER NOT NULL,"filter" VARCHAR(254) NOT NULL);
 alter table "part_def_in_order" add constraint "pk_part_def_in_order" primary key("order_id","part_def_id");
 create table "semiproduct" ("id" int NOT NULL DEFAULT nextval('semiproduct_id_seq') PRIMARY KEY,"serial_no" VARCHAR(254) NOT NULL);
-create table "shape" ("id" int NOT NULL DEFAULT nextval('shape_id_seq') PRIMARY KEY,"text_description" VARCHAR(254) NOT NULL);
+create table "shape" ("id" int NOT NULL DEFAULT nextval('shape_id_seq') PRIMARY KEY);
 create table "sheet" ("id" int NOT NULL DEFAULT nextval('sheet_id_seq') PRIMARY KEY,"shape_id" INTEGER NOT NULL,"thickness" DOUBLE PRECISION NULL);
 create table "square_pipe" ("id" int NOT NULL DEFAULT nextval('square_pipe_id_seq') PRIMARY KEY,"shape_id" INTEGER NOT NULL,"thickness" DOUBLE PRECISION NULL,"diameter" DOUBLE PRECISION NULL);
-alter table "circle_pipe" add constraint "fk_circle_pipe_shape" foreign key("shape_id") references "sheet"("id") on update NO ACTION on delete NO ACTION;
-alter table "extended_circle_pipe" add constraint "fk_extended_circle_pipe_circle_pipe" foreign key("circle_pipe_id") references "sheet"("id") on update NO ACTION on delete NO ACTION;
+alter table "circle_pipe" add constraint "fk_circle_pipe_shape" foreign key("shape_id") references "shape"("id") on update NO ACTION on delete NO ACTION;
+alter table "extended_circle_pipe" add constraint "fk_extended_circle_pipe_circle_pipe" foreign key("circle_pipe_id") references "circle_pipe"("id") on update NO ACTION on delete NO ACTION;
 alter table "extended_sheet" add constraint "fk_extended_sheet_sheet" foreign key("sheet_id") references "sheet"("id") on update NO ACTION on delete NO ACTION;
-alter table "extended_square_pipe" add constraint "fk_extended_square_pipe_square_pipe" foreign key("square_pipe_id") references "sheet"("id") on update NO ACTION on delete NO ACTION;
+alter table "extended_square_pipe" add constraint "fk_extended_square_pipe_square_pipe" foreign key("square_pipe_id") references "square_pipe"("id") on update NO ACTION on delete NO ACTION;
 alter table "pack" add constraint "fk_pack_shape" foreign key("shape_id") references "shape"("id") on update NO ACTION on delete NO ACTION;
 alter table "pack" add constraint "fk_pack_material" foreign key("material_id") references "material"("id") on update NO ACTION on delete NO ACTION;
 alter table "part" add constraint "fk_part_order" foreign key("order_id") references "order"("id") on update NO ACTION on delete NO ACTION;
@@ -50,8 +50,8 @@ alter table "part_def_in_cut_plan" add constraint "fk_part_def_in_cut_plan_cut_p
 alter table "part_def_in_order" add constraint "fk_part_def_in_order_order" foreign key("order_id") references "order"("id") on update NO ACTION on delete NO ACTION;
 alter table "part_def_in_order" add constraint "fk_part_def_in_order_part_def" foreign key("part_def_id") references "part_definition"("id") on update NO ACTION on delete NO ACTION;
 alter table "semiproduct" add constraint "fk_semiproduct_pack" foreign key("id") references "pack"("id") on update NO ACTION on delete NO ACTION;
-alter table "sheet" add constraint "fk_sheet_shape" foreign key("shape_id") references "sheet"("id") on update NO ACTION on delete NO ACTION;
-alter table "square_pipe" add constraint "fk_square_pipe_shape" foreign key("shape_id") references "sheet"("id") on update NO ACTION on delete NO ACTION;
+alter table "sheet" add constraint "fk_sheet_shape" foreign key("shape_id") references "shape"("id") on update NO ACTION on delete NO ACTION;
+alter table "square_pipe" add constraint "fk_square_pipe_shape" foreign key("shape_id") references "shape"("id") on update NO ACTION on delete NO ACTION;
 
 # --- !Downs
 

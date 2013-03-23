@@ -1,19 +1,19 @@
 package models.basic
 
 import models._
-import java.sql.Date
 import java.sql.Blob
 import models.enums.OrderStatusType
 import models.mappers._
+import org.joda.time.DateTime
 
-trait Tables { this:WithProfile =>
+trait Tables { this:DBAccess =>
     import profile.simple._
     
-    object Order extends Table[(Int, String, Date, Option[Date], OrderStatusType)]("order") {
+    object Order extends Table[(Int, String, DateTime, Option[DateTime], OrderStatusType)]("order") {
         def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
         def name = column[String]("name")
-        def fillingDate = column[Date]("filling_date")
-        def dueDate = column[Option[Date]]("due_date")
+        def fillingDate = column[DateTime]("filling_date")
+        def dueDate = column[Option[DateTime]]("due_date")
         def status = column[OrderStatusType]("status")
         def * = id ~ name ~ fillingDate ~ dueDate ~ status
     }
@@ -78,6 +78,7 @@ trait Tables { this:WithProfile =>
     object Shape extends Table[(Int)]("shape") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def * = id
+    	def forInsert = id returning id
     }
     
     object Sheet extends Table[(Int, Int, Option[Double])]("sheet") {
@@ -94,7 +95,7 @@ trait Tables { this:WithProfile =>
     	def thickness = column[Option[Double]]("thickness")
     	def radius = column[Option[Double]]("radius")
     	def * = id ~ shapeId ~ thickness ~ radius
-    	def shape = foreignKey("fk_circle_pipe_shape", shapeId, Sheet)(_.id)
+    	def shape = foreignKey("fk_circle_pipe_shape", shapeId, Shape)(_.id)
     }
     
     object SquarePipe extends Table[(Int, Int, Option[Double], Option[Double])]("square_pipe") {
@@ -103,7 +104,7 @@ trait Tables { this:WithProfile =>
     	def thickness = column[Option[Double]]("thickness")
     	def diameter = column[Option[Double]]("diameter")
     	def * = id ~ shapeId ~ thickness ~ diameter
-    	def shape = foreignKey("fk_square_pipe_shape", shapeId, Sheet)(_.id)
+    	def shape = foreignKey("fk_square_pipe_shape", shapeId, Shape)(_.id)
     }
     
     object ExtendedSheet extends Table[(Int, Int, Option[Double], Option[Double])]("extended_sheet") {
@@ -120,7 +121,7 @@ trait Tables { this:WithProfile =>
     	def circlePipeId = column[Int]("circle_pipe_id")
     	def length = column[Option[Double]]("length")
     	def * = id ~ circlePipeId ~ length
-    	def sheet = foreignKey("fk_extended_circle_pipe_circle_pipe", circlePipeId, Sheet)(_.id)
+    	def circlePipe = foreignKey("fk_extended_circle_pipe_circle_pipe", circlePipeId, CirclePipe)(_.id)
     }
     
     object ExtendedSquarePipe extends Table[(Int, Int, Option[Double])]("extended_square_pipe") {
@@ -128,15 +129,15 @@ trait Tables { this:WithProfile =>
     	def squarePipeId = column[Int]("square_pipe_id")
     	def length = column[Option[Double]]("length")
     	def * = id ~ squarePipeId ~ length
-    	def sheet = foreignKey("fk_extended_square_pipe_square_pipe", squarePipeId, Sheet)(_.id)
+    	def squarePipe = foreignKey("fk_extended_square_pipe_square_pipe", squarePipeId, SquarePipe)(_.id)
     }
     
-    object Pack extends Table[(Int, Int, Int, Boolean, Date, String)]("pack") {
+    object Pack extends Table[(Int, Int, Int, Boolean, DateTime, String)]("pack") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def materialId = column[Int]("material_id")
     	def unlimited = column[Boolean]("unlimited")
     	def shapeId = column[Int]("shape_id")
-    	def deliveryDate = column[Date]("delivery_date")
+    	def deliveryDate = column[DateTime]("delivery_date")
     	def heatNo = column[String]("heat_no")
     	def * = id ~ materialId ~ shapeId ~ unlimited ~ deliveryDate ~ heatNo
     	def shape = foreignKey("fk_pack_shape", shapeId, Shape)(_.id)
@@ -151,9 +152,9 @@ trait Tables { this:WithProfile =>
     	def pack = foreignKey("fk_semiproduct_pack", packId, Pack)(_.id)
     }
     
-    object Cutting extends Table[(Int, Option[Date], Int)]("cutting") {
+    object Cutting extends Table[(Int, Option[DateTime], Int)]("cutting") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    	def finishTime = column[Option[Date]]("finish_time")
+    	def finishTime = column[Option[DateTime]]("finish_time")
     	def semiproductId = column[Int]("semiproduct_id")
     	def * = id ~ finishTime ~ semiproductId
     }
