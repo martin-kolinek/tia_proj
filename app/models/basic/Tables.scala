@@ -75,59 +75,58 @@ trait Tables { this:WithProfile =>
     	def * = id ~ name
     }
     
-    object Shape extends Table[(Int, String)]("shape") {
+    object Shape extends Table[(Int)]("shape") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    	def textDescription = column[String]("text_description")
-    	def * = id ~ textDescription
+    	def * = id
     }
     
-    object Sheet extends Table[(Int, Int, Double)]("sheet") {
+    object Sheet extends Table[(Int, Int, Option[Double])]("sheet") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def shapeId = column[Int]("shape_id")
-    	def thickness = column[Double]("thickness")
+    	def thickness = column[Option[Double]]("thickness")
     	def * = id ~ shapeId ~ thickness
     	def shape = foreignKey("fk_sheet_shape", shapeId, Sheet)(_.id)
     }
     
-    object CirclePipe extends Table[(Int, Int, Double, Double)]("circle_pipe") {
+    object CirclePipe extends Table[(Int, Int, Option[Double], Option[Double])]("circle_pipe") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def shapeId = column[Int]("shape_id")
-    	def thickness = column[Double]("thickness")
-    	def radius = column[Double]("radius")
+    	def thickness = column[Option[Double]]("thickness")
+    	def radius = column[Option[Double]]("radius")
     	def * = id ~ shapeId ~ thickness ~ radius
     	def shape = foreignKey("fk_circle_pipe_shape", shapeId, Sheet)(_.id)
     }
     
-    object SquarePipe extends Table[(Int, Int, Double, Double)]("square_pipe") {
+    object SquarePipe extends Table[(Int, Int, Option[Double], Option[Double])]("square_pipe") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def shapeId = column[Int]("shape_id")
-    	def thickness = column[Double]("thickness")
-    	def diameter = column[Double]("diameter")
+    	def thickness = column[Option[Double]]("thickness")
+    	def diameter = column[Option[Double]]("diameter")
     	def * = id ~ shapeId ~ thickness ~ diameter
     	def shape = foreignKey("fk_square_pipe_shape", shapeId, Sheet)(_.id)
     }
     
-    object ExtendedSheet extends Table[(Int, Int, Double, Double)]("extended_sheet") {
+    object ExtendedSheet extends Table[(Int, Int, Option[Double], Option[Double])]("extended_sheet") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def sheetId = column[Int]("sheet_id")
-    	def width = column[Double]("width")
-    	def height = column[Double]("height")
+    	def width = column[Option[Double]]("width")
+    	def height = column[Option[Double]]("height")
     	def * = id ~ sheetId ~ width ~ height
     	def sheet = foreignKey("fk_extended_sheet_sheet", sheetId, Sheet)(_.id)
     }
     
-    object ExtendedCirclePipe extends Table[(Int, Int, Double)]("extended_circle_pipe") {
+    object ExtendedCirclePipe extends Table[(Int, Int, Option[Double])]("extended_circle_pipe") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def circlePipeId = column[Int]("circle_pipe_id")
-    	def length = column[Double]("length")
+    	def length = column[Option[Double]]("length")
     	def * = id ~ circlePipeId ~ length
     	def sheet = foreignKey("fk_extended_circle_pipe_circle_pipe", circlePipeId, Sheet)(_.id)
     }
     
-    object ExtendedSquarePipe extends Table[(Int, Int, Double)]("extended_square_pipe") {
+    object ExtendedSquarePipe extends Table[(Int, Int, Option[Double])]("extended_square_pipe") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def squarePipeId = column[Int]("square_pipe_id")
-    	def length = column[Double]("length")
+    	def length = column[Option[Double]]("length")
     	def * = id ~ squarePipeId ~ length
     	def sheet = foreignKey("fk_extended_square_pipe_square_pipe", squarePipeId, Sheet)(_.id)
     }
@@ -135,8 +134,8 @@ trait Tables { this:WithProfile =>
     object Pack extends Table[(Int, Int, Int, Boolean, Date, String)]("pack") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def materialId = column[Int]("material_id")
-    	def shapeId = column[Int]("shape_id")
     	def unlimited = column[Boolean]("unlimited")
+    	def shapeId = column[Int]("shape_id")
     	def deliveryDate = column[Date]("delivery_date")
     	def heatNo = column[String]("heat_no")
     	def * = id ~ materialId ~ shapeId ~ unlimited ~ deliveryDate ~ heatNo
