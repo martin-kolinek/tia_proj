@@ -53,8 +53,10 @@ trait Shapes extends Tables { this:DBAccess =>
     	    ExtendedCirclePipe on (_._1._1._2.id === _.circlePipeId) leftJoin
     	    ExtendedSquarePipe on (_._1._1._2.id === _.squarePipeId)
     } yield (shape.id, optionSheet(sheet), optionCirclePipe(circ), optionSquarePipe(square), optionExtendedSheet(extSheet), optionExtendedCirclePipe(extCirc), optionExtendedSquarePipe(extSquare))
-    	
-    def extractShape:(Int, OptionSheet, OptionCirclePipe, OptionSquarePipe, OptionExtendedSheet, OptionExtendedPipe, OptionExtendedPipe) => ShapeDesc = {
+    
+    type OptionShape = (Int, OptionSheet, OptionCirclePipe, OptionSquarePipe, OptionExtendedSheet, OptionExtendedPipe, OptionExtendedPipe) 
+    
+    def extractShape: OptionShape => ShapeDesc = {
     	case (_, OptionSheet(Some(_), thick), _, _, OptionExtendedSheet(_, width, height), _, _) => SheetDesc(thick, width, height)
     	case (_, _, OptionCirclePipe(Some(_), rad, thick), _, _, OptionExtendedPipe(_, len), _) => CirclePipeDesc(thick, rad, len)
     	case (_, _, _, OptionSquarePipe(Some(_), diam, thick), _, _, OptionExtendedPipe(_, len)) => SquarePipeDesc(thick, diam, len)

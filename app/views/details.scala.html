@@ -1,0 +1,8 @@
+@(header:Seq[Html], values:Seq[Html])
+
+<dl>
+	@for((h, v)<-header zip values) {
+		<dt>@h</dt>
+		<dd>@v</dd>
+	}
+</dl>

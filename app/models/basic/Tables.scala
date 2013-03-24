@@ -69,10 +69,12 @@ trait Tables { this:DBAccess =>
     	def partDefinition = foreignKey("fk_part_def_in_cut_plan_part_def", partDefId, PartDefinition)(_.id)
     }
     
-    object Material extends Table[(Int, String)]("material") {
+    case class DBMaterial(id:Int, name:String) {}
+    
+    object Material extends Table[DBMaterial]("material") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def name = column[String]("name")
-    	def * = id ~ name
+    	def * = id ~ name <> (DBMaterial, DBMaterial.unapply _)
     }
     
     object Shape extends Table[(Int)]("shape") {
@@ -132,14 +134,16 @@ trait Tables { this:DBAccess =>
     	def squarePipe = foreignKey("fk_extended_square_pipe_square_pipe", squarePipeId, SquarePipe)(_.id)
     }
     
-    object Pack extends Table[(Int, Int, Int, Boolean, DateTime, String)]("pack") {
+    case class DBPack(id:Int, materialId:Int, shapeId:Int, unlimited:Boolean, deliveryDate:DateTime, heatNo:String) {}
+    
+    object Pack extends Table[DBPack]("pack") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def materialId = column[Int]("material_id")
     	def unlimited = column[Boolean]("unlimited")
     	def shapeId = column[Int]("shape_id")
     	def deliveryDate = column[DateTime]("delivery_date")
     	def heatNo = column[String]("heat_no")
-    	def * = id ~ materialId ~ shapeId ~ unlimited ~ deliveryDate ~ heatNo
+    	def * = id ~ materialId ~ shapeId ~ unlimited ~ deliveryDate ~ heatNo <> (DBPack, DBPack.unapply _)
     	def shape = foreignKey("fk_pack_shape", shapeId, Shape)(_.id)
     	def material = foreignKey("fk_pack_material", materialId, Material)(_.id)
     }
