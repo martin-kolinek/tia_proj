@@ -5,7 +5,7 @@ import models.DBAccess
 import models.DBAccess
 import org.joda.time.DateTime
 
-case class PackDesc(heatNo:String, deliveryDate:DateTime, unlimited:Boolean, material:MaterialDesc, shape:ShapeDesc) {	
+case class PackDesc(id:Int, heatNo:String, deliveryDate:DateTime, unlimited:Boolean, material:MaterialDesc, shape:ShapeDesc) {	
 }
 
 trait Semiproducts extends Shapes { this: DBAccess =>
@@ -16,9 +16,9 @@ trait Semiproducts extends Shapes { this: DBAccess =>
     		shp@(shapeId, _, _, _, _, _, _) <- basicShapeJoin
     		pack <- Pack if pack.shapeId === shapeId
     		mat <- pack.material
-    	} yield (shp, pack.unlimited, pack.deliveryDate, pack.heatNo, mat.name)
+    	} yield (shp, pack.id, pack.unlimited, pack.deliveryDate, pack.heatNo, mat.name)
     	q.list().map{
-    		case (shp, unlim, deliv, heat, mat) => PackDesc(heat, deliv, unlim, MaterialDesc(mat), extractShape.tupled(shp))
+    		case (shp, id, unlim, deliv, heat, mat) => PackDesc(id, heat, deliv, unlim, MaterialDesc(mat), extractShape.tupled(shp))
     	}
     }
 }

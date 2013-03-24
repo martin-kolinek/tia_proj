@@ -28,19 +28,20 @@ class SemiproductTest extends FunSuite {
 				val circ = (sp.CirclePipe.shapeId ~ sp.CirclePipe.thickness ~ sp.CirclePipe.radius returning sp.CirclePipe.id).insert(sh3, Some(9.0), Some(200.0))
 				val extCirc = (sp.ExtendedCirclePipe.circlePipeId ~ sp.ExtendedCirclePipe.length returning sp.ExtendedCirclePipe.id).insert(circ, Some(20.0))
 				val mat = sp.Material.name.insert("material")
-				val pack = (sp.Pack.heatNo ~ 
-						sp.Pack.deliveryDate ~ 
-						sp.Pack.materialId ~ 
-						sp.Pack.shapeId ~ 
-						sp.Pack.unlimited).insertAll(
-								("heat", dt, mat, sh, false),
-								("heat", dt+1.minute, mat, sh3, true),
-								("heat", dt, mat, sh2, false))
+				(sp.Pack.id ~
+					sp.Pack.heatNo ~ 
+					sp.Pack.deliveryDate ~ 
+					sp.Pack.materialId ~ 
+					sp.Pack.shapeId ~ 
+					sp.Pack.unlimited).insertAll(
+							(1, "heat", dt, mat, sh, false),
+							(2, "heat", dt+1.minute, mat, sh3, true),
+							(3, "heat", dt, mat, sh2, false))
 				val pcks = sp.listPacks.toSet
 				val should = Set(
-						PackDesc("heat", dt, false, MaterialDesc("material"), ShapeDesc),
-						PackDesc("heat", dt+1.minute, true, MaterialDesc("material"), CirclePipeDesc(Some(9.0), Some(200.0), Some(20.0))),
-						PackDesc("heat", dt, false, MaterialDesc("material"), SheetDesc(Some(10.0), None, None)))
+						PackDesc(1, "heat", dt, false, MaterialDesc("material"), ShapeDesc),
+						PackDesc(2, "heat", dt+1.minute, true, MaterialDesc("material"), CirclePipeDesc(Some(9.0), Some(200.0), Some(20.0))),
+						PackDesc(3, "heat", dt, false, MaterialDesc("material"), SheetDesc(Some(10.0), None, None)))
 				assert(should == pcks)
 			}
 		}
