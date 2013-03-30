@@ -4,11 +4,11 @@ import models.basic.Tables
 import models.DBAccess
 import models.DBAccess
 
-case class OptionSheet(id:Option[Int], thickness:Option[Double])
-case class OptionCirclePipe(id:Option[Int], radius:Option[Double], thickness:Option[Double])
-case class OptionSquarePipe(id:Option[Int], diameter:Option[Double], thickness:Option[Double])
-case class OptionExtendedSheet(id:Option[Int], width:Option[Double], height:Option[Double])
-case class OptionExtendedPipe(id:Option[Int], length:Option[Double])
+case class OptionSheet(id:Option[Int], thickness:Option[BigDecimal])
+case class OptionCirclePipe(id:Option[Int], radius:Option[BigDecimal], thickness:Option[BigDecimal])
+case class OptionSquarePipe(id:Option[Int], diameter:Option[BigDecimal], thickness:Option[BigDecimal])
+case class OptionExtendedSheet(id:Option[Int], width:Option[BigDecimal], height:Option[BigDecimal])
+case class OptionExtendedPipe(id:Option[Int], length:Option[BigDecimal])
 
 class ShapeDesc protected() {
 	def description = "something" 
@@ -17,15 +17,15 @@ class ShapeDesc protected() {
 object ShapeDesc extends ShapeDesc {
 }
 
-case class SheetDesc(thickness:Option[Double], width:Option[Double], height:Option[Double]) extends ShapeDesc {
+case class SheetDesc(thickness:Option[BigDecimal], width:Option[BigDecimal], height:Option[BigDecimal]) extends ShapeDesc {
 	override def description = s"sheet - $thickness mm, $width x $height"
 }
 
-case class CirclePipeDesc(thickness:Option[Double], radius:Option[Double], length:Option[Double]) extends ShapeDesc {
+case class CirclePipeDesc(thickness:Option[BigDecimal], radius:Option[BigDecimal], length:Option[BigDecimal]) extends ShapeDesc {
 	override def description = s"circle pipe - $thickness, R=$radius, L=$length" 
 } 
 
-case class SquarePipeDesc(thickness:Option[Double], diameter:Option[Double], length:Option[Double]) extends ShapeDesc {
+case class SquarePipeDesc(thickness:Option[BigDecimal], diameter:Option[BigDecimal], length:Option[BigDecimal]) extends ShapeDesc {
 	override def description = s"square pipe - $thickness, D=$diameter, L=$length"
 }
 
