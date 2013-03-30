@@ -1,0 +1,18 @@
+@(frm:Form[models.semiproduct.PackDesc], replyTo:Call)
+
+@helper.form(action = replyTo) {
+	@helper.inputText(frm("heat"))
+	@helper.inputDate(frm("delivery"))
+	@helper.checkbox(frm("unlimited"))
+	@helper.inputText(frm("material.material"))
+	@helper.inputText(frm("type"))
+	@helper.inputText(frm("sheet.thickness"))
+	@helper.inputText(frm("sheet.width"))
+	@helper.inputText(frm("sheet.height"))
+	@helper.inputText(frm("circ.thickness"))
+	@helper.inputText(frm("circ.radius"))
+	@helper.inputText(frm("circ.length"))
+	@helper.inputText(frm("square.thickness"))
+	@helper.inputText(frm("square.diameter"))
+	@helper.inputText(frm("square.length"))
+}

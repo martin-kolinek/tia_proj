@@ -5,7 +5,7 @@ import models.DBAccess
 import models.DBAccess
 import org.joda.time.DateTime
 
-case class PackDesc(id:Int, heatNo:String, deliveryDate:DateTime, unlimited:Boolean, material:MaterialDesc, shape:ShapeDesc) {	
+case class PackDesc(heatNo:String, deliveryDate:DateTime, unlimited:Boolean, material:MaterialDesc, shape:ShapeDesc) {	
 }
 
 case class SemiproductDesc(id:Int, serialNo:String) {} 
@@ -20,7 +20,7 @@ trait Semiproducts extends Shapes { this: DBAccess =>
         } yield (shp, pack, mat)
     
     def extractPackDesc(shp:OptionShape, pack:DBPack, mat:DBMaterial) = {
-    	PackDesc(pack.id, pack.heatNo, pack.deliveryDate, pack.unlimited, MaterialDesc(mat.name), extractShape(shp))
+    	PackDesc(pack.heatNo, pack.deliveryDate, pack.unlimited, MaterialDesc(mat.name), extractShape(shp))
     }
         
     def listPacks(implicit session:Session) = {
@@ -33,4 +33,9 @@ trait Semiproducts extends Shapes { this: DBAccess =>
     	val sps = Semiproduct.filter(_.packId===id).map(x=>(x.id, x.serialNo)).list().map(SemiproductDesc.tupled)
     	pack.map(x=>(x, sps))
     }
+    
+    def insertPack(pck:PackDesc)(implicit session:Session) {
+    	
+    }
+    
 }

@@ -3,6 +3,7 @@ package models
 import play.api.Application
 import scala.slick.driver.ExtendedProfile
 import play.api.db.DB
+import scala.slick.lifted.OptionMapper2
 
 trait DBAccess {
     val profile:ExtendedProfile

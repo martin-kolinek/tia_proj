@@ -75,6 +75,7 @@ trait Tables { this:DBAccess =>
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def name = column[String]("name")
     	def * = id ~ name <> (DBMaterial, DBMaterial.unapply _)
+    	def forInsert = name returning id
     }
     
     object Shape extends Table[(Int)]("shape") {
@@ -89,6 +90,7 @@ trait Tables { this:DBAccess =>
     	def thickness = column[Option[BigDecimal]]("thickness")
     	def * = id ~ shapeId ~ thickness
     	def shape = foreignKey("fk_sheet_shape", shapeId, Sheet)(_.id)
+    	def forInsert = shapeId ~ thickness returning id
     }
     
     object CirclePipe extends Table[(Int, Int, Option[BigDecimal], Option[BigDecimal])]("circle_pipe") {
@@ -98,6 +100,7 @@ trait Tables { this:DBAccess =>
     	def radius = column[Option[BigDecimal]]("radius")
     	def * = id ~ shapeId ~ thickness ~ radius
     	def shape = foreignKey("fk_circle_pipe_shape", shapeId, Shape)(_.id)
+    	def forInsert = shapeId ~ thickness ~ radius returning id
     }
     
     object SquarePipe extends Table[(Int, Int, Option[BigDecimal], Option[BigDecimal])]("square_pipe") {
@@ -107,6 +110,7 @@ trait Tables { this:DBAccess =>
     	def diameter = column[Option[BigDecimal]]("diameter")
     	def * = id ~ shapeId ~ thickness ~ diameter
     	def shape = foreignKey("fk_square_pipe_shape", shapeId, Shape)(_.id)
+    	def forInsert = shapeId ~ thickness ~ diameter returning id
     }
     
     object ExtendedSheet extends Table[(Int, Int, Option[BigDecimal], Option[BigDecimal])]("extended_sheet") {
@@ -116,6 +120,7 @@ trait Tables { this:DBAccess =>
     	def height = column[Option[BigDecimal]]("height")
     	def * = id ~ sheetId ~ width ~ height
     	def sheet = foreignKey("fk_extended_sheet_sheet", sheetId, Sheet)(_.id)
+    	def forInsert = sheetId ~ width ~ height returning id
     }
     
     object ExtendedCirclePipe extends Table[(Int, Int, Option[BigDecimal])]("extended_circle_pipe") {
@@ -124,6 +129,7 @@ trait Tables { this:DBAccess =>
     	def length = column[Option[BigDecimal]]("length")
     	def * = id ~ circlePipeId ~ length
     	def circlePipe = foreignKey("fk_extended_circle_pipe_circle_pipe", circlePipeId, CirclePipe)(_.id)
+    	def forInsert = circlePipeId ~ length returning id
     }
     
     object ExtendedSquarePipe extends Table[(Int, Int, Option[BigDecimal])]("extended_square_pipe") {
@@ -132,6 +138,7 @@ trait Tables { this:DBAccess =>
     	def length = column[Option[BigDecimal]]("length")
     	def * = id ~ squarePipeId ~ length
     	def squarePipe = foreignKey("fk_extended_square_pipe_square_pipe", squarePipeId, SquarePipe)(_.id)
+    	def forInsert = squarePipeId ~ length returning id
     }
     
     case class DBPack(id:Int, materialId:Int, shapeId:Int, unlimited:Boolean, deliveryDate:DateTime, heatNo:String) {}

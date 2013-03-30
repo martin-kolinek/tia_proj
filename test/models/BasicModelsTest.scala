@@ -21,9 +21,9 @@ class BasicModelsTest extends FunSuite {
 			val tbls = getTables
 			assert(tbls.profile.isInstanceOf[scala.slick.driver.PostgresDriver])
 			val ddl = tbls.CirclePipe.ddl ++ tbls.Cutting.ddl ++ tbls.CuttingPlan.ddl ++ tbls.ExtendedCirclePipe.ddl ++ tbls.ExtendedSheet.ddl ++ tbls.ExtendedSquarePipe.ddl ++ tbls.Material.ddl ++ tbls.Order.ddl ++ tbls.Pack.ddl ++ tbls.Part.ddl ++ tbls.PartDefinition.ddl ++ tbls.PartDefinitionInCuttingPlan.ddl ++ tbls.PartDefinitionInOrder.ddl ++ tbls.Semiproduct.ddl ++ tbls.Shape.ddl ++ tbls.Sheet.ddl ++ tbls.SquarePipe.ddl
-			/*ddl.createStatements.foreach(x=>info(x+";"))
+			ddl.createStatements.foreach(x=>info(x+";"))
 			info("DROP")
-			ddl.dropStatements.foreach(x=>info(x+";"))*/
+			ddl.dropStatements.foreach(x=>info(x+";"))
 		}
 	}
 }
