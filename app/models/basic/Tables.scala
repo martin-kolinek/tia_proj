@@ -153,6 +153,7 @@ trait Tables { this:DBAccess =>
     	def * = id ~ materialId ~ shapeId ~ unlimited ~ deliveryDate ~ heatNo <> (DBPack, DBPack.unapply _)
     	def shape = foreignKey("fk_pack_shape", shapeId, Shape)(_.id)
     	def material = foreignKey("fk_pack_material", materialId, Material)(_.id)
+    	def forInsert = materialId ~ unlimited ~ shapeId ~ deliveryDate ~ heatNo returning id
     }
     
     object Semiproduct extends Table[(Int, Int, String)]("semiproduct") {

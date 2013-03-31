@@ -10,7 +10,7 @@ case class PackDesc(heatNo:String, deliveryDate:DateTime, unlimited:Boolean, mat
 
 case class SemiproductDesc(id:Int, serialNo:String) {} 
 
-trait Semiproducts extends Shapes { this: DBAccess =>
+trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     import profile.simple._
     
     private val packQuery = for {
@@ -35,7 +35,9 @@ trait Semiproducts extends Shapes { this: DBAccess =>
     }
     
     def insertPack(pck:PackDesc)(implicit session:Session) {
-    	
+    	val matId = getOrCreateMaterial(pck.material)
+    	val shapeId = getOrCreateShapeId(pck.shape)
+    	Pack.forInsert.insert(matId, pck.unlimited, shapeId, pck.deliveryDate, pck.heatNo)
     }
     
 }
