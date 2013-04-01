@@ -12,16 +12,17 @@ import models.DBAccessConf
 import play.api.templates.Html
 import org.omg.CosNaming.NamingContextPackage.NotFound
 import org.joda.time.DateTime
+import models.WithID
 
 object Semiproducts extends Controller { 
 	def list = Action { implicit request:RequestHeader =>
 		val sp = new DBAccessConf with Semiproducts
 		sp.withSession {implicit session =>
-			Ok(views.html.semiproducts(KeyValUtils.grid(sp.listPacks)))
+			Ok(views.html.semiproducts(KeyValUtils.grid(sp.listPacks.map(_.obj))))
 		}
 	}
 	
-	def details(packId:Int) = Action { implicit request:RequestHeader =>
+	/*def details(packId:Int) = Action { implicit request:RequestHeader =>
 		val sp = new DBAccessConf with Semiproducts
 		sp.withSession{ implicit session=>
 		    sp.packDetails(packId) match {
@@ -31,7 +32,7 @@ object Semiproducts extends Controller {
 		    	case None => NotFound("Pack not found")
 		    }
 		}
-	}
+	}*/
 	
 	val sheetMapping = mapping(
 			"thickness" -> optional(bigDecimal),
@@ -72,7 +73,7 @@ object Semiproducts extends Controller {
 		case _ => None
 	} 
 	
-	val form = Form(mapping(
+	val packMapping = mapping(
 			"heat" -> nonEmptyText,
 			"delivery" -> jodaDate,
 			"unlimited" -> boolean,
@@ -80,21 +81,65 @@ object Semiproducts extends Controller {
 			"type" -> number,
 			"sheet" -> sheetMapping,
 			"circ" -> circMapping,
-			"square" -> squareMapping)(formPackExtract)(packFormExtract))
+			"square" -> squareMapping)(formPackExtract)(packFormExtract)
+			
+	val spMapping = mapping(
+			"id" -> optional(number),
+			"serial" -> nonEmptyText)((id, serial)=>WithID(id, SemiproductDesc(serial))){
+		case WithID(id, SemiproductDesc(serial)) => Some((id, serial))
+		case _ => None
+	}
+			
+	val form = Form(tuple(
+			"pack" -> packMapping,
+			"semiproducts" -> play.api.data.Forms.list(spMapping)
+			))
 	
-	def insert = Action { 
+	def insert = Action {
+		Ok(views.html.semiprod_form(form, routes.Semiproducts.insertPost))
+	}
+			
+	def insertPost = Action { 
 		implicit request =>
 		val binding = form.bindFromRequest
 		binding.fold (
-				errFrm => BadRequest(views.html.semiprod_form(errFrm, routes.Semiproducts.insert)),
+				errFrm => BadRequest(views.html.semiprod_form(errFrm, routes.Semiproducts.insertPost)),
 				pck => {
 					val sp = new DBAccessConf with Semiproducts
 					sp.withSession{
 						implicit session =>
-						sp.insertPack(pck)
+						val id = sp.insertPack(pck._1)
+						sp.modifyPackSemiproducts(id, pck._2)
 					}
-				}
-				)
-		Ok("asdf")
+					Redirect(routes.Semiproducts.list)
+				})
 	}
+	
+	def update(id:Int) = Action {
+		val sp = new DBAccessConf with Semiproducts
+		sp.withSession{
+			implicit session =>
+			val pack = sp.packDetails(id)
+			pack.map{ pck =>
+				val filledForm = form.fill((pck.obj, sp.getPackSemiproducts(id)))
+				Ok(views.html.semiprod_form(filledForm, routes.Semiproducts.updatePost(id)))	
+			}.getOrElse(NotFound)
+		}
+	}
+	
+	def updatePost(id:Int) = Action {
+		implicit request =>
+		val binding = form.bindFromRequest()
+		binding.fold (
+				errFrm => BadRequest(views.html.semiprod_form(errFrm, routes.Semiproducts.updatePost(id))),
+				pck => {
+					val sp = new DBAccessConf with Semiproducts
+					sp.withSession {
+						implicit session =>
+						sp.updatePack(id, pck._1)
+						sp.modifyPackSemiproducts(id, pck._2)
+					}
+				})
+		Ok("asdf")
+	}	
 }

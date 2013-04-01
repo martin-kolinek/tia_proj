@@ -162,6 +162,7 @@ trait Tables { this:DBAccess =>
     	def serialNo = column[String]("serial_no")
     	def * = id ~ packId ~ serialNo
     	def pack = foreignKey("fk_semiproduct_pack", packId, Pack)(_.id)
+    	def forInsert = packId ~ serialNo returning id
     }
     
     object Cutting extends Table[(Int, Option[DateTime], Int)]("cutting") {
