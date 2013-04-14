@@ -37,6 +37,7 @@ trait Tables { this:DBAccess =>
     	def name = column[String]("name")
     	def hidden = column[Boolean]("hidden")
     	def * = id ~ file ~ filter ~ name ~ hidden
+    	def forInsert = file ~ filter ~ name ~ hidden returning id
     }
     
     object PartDefinitionInOrder extends Table[(Int, Int, Int, String)]("part_def_in_order") {

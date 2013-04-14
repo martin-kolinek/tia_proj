@@ -1,23 +1,23 @@
-@(frm:Form[(models.semiproduct.PackDesc, List[models.WithID[models.semiproduct.SemiproductDesc]])], replyTo:Call)
+@(frm:Form[models.semiproduct.PackDesc], replyTo:Call)
 
 @helper.form(action = replyTo) {
-	@helper.inputText(frm("pack.heat"))
-	@helper.inputDate(frm("pack.delivery"))
-	@helper.checkbox(frm("pack.unlimited"))
-	@helper.inputText(frm("pack.material.material"))
-	@helper.inputText(frm("pack.type"))
-	@helper.inputText(frm("pack.sheet.thickness"))
-	@helper.inputText(frm("pack.sheet.width"))
-	@helper.inputText(frm("pack.sheet.height"))
-	@helper.inputText(frm("pack.circ.thickness"))
-	@helper.inputText(frm("pack.circ.radius"))
-	@helper.inputText(frm("pack.circ.length"))
-	@helper.inputText(frm("pack.square.thickness"))
-	@helper.inputText(frm("pack.square.diameter"))
-	@helper.inputText(frm("pack.square.length"))
+	@helper.inputText(frm("heat"))
+	@helper.inputDate(frm("delivery"))
+	@helper.checkbox(frm("unlimited"))
+	@helper.inputText(frm("material.material"))
+	@helper.inputText(frm("type"))
+	@helper.inputText(frm("sheet.thickness"))
+	@helper.inputText(frm("sheet.width"))
+	@helper.inputText(frm("sheet.height"))
+	@helper.inputText(frm("circ.thickness"))
+	@helper.inputText(frm("circ.radius"))
+	@helper.inputText(frm("circ.length"))
+	@helper.inputText(frm("square.thickness"))
+	@helper.inputText(frm("square.diameter"))
+	@helper.inputText(frm("square.length"))
 	
 	<h4>Semiproducts</h4>
-		@helper.repeat(frm("semiproducts")) { sp =>
+		@helper.repeat(frm("semiproducts"), 0) { sp =>
 			@helper.inputText(sp("serial"))
 			@defining(sp("id")) { field =>
 				<input type="hidden" id="@field.id" name="@field.name" value="@field.value" />

@@ -13,14 +13,16 @@ import play.api.templates.Html
 import org.omg.CosNaming.NamingContextPackage.NotFound
 import org.joda.time.DateTime
 import models.WithID
+import models.semiproduct.{Semiproducts => DBSemiprods}
+import views.html.semiprod_form
 
-object Semiproducts extends Controller { 
-	def list = Action { implicit request:RequestHeader =>
+object Semiproducts extends Controller with ObjectController[PackDesc] { 
+	/*def list = Action { implicit request:RequestHeader =>
 		val sp = new DBAccessConf with Semiproducts
-		sp.withSession {implicit session =>
+		sp.withTransaction{implicit session =>
 			Ok(views.html.semiproducts(KeyValUtils.grid(sp.listPacks.map(_.obj))))
 		}
-	}
+	}*/
 	
 	/*def details(packId:Int) = Action { implicit request:RequestHeader =>
 		val sp = new DBAccessConf with Semiproducts
@@ -33,6 +35,8 @@ object Semiproducts extends Controller {
 		    }
 		}
 	}*/
+	
+	def model = new DBAccessConf with DBSemiprods
 	
 	val sheetMapping = mapping(
 			"thickness" -> optional(bigDecimal),
@@ -52,13 +56,13 @@ object Semiproducts extends Controller {
 	val materialMapping = mapping(
 			"material" -> nonEmptyText)(MaterialDesc)(MaterialDesc.unapply _)
 
-	def formPackExtract(heat:String, date:DateTime, unlim:Boolean, mat:MaterialDesc, shType:Int, sheet:SheetDesc, circ:CirclePipeDesc, square:SquarePipeDesc) = { 
+	def formPackExtract(heat:String, date:DateTime, unlim:Boolean, mat:MaterialDesc, shType:Int, sheet:SheetDesc, circ:CirclePipeDesc, square:SquarePipeDesc, semiprods:List[WithID[SemiproductDesc]]) = { 
 		val shp = IndexedSeq(ShapeDesc, sheet, circ, square)(shType)
-		PackDesc(heat, date, unlim, mat, shp)
+		PackDesc(heat, date, unlim, mat, shp, semiprods)
 	}
 	
 	def packFormExtract(pck:PackDesc) = pck match {
-		case PackDesc(heat, date, unlim, mat, shp) => {
+		case PackDesc(heat, date, unlim, mat, shp, semiprods) => {
 			val emptySheet = SheetDesc(None, None, None)
 			val emptyCirc = CirclePipeDesc(None, None, None)
 			val emptySquare = SquarePipeDesc(None, None, None)
@@ -68,7 +72,7 @@ object Semiproducts extends Controller {
 				case s:SquarePipeDesc => (3, emptySheet, emptyCirc, s)
 				case _ => (0, emptySheet, emptyCirc, emptySquare)
 			}
-			Some(heat, date, unlim, mat, shpType, sheet, circ, square)
+			Some(heat, date, unlim, mat, shpType, sheet, circ, square, semiprods)
 		}
 		case _ => None
 	} 
@@ -81,7 +85,9 @@ object Semiproducts extends Controller {
 			"type" -> number,
 			"sheet" -> sheetMapping,
 			"circ" -> circMapping,
-			"square" -> squareMapping)(formPackExtract)(packFormExtract)
+			"square" -> squareMapping,
+			"semiproducts" -> play.api.data.Forms.list(spMapping)
+			)(formPackExtract)(packFormExtract)
 			
 	val spMapping = mapping(
 			"id" -> optional(number),
@@ -90,56 +96,11 @@ object Semiproducts extends Controller {
 		case _ => None
 	}
 			
-	val form = Form(tuple(
-			"pack" -> packMapping,
-			"semiproducts" -> play.api.data.Forms.list(spMapping)
-			))
+	val form = Form(packMapping)
 	
-	def insert = Action {
-		Ok(views.html.semiprod_form(form, routes.Semiproducts.insertPost))
-	}
-			
-	def insertPost = Action { 
-		implicit request =>
-		val binding = form.bindFromRequest
-		binding.fold (
-				errFrm => BadRequest(views.html.semiprod_form(errFrm, routes.Semiproducts.insertPost)),
-				pck => {
-					val sp = new DBAccessConf with Semiproducts
-					sp.withSession{
-						implicit session =>
-						val id = sp.insertPack(pck._1)
-						sp.modifyPackSemiproducts(id, pck._2)
-					}
-					Redirect(routes.Semiproducts.list)
-				})
-	}
+	def template = semiprod_form.apply
 	
-	def update(id:Int) = Action {
-		val sp = new DBAccessConf with Semiproducts
-		sp.withSession{
-			implicit session =>
-			val pack = sp.packDetails(id)
-			pack.map{ pck =>
-				val filledForm = form.fill((pck.obj, sp.getPackSemiproducts(id)))
-				Ok(views.html.semiprod_form(filledForm, routes.Semiproducts.updatePost(id)))	
-			}.getOrElse(NotFound)
-		}
-	}
+	def saveRoute = routes.Semiproducts.save
 	
-	def updatePost(id:Int) = Action {
-		implicit request =>
-		val binding = form.bindFromRequest()
-		binding.fold (
-				errFrm => BadRequest(views.html.semiprod_form(errFrm, routes.Semiproducts.updatePost(id))),
-				pck => {
-					val sp = new DBAccessConf with Semiproducts
-					sp.withSession {
-						implicit session =>
-						sp.updatePack(id, pck._1)
-						sp.modifyPackSemiproducts(id, pck._2)
-					}
-				})
-		Ok("asdf")
-	}	
+	def updateRoute = routes.Semiproducts.update
 }

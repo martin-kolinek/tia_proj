@@ -8,7 +8,7 @@ import scala.slick.lifted.OptionMapper2
 trait DBAccess {
     val profile:ExtendedProfile
     import profile.simple._
-    def withSession[T](act: Session => T):T
+    def withTransaction[T](act: Session => T):T
 }
 
 class DBAccessConf(implicit app:Application) extends DBAccess {
@@ -19,5 +19,5 @@ class DBAccessConf(implicit app:Application) extends DBAccess {
 	lazy val profile = mir.reflectModule(driverSymbol).instance.asInstanceOf[ExtendedProfile]
 	import profile.simple._
 	private val db = Database.forDataSource(DB.getDataSource())
-	def withSession[T](act:Session => T) = db.withSession(act)
+	def withTransaction[T](act:Session => T) = db.withTransaction(act)
 }

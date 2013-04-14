@@ -5,13 +5,18 @@ import models.DBAccess
 import models.DBAccess
 import org.joda.time.DateTime
 import models.WithID
+import models.ObjectModel
 
-case class PackDesc(heatNo:String, deliveryDate:DateTime, unlimited:Boolean, material:MaterialDesc, shape:ShapeDesc) {	
-} 
+case class PackDesc(heatNo:String, 
+		deliveryDate:DateTime, 
+		unlimited:Boolean, 
+		material:MaterialDesc, 
+		shape:ShapeDesc, 
+		semiproducts:List[WithID[SemiproductDesc]]) 
 
 case class SemiproductDesc(serialNo:String) {}
 
-trait Semiproducts extends Shapes with Materials { this: DBAccess =>
+trait Semiproducts extends Shapes with Materials with ObjectModel[PackDesc] { this: DBAccess =>
     import profile.simple._
     
     private val packQuery = for {
@@ -20,17 +25,20 @@ trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     		mat <- pack.material
         } yield (shp, pack, mat)
     
-    def extractPackDesc(shp:OptionShape, pack:DBPack, mat:DBMaterial) = {
-    	WithID(Some(pack.id), PackDesc(pack.heatNo, pack.deliveryDate, pack.unlimited, MaterialDesc(mat.name), extractShape(shp)))
+    def extractPackDesc(shp:OptionShape, pack:DBPack, mat:DBMaterial, semiprods:List[WithID[SemiproductDesc]]) = {
+    	PackDesc(pack.heatNo, pack.deliveryDate, pack.unlimited, MaterialDesc(mat.name), extractShape(shp), semiprods)
     }
         
-    def listPacks(implicit session:Session) = {
+    /*def listPacks(implicit session:Session) = {
     	packQuery.list().map((extractPackDesc _).tupled)
-    }
+    }*/
         
-    def packDetails(id:Int)(implicit session:Session) = {
+    def get(id:Int)(implicit session:Session) = {
     	val q = packQuery.filter(_._2.id === id)
-    	q.firstOption().map((extractPackDesc _).tupled)
+    	for{
+    		pck <- q.firstOption
+    		semiprods = getPackSemiproducts(pck._2.id)
+    	} yield extractPackDesc(pck._1, pck._2, pck._3, semiprods)
     }
     
     def getPackSemiproducts(packId:Int)(implicit session:Session) = {
@@ -38,19 +46,20 @@ trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     			.map(x=>WithID(Some(x._1), SemiproductDesc(x._2)))
     }
     
-    def insertPack(pck:PackDesc)(implicit session:Session) = {
+    def insert(pck:PackDesc)(implicit session:Session) = {
     	val matId = getOrCreateMaterial(pck.material)
     	val shapeId = getOrCreateShapeId(pck.shape)
     	Pack.forInsert.insert(matId, pck.unlimited, shapeId, pck.deliveryDate, pck.heatNo)
     }
     
-    def updatePack(id:Int, pck:PackDesc)(implicit session:Session) = {
+    def update(id:Int, pck:PackDesc)(implicit session:Session) {
     	val matId = getOrCreateMaterial(pck.material)
     	val shapeId = getOrCreateShapeId(pck.shape)
     	(for {
     		dbpck <- Pack if dbpck.id === id
     	} yield dbpck.materialId ~ dbpck.unlimited ~ dbpck.shapeId ~ dbpck.deliveryDate ~ dbpck.heatNo)
     	    .update((matId, pck.unlimited, shapeId, pck.deliveryDate, pck.heatNo))
+        modifyPackSemiproducts(id, pck.semiproducts)
     }
     
     def modifyPackSemiproducts(packId:Int, sps:List[WithID[SemiproductDesc]])(implicit session:Session) {

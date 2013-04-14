@@ -1,0 +1,10 @@
+@(frm:Form[models.partdef.PartDefinitionDesc], replyTo:Call)
+
+@helper.form(action = replyTo, 'enctype -> "multipart/form-data") {
+	@helper.inputText(frm("name"))
+	@helper.inputText(frm("filter"))
+	@defining(frm("file")) { field =>
+		<input type="hidden" id="@field.id" name="@field.name" value="@field.value" />  
+	}
+	<input type="file" id="file" name="file" />
+}
