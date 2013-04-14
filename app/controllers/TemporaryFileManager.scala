@@ -2,10 +2,9 @@ package controllers
 
 import play.api._
 import play.api.mvc._
-import akka.actor.Actor
-import akka.actor.Props
+import play.api.data._
+import play.api.data.Forms._
 import scala.collection.mutable.HashMap
-import play.api.libs.concurrent.Akka
 import play.api.Play.current
 import play.api.libs.Files.TemporaryFile
 import resource._
@@ -61,4 +60,12 @@ object TemporaryFileManager extends Controller {
 	def upload = Action(parse.temporaryFile){ request =>
 		Ok(TemporaryFileStorage.addFile(request.body))
 	}
+	
+	val tempFileMapping = nonEmptyText.
+			transform(TemporaryFileStorage.retrieveFile, {
+				case None => ""
+				case Some(data) => TemporaryFileStorage.createFile(data)
+			}:Option[Array[Byte]] => String).
+			verifying("non existent file reference", _.isDefined).
+			transform(_.get, (x:Array[Byte]) => Some(x))
 }

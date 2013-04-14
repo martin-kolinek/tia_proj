@@ -58,6 +58,7 @@ trait Tables { this:DBAccess =>
     	def hidden = column[Boolean]("hidden")
     	def filter = column[String]("filter")
     	def * = id ~ name ~ file ~ hidden ~ filter
+    	def forInsert = name ~ filter ~ file ~ hidden returning id
     }
     
     object PartDefinitionInCuttingPlan extends Table[(Int, Int, Int)]("part_def_in_cut_plan") {

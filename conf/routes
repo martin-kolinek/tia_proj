@@ -17,7 +17,7 @@ POST	/semiproduct/:pack/edit		controllers.Semiproducts.update(pack:Int)
 
 #GET     /semiproduct/:pack         controllers.Semiproducts.details(pack:Int)
 
-#GET	/partdef/					controllers.PartDefinitions.list
+#GET	/partdef					controllers.PartDefinitions.list
 
 GET		/partdef/add				controllers.PartDefinitions.add
 
@@ -26,6 +26,14 @@ POST	/partdef/add				controllers.PartDefinitions.save
 GET		/partdef/:id/edit			controllers.PartDefinitions.edit(id:Int)
 
 POST	/partdef/:id/edit			controllers.PartDefinitions.update(id:Int)
+
+GET		/cuttingplan/add			controllers.CuttingPlans.add
+
+POST	/cuttingplan/add			controllers.CuttingPlans.save
+
+GET		/cuttingplan/:id/edit		controllers.CuttingPlans.edit(id:Int)
+
+POST	/cuttingplan/:id/edit		controllers.CuttingPlans.update(id:Int)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

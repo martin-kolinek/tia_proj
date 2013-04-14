@@ -16,14 +16,8 @@ object PartDefinitions extends Controller with ObjectController[PartDefinitionDe
 	
 	val form = Form(mapping(
 			"name" -> nonEmptyText,
-			"filter" -> nonEmptyText,
-			"file" -> nonEmptyText.
-			transform(TemporaryFileStorage.retrieveFile, {
-				case None => ""
-				case Some(data) => TemporaryFileStorage.createFile(data)
-			}:Option[Array[Byte]] => String).
-			verifying("non existent file reference", _.isDefined).
-			transform(_.get, (x:Array[Byte]) => Some(x)))
+			"filter" -> text,
+			"file" -> TemporaryFileManager.tempFileMapping)
 			(PartDefinitionDesc)(PartDefinitionDesc.unapply _))
 	
 	def saveRoute = routes.PartDefinitions.save
