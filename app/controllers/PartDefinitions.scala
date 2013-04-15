@@ -16,7 +16,7 @@ object PartDefinitions extends Controller with ObjectController[PartDefinitionDe
 
 	def model = new DBAccessConf with DBPartDef
 	
-	def form(m:ModelType)(implicit session:m.profile.simple.Session) = Form(mapping(
+	def form(implicit session:scala.slick.session.Session) = Form(mapping(
 			"name" -> nonEmptyText,
 			"filter" -> text,
 			"file" -> TemporaryFileManager.tempFileMapping)

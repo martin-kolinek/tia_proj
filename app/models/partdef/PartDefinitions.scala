@@ -17,7 +17,7 @@ trait PartDefinitions extends Tables with ObjectModel[PartDefinitionDesc] {
 	}
 
     def exists(id:Int)(implicit session:Session) = {
-        idQuery(id).exists
+        idQuery(id).firstOption.isDefined
     }
 	
 	def listPartDefinitions(implicit session:Session) = {

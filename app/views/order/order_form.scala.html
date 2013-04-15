@@ -1,0 +1,15 @@
+@(frm:Form[models.order.OrderDesc], replyTo:Call)
+
+@helper.form(action = replyTo) {
+	@helper.inputText(frm("name"))
+	@helper.inputDate(frm("filling_date"))
+	@helper.inputDate(frm("due_date"))
+	@helper.inputText(frm("status"))
+	
+	<h4>Part definitions</h4>
+	@helper.repeat(frm("pdefs"), 0) { pdef =>
+		@helper.inputText(pdef("id"))
+		@helper.inputText(pdef("count"))
+		@helper.inputText(frm("filter"))
+	}
+}

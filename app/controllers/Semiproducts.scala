@@ -98,7 +98,7 @@ object Semiproducts extends Controller with ObjectController[PackDesc] {
 		case _ => None
 	}
 			
-	def form(m:ModelType)(implicit session:m.profile.simple.Session) = Form(packMapping)
+	def form(implicit session:scala.slick.session.Session) = Form(packMapping)
 	
 	def template = semiprod_form.apply
 	

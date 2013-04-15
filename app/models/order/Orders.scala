@@ -35,5 +35,24 @@ trait Orders extends Tables with ObjectModel[OrderDesc] {
         PartDefinitionInOrder.insertAll(ord.partdefs.map(x=>(id, x.partDefId, x.count, x.filter)):_*) 
         id
     }
+    
+    def update(id:Int, ord:OrderDesc)(implicit session:Session) = {
+    	val q = for {
+    		dbo <- Order if dbo.id === id
+    	} yield dbo.name ~ dbo.fillingDate ~ dbo.dueDate ~ dbo.status
+    	q.update(ord.name, ord.fillingDate, ord.dueDate, ord.status)
+    	(for {
+    		pdef <- PartDefinitionInOrder
+    		if pdef.orderId === id
+    		if !pdef.partDefId.inSet(ord.partdefs.map(_.partDefId))
+    	} yield pdef).delete
+    	for (pdef <- ord.partdefs) {
+    		val upd = Query(PartDefinitionInOrder).filter(_.orderId === id).
+    		    filter(_.partDefId===pdef.partDefId).map(x=>x.filter ~ x.count).
+    		    update(pdef.filter, pdef.count)
+    		if(upd == 0) 
+    			PartDefinitionInOrder.insert(id, pdef.partDefId, pdef.count, pdef.filter)
+    	}
+    }
 
 }

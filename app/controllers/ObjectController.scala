@@ -10,7 +10,7 @@ import models.DBAccess
 
 trait ObjectController[ObjectType] {
 	self:Controller =>
-	def form(m:ModelType)(implicit session:m.profile.simple.Session):Form[ObjectType]
+	def form(implicit session:scala.slick.session.Session):Form[ObjectType]
 	
 	def template: (Form[ObjectType], Call) => Html
 	
@@ -26,7 +26,7 @@ trait ObjectController[ObjectType] {
         val m = model
         m.withTransaction {
             implicit s=>
-		    Ok(template(form(m), saveRoute))
+		    Ok(template(form, saveRoute))
         }
 	}
 	
@@ -34,9 +34,9 @@ trait ObjectController[ObjectType] {
         val m = model
         m.withTransaction { 
             implicit session =>
-		    val binding = form(m).bindFromRequest
+		    val binding = form.bindFromRequest
 		    binding.fold(
-			    errFrm => BadRequest(template(form(m), saveRoute)),
+			    errFrm => BadRequest(template(form, saveRoute)),
 			    obj => {
 					m.insert(obj)
 					Ok("inserted")
@@ -49,7 +49,7 @@ trait ObjectController[ObjectType] {
 		m.withTransaction { implicit session =>
 			m.get(id) match {
 				case None => BadRequest("Unknown id")
-				case Some(obj) => Ok(template(form(m).fill(obj), updateRoute(id)))
+				case Some(obj) => Ok(template(form.fill(obj), updateRoute(id)))
 			}
 		}
 	}
@@ -58,7 +58,7 @@ trait ObjectController[ObjectType] {
         val m = model
 		m.withTransaction { 
             implicit session =>
-		    val binding = form(m).bindFromRequest
+		    val binding = form.bindFromRequest
 		    binding.fold(
 				errFrm => BadRequest(template(errFrm, updateRoute(id))),
 				obj => {
