@@ -19,7 +19,7 @@ import models.cutting.CuttingModel
 object CuttingController extends Controller with ObjectController[CuttingDesc] {
     type ModelType = DBAccessConf with CuttingModel 
     lazy val model = new DBAccessConf with Cuttings 
-        with DBSP with DBCP with DBPartDefs 
+        with DBSP with DBPartDefs
         with DBOrders with CuttingModel
 
     def partMapping(implicit s:scala.slick.session.Session) = mapping(
