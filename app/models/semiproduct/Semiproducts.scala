@@ -19,7 +19,7 @@ case class SemiproductDesc(serialNo:String) {}
 trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     import profile.simple._
     
-    private val packQuery = for {
+    val packQuery = for {
     		shp@(shapeId, _, _, _, _, _, _) <- basicShapeJoin
     		pack <- Pack if pack.shapeId === shapeId
     		mat <- pack.material

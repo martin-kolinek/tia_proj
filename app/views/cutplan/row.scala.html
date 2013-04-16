@@ -1,0 +1,11 @@
+@(obj:models.cutplan.CuttingPlanForList)
+
+<td>
+	@obj.name
+</td>
+<td>
+	@obj.filter
+</td>
+<td>
+	<a href="@routes.CuttingPlans.edit(obj.id)">edit</a>
+</td>

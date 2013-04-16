@@ -13,11 +13,14 @@ import models.cutplan.PartDefInCutPlan
 import models.cutplan.CuttingPlanDesc
 import views.html.cutplan.cutplan_form
 import models.cutplan.CuttingPlanModel
+import models.cutplan.CuttingPlanForList
+import models.cutplan.CuttingPlanList
 
-object CuttingPlans extends Controller with ObjectController[CuttingPlanDesc] {
-    type ModelType = DBAccessConf with CuttingPlanModel
+object CuttingPlans extends Controller with ObjectController[CuttingPlanDesc] 
+		with ObjectListController[CuttingPlanForList] {
+    type ModelType = DBAccessConf with CuttingPlanModel with CuttingPlanList
     
-	lazy val model = new DBAccessConf with DBCutPlans with DBPartDefs with CuttingPlanModel
+	lazy val model = new DBAccessConf with DBCutPlans with DBPartDefs with CuttingPlanModel with CuttingPlanList
 	
 	def partDefMapping(implicit s:scala.slick.session.Session) = mapping(
 			"partdefid" -> number.verifying(model.existsPartDef _),
@@ -27,11 +30,16 @@ object CuttingPlans extends Controller with ObjectController[CuttingPlanDesc] {
 			"name" -> nonEmptyText,
 			"filter" -> text,
 			"file" -> TemporaryFileManager.tempFileMapping,
-			"partdefs" -> list(partDefMapping)
+			"partdefs" -> play.api.data.Forms.list(partDefMapping)
 			)(CuttingPlanDesc)(CuttingPlanDesc.unapply))
 			
 	def template = cutplan_form.apply
 	
 	def saveRoute = routes.CuttingPlans.save
+	
 	def updateRoute = routes.CuttingPlans.update
+	
+	def header = views.html.cutplan.header()
+	
+	def row = views.html.cutplan.row.apply
 }

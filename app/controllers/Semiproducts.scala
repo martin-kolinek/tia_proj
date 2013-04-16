@@ -6,8 +6,6 @@ import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.Play.current
-import views.KeyValUtils
-import views.Semiproducts._
 import models.DBAccessConf
 import play.api.templates.Html
 import org.omg.CosNaming.NamingContextPackage.NotFound
