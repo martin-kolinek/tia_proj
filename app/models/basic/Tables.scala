@@ -23,12 +23,12 @@ trait Tables { this:DBAccess =>
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def orderId = column[Option[Int]]("order_id")
     	def partDefId = column[Int]("part_def_id")
-    	def cutPlanId = column[Int]("cut_plan_id")
+    	def cuttingId = column[Int]("cutting_id")
     	def damaged = column[Boolean]("damaged")
-    	def * = id ~ orderId ~ partDefId ~ cutPlanId ~ damaged
+    	def * = id ~ orderId ~ partDefId ~ cuttingId ~ damaged
     	def order = foreignKey("fk_part_order", orderId, Order)(_.id)
     	def partDefinition = foreignKey("fk_part_part_def", partDefId, PartDefinition)(_.id)
-    	def cuttingPlan = foreignKey("fk_part_cut_plan", cutPlanId, CuttingPlan)(_.id)
+    	def cutting = foreignKey("fk_part_cutting", cuttingId, Cutting)(_.id)
     }
     
     object PartDefinition extends Table[(Int, Array[Byte], String, String, Boolean)]("part_definition") {
@@ -176,6 +176,7 @@ trait Tables { this:DBAccess =>
     	def * = id ~ finishTime ~ semiproductId
         def semiproduct = foreignKey("fk_cutting_semiproduct", semiproductId, Semiproduct)(_.id)
         def cuttingPlan = foreignKey("fk_cutting_cutting_plan", cuttingPlanId, CuttingPlan)(_.id)
+        def forInsert = finishTime ~ semiproductId ~ cuttingPlanId returning id
     }
 }
 

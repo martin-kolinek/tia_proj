@@ -26,7 +26,7 @@ create table "extended_square_pipe" ("id" int NOT NULL DEFAULT nextval('extended
 create table "material" ("id" int NOT NULL DEFAULT nextval('material_id_seq') PRIMARY KEY,"name" VARCHAR(254) NOT NULL);
 create table "order" ("id" int NOT NULL DEFAULT nextval('order_id_seq') PRIMARY KEY,"name" VARCHAR(254) NOT NULL,"filling_date" TIMESTAMP NOT NULL,"due_date" TIMESTAMP,"status" INTEGER NOT NULL);
 create table "pack" ("id" int NOT NULL DEFAULT nextval('pack_id_seq') PRIMARY KEY,"material_id" INTEGER NOT NULL,"shape_id" INTEGER NOT NULL,"unlimited" BOOLEAN NOT NULL,"delivery_date" TIMESTAMP NOT NULL,"heat_no" VARCHAR(254) NOT NULL);
-create table "part" ("id" int NOT NULL DEFAULT nextval('part_id_seq') PRIMARY KEY,"order_id" INTEGER,"part_def_id" INTEGER NOT NULL,"cut_plan_id" INTEGER NOT NULL,"damaged" BOOLEAN NOT NULL);
+create table "part" ("id" int NOT NULL DEFAULT nextval('part_id_seq') PRIMARY KEY,"order_id" INTEGER,"part_def_id" INTEGER NOT NULL,"cutting_id" INTEGER NOT NULL,"damaged" BOOLEAN NOT NULL);
 create table "part_definition" ("id" int NOT NULL DEFAULT nextval('part_definition_id_seq') PRIMARY KEY,"file" BYTEA NOT NULL,"filter" VARCHAR(254) NOT NULL,"name" VARCHAR(254) NOT NULL,"hidden" BOOLEAN NOT NULL);
 create table "part_def_in_cut_plan" ("cut_plan_id" INTEGER NOT NULL,"part_def_id" INTEGER NOT NULL,"count" INTEGER NOT NULL);
 alter table "part_def_in_cut_plan" add constraint "pk_part_def_in_cut_plan" primary key("cut_plan_id","part_def_id");
@@ -44,7 +44,7 @@ alter table "pack" add constraint "fk_pack_shape" foreign key("shape_id") refere
 alter table "pack" add constraint "fk_pack_material" foreign key("material_id") references "material"("id") on update NO ACTION on delete NO ACTION;
 alter table "part" add constraint "fk_part_order" foreign key("order_id") references "order"("id") on update NO ACTION on delete NO ACTION;
 alter table "part" add constraint "fk_part_part_def" foreign key("part_def_id") references "part_definition"("id") on update NO ACTION on delete NO ACTION;
-alter table "part" add constraint "fk_part_cut_plan" foreign key("cut_plan_id") references "cutting_plan"("id") on update NO ACTION on delete NO ACTION;
+alter table "part" add constraint "fk_part_cutting" foreign key("cutting_id") references "cutting"("id") on update NO ACTION on delete NO ACTION;
 alter table "part_def_in_cut_plan" add constraint "fk_part_def_in_cut_plan_part_def" foreign key("part_def_id") references "part_definition"("id") on update NO ACTION on delete NO ACTION;
 alter table "part_def_in_cut_plan" add constraint "fk_part_def_in_cut_plan_cut_plan" foreign key("cut_plan_id") references "cutting_plan"("id") on update NO ACTION on delete NO ACTION;
 alter table "part_def_in_order" add constraint "fk_part_def_in_order_order" foreign key("order_id") references "order"("id") on update NO ACTION on delete NO ACTION;

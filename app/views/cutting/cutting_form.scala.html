@@ -1,0 +1,13 @@
+@(frm:Form[models.cutting.CuttingDesc], replyTo:Call)
+
+@helper.form(action = replyTo) {
+	@helper.inputText(frm("semiproduct"))
+	@helper.inputText(frm("cuttin_plan"))
+	
+	<h4>Parts</h4>
+	@helper.repeat(frm("parts"), 0) { part =>
+		@helper.inputText(part("partdefid"))
+		@helper.inputText(part("count"))
+        @helper.inputText(part("order"))
+	}
+}

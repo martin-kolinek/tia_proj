@@ -42,6 +42,14 @@ POST	/order/add					controllers.OrderController.save
 GET		/order/:id/edit				controllers.OrderController.edit(id:Int)
 
 POST	/order/:id/edit				controllers.OrderController.update(id:Int)
+        
+GET     /cutting/add                controllers.CuttingController.add
+
+POST	/cuntting/add				controllers.CuttingController.save
+
+GET		/cutting/:id/edit			controllers.CuttingController.edit(id:Int)
+
+POST	/cutting/:id/edit			controllers.CuttingController.update(id:Int)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

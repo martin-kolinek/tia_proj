@@ -22,6 +22,9 @@ trait CuttingPlans extends Tables with ObjectModel[CuttingPlanDesc] {
 			pdefs = getPartDefs(id)
 		} yield CuttingPlanDesc(nm, filt, file, pdefs)
 	}
+
+    def exists(id:Int)(implicit session:Session) = 
+        Query(CuttingPlan).filter(_.id===id).firstOption.isDefined
 	
 	def getPartDefs(cutPlanId:Int)(implicit session:Session) = {
 		(for {

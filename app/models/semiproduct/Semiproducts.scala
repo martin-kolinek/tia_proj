@@ -76,4 +76,6 @@ trait Semiproducts extends Shapes with Materials with ObjectModel[PackDesc] { th
     		Semiproduct.forInsert.insert((packId, sp.obj.serialNo))
     	}
     }
+
+    def existsSemiproduct(id:Int)(implicit session:Session) = Query(Semiproduct).filter(_.id === id).firstOption.isDefined
 }

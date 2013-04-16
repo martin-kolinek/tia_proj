@@ -30,6 +30,9 @@ trait Orders extends Tables with ObjectModel[OrderDesc] {
         } yield OrderDesc.tupled((ord.hlisted ::: (q2.list.map(PartDefInOrder.tupled) :: HNil)).tupled)
     }
 
+    def exists(id:Int)(implicit session:Session) =
+        Query(Order).filter(_.id === id).firstOption.isDefined
+
     def insert(ord:OrderDesc)(implicit session:Session) = {
         val id:Int = Order.forInsert.insert((ord.name, ord.fillingDate, ord.dueDate, ord.status))
         PartDefinitionInOrder.insertAll(ord.partdefs.map(x=>(id, x.partDefId, x.count, x.filter)):_*) 
