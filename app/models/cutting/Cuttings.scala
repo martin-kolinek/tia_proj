@@ -12,12 +12,12 @@ case class CuttingDesc(semiprodId:Int, cutPlanId:Int, parts:List[PartInCuttingDe
 
 case class PartInCuttingDesc(partDefId:Int, OrderId:Int, count:Int)
 
-trait Cuttings extends Tables with ObjectModel[CuttingDesc] {
+trait Cuttings extends Tables {
     self:DBAccess =>
 
     import profile.simple._
 
-    def get(id:Int)(implicit s:Session) = {
+    def getCutting(id:Int)(implicit s:Session) = {
         val cutting = Query(Cutting).filter(_.id === id).filter(_.finishTime.isNull).map(x=>(x.semiproductId, x.cuttingPlanId)).
             firstOption
         val parts = Query(Part).filter(_.cuttingId === id).filter(_.orderId.isNotNull).groupBy(x=>x.partDefId -> x.orderId).map{
@@ -26,11 +26,11 @@ trait Cuttings extends Tables with ObjectModel[CuttingDesc] {
         cutting.map(x=>(x.hlisted ::: parts :: HNil).tupled).map(CuttingDesc.tupled)
     }
 
-    def insert(cut:CuttingDesc)(implicit s:Session) = {
+    def insertCutting(cut:CuttingDesc)(implicit s:Session) = {
         Cutting.forInsert.insert(None, cut.semiprodId, cut.cutPlanId)
     }
 
-    def update(id:Int, cut:CuttingDesc)(implicit s:Session) {
+    def updateCutting(id:Int, cut:CuttingDesc)(implicit s:Session) {
         Cutting.filter(_.id === id).map(x=>x.semiproductId ~ x.cuttingPlanId).update(cut.semiprodId, cut.cutPlanId)
     }
 }

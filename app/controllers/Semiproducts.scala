@@ -36,9 +36,9 @@ object Semiproducts extends Controller with ObjectController[PackDesc] {
 		}
 	}*/
 
-    type ModelType = DBAccessConf with DBSemiprods
+    type ModelType = DBAccessConf with SemiproductModel
 	
-	def model = new DBAccessConf with DBSemiprods
+	lazy val model = new DBAccessConf with DBSemiprods with SemiproductModel
 	
 	val sheetMapping = mapping(
 			"thickness" -> optional(bigDecimal),

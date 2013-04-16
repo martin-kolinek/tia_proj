@@ -12,15 +12,15 @@ import models.partdef.{PartDefinitions => DBPartDefs}
 import models.cutplan.PartDefInCutPlan
 import models.cutplan.CuttingPlanDesc
 import views.html.cutplan.cutplan_form
+import models.cutplan.CuttingPlanModel
 
 object CuttingPlans extends Controller with ObjectController[CuttingPlanDesc] {
-    type ModelType = DBAccessConf with DBCutPlans
+    type ModelType = DBAccessConf with CuttingPlanModel
     
-	lazy val model = new DBAccessConf with DBCutPlans
-	lazy val parts = new DBAccessConf with DBPartDefs
+	lazy val model = new DBAccessConf with DBCutPlans with DBPartDefs with CuttingPlanModel
 	
 	def partDefMapping(implicit s:scala.slick.session.Session) = mapping(
-			"partdefid" -> number.verifying(parts.exists _),
+			"partdefid" -> number.verifying(model.existsPartDef _),
 			"count" -> number.verifying(_>0))(PartDefInCutPlan)(PartDefInCutPlan.unapply)
 	
 	def form(implicit s:scala.slick.session.Session) = Form(mapping(

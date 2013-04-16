@@ -38,7 +38,7 @@ trait ObjectController[ObjectType] {
 		    binding.fold(
 			    errFrm => BadRequest(template(form, saveRoute)),
 			    obj => {
-					m.insert(obj)
+					m.insert.apply(obj)
 					Ok("inserted")
 			    })
         }
@@ -47,7 +47,7 @@ trait ObjectController[ObjectType] {
 	def edit(id:Int) = Action {
 		val m = model
 		m.withTransaction { implicit session =>
-			m.get(id) match {
+			m.get.apply(id) match {
 				case None => BadRequest("Unknown id")
 				case Some(obj) => Ok(template(form.fill(obj), updateRoute(id)))
 			}
@@ -62,7 +62,7 @@ trait ObjectController[ObjectType] {
 		    binding.fold(
 				errFrm => BadRequest(template(errFrm, updateRoute(id))),
 				obj => {
-				    m.update(id, obj)
+				    m.update.apply(id, obj)
 				    Ok("updated")
 				})
 	    }

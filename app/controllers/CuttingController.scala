@@ -14,23 +14,22 @@ import models.partdef.{PartDefinitions => DBPartDefs}
 import models.order.{Orders => DBOrders}
 import models.cutting.PartInCuttingDesc
 import views.html.cutting.cutting_form
+import models.cutting.CuttingModel
 
 object CuttingController extends Controller with ObjectController[CuttingDesc] {
-    type ModelType = DBAccessConf with Cuttings
-    lazy val model = new DBAccessConf with Cuttings
-    lazy val semiprods = new DBAccessConf with DBSP
-    lazy val cutplans = new DBAccessConf with DBCP
-    lazy val partdef = new DBAccessConf with DBPartDefs
-    lazy val ord = new DBAccessConf with DBOrders
+    type ModelType = DBAccessConf with CuttingModel 
+    lazy val model = new DBAccessConf with Cuttings 
+        with DBSP with DBCP with DBPartDefs 
+        with DBOrders with CuttingModel
 
     def partMapping(implicit s:scala.slick.session.Session) = mapping(
-        "partdef" -> number.verifying(partdef.exists _),
-        "order" -> number.verifying(ord.exists _),
+        "partdef" -> number.verifying(model.existsPartDef _),
+        "order" -> number.verifying(model.existsOrder _),
         "count" -> number.verifying(_>0))(PartInCuttingDesc)(PartInCuttingDesc.unapply)
 
     def form(implicit s:scala.slick.session.Session) = Form(mapping(
-        "semiproduct" -> number.verifying(semiprods.existsSemiproduct _),
-        "cutting_plan" -> number.verifying(cutplans.exists _),
+        "semiproduct" -> number.verifying(model.existsSemiproduct _),
+        "cutting_plan" -> number.verifying(model.existsCuttingPlan _),
         "parts" -> list(partMapping)
     )(CuttingDesc)(CuttingDesc.unapply))
 

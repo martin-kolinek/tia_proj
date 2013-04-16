@@ -12,14 +12,14 @@ import models.enums._
 import models.partdef.{PartDefinitions => DBPartDef}
 import models.order.PartDefInOrder
 import views.html.order.order_form
+import models.order.OrderModel
 
 object OrderController extends Controller with ObjectController[OrderDesc] {
-	type ModelType = DBAccessConf with Orders
-	lazy val model = new DBAccessConf with Orders
-	lazy val parts = new DBAccessConf with DBPartDef
+	type ModelType = DBAccessConf with OrderModel
+	lazy val model = new DBAccessConf with Orders with DBPartDef with OrderModel
 	
 	def pdefMapping(implicit s:scala.slick.session.Session) = mapping(
-			"id" -> number.verifying(parts.exists _),
+			"id" -> number.verifying(model.existsPartDef _),
 			"filter" -> nonEmptyText,
 			"count" -> number(1))(PartDefInOrder)(PartDefInOrder.unapply)
 	

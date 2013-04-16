@@ -8,12 +8,12 @@ case class CuttingPlanDesc(name:String, filter:String, file:Array[Byte], partdef
 
 case class PartDefInCutPlan(partDefId:Int, count:Int)
 
-trait CuttingPlans extends Tables with ObjectModel[CuttingPlanDesc] {
+trait CuttingPlans extends Tables {
 	self:DBAccess =>
 		
 	import profile.simple._
 
-	def get(id:Int)(implicit session:Session) = {
+	def getCuttingPlan(id:Int)(implicit session:Session) = {
 		val q = for {
 			cp <- CuttingPlan if cp.id === id
 		} yield (cp.name, cp.filter, cp.file)
@@ -23,22 +23,22 @@ trait CuttingPlans extends Tables with ObjectModel[CuttingPlanDesc] {
 		} yield CuttingPlanDesc(nm, filt, file, pdefs)
 	}
 
-    def exists(id:Int)(implicit session:Session) = 
+    def existsCuttingPlan(id:Int)(implicit session:Session) = 
         Query(CuttingPlan).filter(_.id===id).firstOption.isDefined
 	
-	def getPartDefs(cutPlanId:Int)(implicit session:Session) = {
+	private def getPartDefs(cutPlanId:Int)(implicit session:Session) = {
 		(for {
 			pdef <- PartDefinitionInCuttingPlan if pdef.cutPlanId === cutPlanId
 		} yield pdef.partDefId -> pdef.count).list.map(PartDefInCutPlan.tupled)
 	}
 	
-	def insert(cp:CuttingPlanDesc)(implicit session:Session) = {
+	def insertCuttingPlan(cp:CuttingPlanDesc)(implicit session:Session) = {
 		val id = CuttingPlan.forInsert.insert((cp.name, cp.filter, cp.file, false))
 		PartDefinitionInCuttingPlan.insertAll(cp.partdefs.map(x=>(id, x.partDefId, x.count)):_*)
 		id
 	}
 	
-	def update(id:Int, cp:CuttingPlanDesc)(implicit session:Session) {
+	def updateCuttingPlan(id:Int, cp:CuttingPlanDesc)(implicit session:Session) {
 		Query(CuttingPlan).filter(_.id === id).map(cp=>cp.name ~ cp.filter ~ cp.file).
 		update(cp.name, cp.filter, cp.file)
 		(for{
