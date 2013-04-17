@@ -12,11 +12,14 @@ import models.partdef.PartDefinitionDesc
 import models.partdef.PartDefinitionDesc
 import models.partdef.PartDefinitionModel
 import models.partdef.PartDefinitionModel
+import models.partdef.PartDefinitionList
+import models.partdef.PartDefinitionForList
 
-object PartDefinitions extends Controller with ObjectController[PartDefinitionDesc]{
-    type ModelType = DBAccessConf with PartDefinitionModel
+object PartDefinitions extends Controller with ObjectController[PartDefinitionDesc]
+		with ObjectListController[PartDefinitionForList]{
+    type ModelType = DBAccessConf with PartDefinitionModel with PartDefinitionList 
 
-	def model = new DBAccessConf with DBPartDef with PartDefinitionModel
+	lazy val model = new DBAccessConf with DBPartDef with PartDefinitionModel with PartDefinitionList
 	
 	def form(implicit session:scala.slick.session.Session) = Form(mapping(
 			"name" -> nonEmptyText,
@@ -28,4 +31,6 @@ object PartDefinitions extends Controller with ObjectController[PartDefinitionDe
 	def updateRoute = routes.PartDefinitions.update
 	
 	def template = partdef_form.apply
+	
+	def listTemplate = views.html.partdef.list.apply
 }

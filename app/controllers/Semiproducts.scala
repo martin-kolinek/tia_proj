@@ -12,31 +12,12 @@ import org.omg.CosNaming.NamingContextPackage.NotFound
 import org.joda.time.DateTime
 import models.WithID
 import models.semiproduct.{Semiproducts => DBSemiprods}
-import views.html.semiprod_form
+import views.html.semiproduct.semiprod_form
 
-object Semiproducts extends Controller with ObjectController[PackDesc] { 
-	/*def list = Action { implicit request:RequestHeader =>
-		val sp = new DBAccessConf with Semiproducts
-		sp.withTransaction{implicit session =>
-			Ok(views.html.semiproducts(KeyValUtils.grid(sp.listPacks.map(_.obj))))
-		}
-	}*/
+object Semiproducts extends Controller with ObjectController[PackDesc] with ObjectListController[PackForList] { 
+    type ModelType = DBAccessConf with SemiproductModel with PackList
 	
-	/*def details(packId:Int) = Action { implicit request:RequestHeader =>
-		val sp = new DBAccessConf with Semiproducts
-		sp.withSession{ implicit session=>
-		    sp.packDetails(packId) match {
-		    	case Some((desc, sps)) => Ok(views.html.semiprod_details(
-		    			KeyValUtils.details(desc), 
-		    			KeyValUtils.grid(sps)))
-		    	case None => NotFound("Pack not found")
-		    }
-		}
-	}*/
-
-    type ModelType = DBAccessConf with SemiproductModel
-	
-	lazy val model = new DBAccessConf with DBSemiprods with SemiproductModel
+	lazy val model = new DBAccessConf with DBSemiprods with SemiproductModel with PackList
 	
 	val sheetMapping = mapping(
 			"thickness" -> optional(bigDecimal),
@@ -103,4 +84,6 @@ object Semiproducts extends Controller with ObjectController[PackDesc] {
 	def saveRoute = routes.Semiproducts.save
 	
 	def updateRoute = routes.Semiproducts.update
+	
+	def listTemplate = views.html.semiproduct.list.apply
 }

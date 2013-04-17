@@ -13,6 +13,8 @@ case class OrderDesc(name:String, fillingDate:DateTime, dueDate:Option[DateTime]
 
 case class PartDefInOrder(partDefId:Int, filter:String, count:Int)
 
+case class OrderForList(id:Int, name:String, fillingDate:DateTime, dueDate:Option[DateTime], status:OrderStatus)
+
 trait Orders extends Tables {
     self:DBAccess =>
 

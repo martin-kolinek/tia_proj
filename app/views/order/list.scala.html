@@ -1,0 +1,44 @@
+@(ords:Seq[models.order.OrderForList])
+
+<h3>
+	Orders
+</h3>
+
+<table>
+	<tr>
+		<th>
+			Name
+		</th>
+		<th>
+			Filling date
+		</th>
+		<th>
+			Due date
+		</th>
+		<th>
+			Status
+		</th>
+		<th>
+			Actions
+		</th>
+	</tr>
+	@for(ord<-ords) {
+		<tr>
+			<td>
+				@ord.name
+			</td>
+			<td>
+				@ord.fillingDate
+			</td>
+			<td>
+				@ord.dueDate
+			</td>
+			<td>
+				@ord.status
+			</td>
+			<td>
+				<a href="@routes.OrderController.edit(ord.id)">edit</a>
+			</td>
+		</tr>
+	}
+</table>

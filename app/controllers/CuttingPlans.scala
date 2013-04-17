@@ -39,7 +39,5 @@ object CuttingPlans extends Controller with ObjectController[CuttingPlanDesc]
 	
 	def updateRoute = routes.CuttingPlans.update
 	
-	def header = views.html.cutplan.header()
-	
-	def row = views.html.cutplan.row.apply
+	def listTemplate = views.html.cutplan.list.apply 
 }

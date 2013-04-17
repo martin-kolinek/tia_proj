@@ -1,0 +1,32 @@
+@(pdefs:Seq[models.partdef.PartDefinitionForList])
+
+<h3>
+	Part definitions
+</h3>
+
+<table>
+	<tr>
+		<th>
+			Name
+		</th>
+		<th>
+			Filter
+		</th>
+		<th>
+			Actions
+		</th>
+	</tr>
+	@for(pdef<-pdefs) {
+		<tr>
+			<td>
+				@pdef.name
+			</td>
+			<td>
+				@pdef.filter
+			</td>
+			<td>
+				<a href="@routes.PartDefinitions.edit(pdef.id)">edit</a>
+			</td>
+		</tr>
+	}
+</table>

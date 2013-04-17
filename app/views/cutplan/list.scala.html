@@ -1,0 +1,32 @@
+@(cps:Seq[models.cutplan.CuttingPlanForList])
+
+<h3>
+	Cutting plans
+</h3>
+
+<table>
+	<tr>
+		<th>
+			Name
+		</th>
+		<th>
+			Filter
+		</th>
+		<th>
+			Actions
+		</th>
+	</tr>
+	@for(cp<-cps) {
+		<tr>
+			<td>
+				@cp.name
+			</td>
+			<td>
+				@cp.filter
+			</td>
+			<td>
+				<a href="@routes.CuttingPlans.edit(cp.id)">edit</a>
+			</td>
+		</tr>
+	}
+</table>

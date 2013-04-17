@@ -16,6 +16,10 @@ case class PackDesc(heatNo:String,
 
 case class SemiproductDesc(serialNo:String) {}
 
+case class PackForList(id:Int, heatNo:String, deliveryDate:DateTime, unlimited:Boolean, material:MaterialDesc, shape:ShapeDesc)
+
+case class SemiproductForList(id:Int, serialNo:String)
+
 trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     import profile.simple._
     
@@ -24,14 +28,15 @@ trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     		pack <- Pack if pack.shapeId === shapeId
     		mat <- pack.material
         } yield (shp, pack, mat)
-    
+        
     def extractPackDesc(shp:OptionShape, pack:DBPack, mat:DBMaterial, semiprods:List[WithID[SemiproductDesc]]) = {
     	PackDesc(pack.heatNo, pack.deliveryDate, pack.unlimited, MaterialDesc(mat.name), extractShape(shp), semiprods)
     }
         
-    /*def listPacks(implicit session:Session) = {
-    	packQuery.list().map((extractPackDesc _).tupled)
-    }*/
+    def extractPackForList(shp:OptionShape, pck:DBPack, mat:DBMaterial) = 
+        PackForList(pck.id, pck.heatNo, pck.deliveryDate, pck.unlimited, MaterialDesc(mat.name), extractShape(shp))
+        
+    def semiproductProjection(sp:Semiproduct.type) = sp.id -> sp.serialNo
         
     def getPack(id:Int)(implicit session:Session) = {
     	val q = packQuery.filter(_._2.id === id)

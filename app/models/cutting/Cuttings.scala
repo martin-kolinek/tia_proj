@@ -8,10 +8,16 @@ import shapeless._
 import shapeless.HList._
 import shapeless.Tuples._
 import models.cutplan.CuttingPlans
+import models.cutplan.CuttingPlanForList
+import models.semiproduct.PackForList
+import models.semiproduct.SemiproductForList
+import models.semiproduct.PackForList
 
 case class CuttingDesc(semiprodId:Int, cutPlanId:Int, parts:List[PartInCuttingDesc])
 
 case class PartInCuttingDesc(partDefId:Int, orderId:Int, count:Int)
+
+case class CuttingForList(id:Int, cutPlan:CuttingPlanForList, semiproduct:SemiproductForList, pack:PackForList)
 
 trait Cuttings extends CuttingPlans {
     self:DBAccess =>

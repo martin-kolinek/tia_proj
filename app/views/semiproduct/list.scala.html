@@ -1,0 +1,50 @@
+@(sps:Seq[models.semiproduct.PackForList])
+
+<h3>
+	Semiproduct List
+</h3>
+
+<table>
+	<tr>
+		<th>
+			ID
+		</th>
+		<th>
+			heat no
+		</th>
+		<th>
+			unlimited
+		</th>
+		<th>
+			material
+		</th>
+		<th>
+			shape
+		</th>
+		<th>
+			actions
+		</th>
+	</tr>
+	@for(sp <- sps) {
+		<tr>
+			<td>
+				@sp.id
+			</td>
+			<td>
+				@sp.heatNo
+			</td>
+			<td>
+				@sp.unlimited
+			</td>
+			<td>
+				@sp.material
+			</td>
+			<td>
+				@sp.shape
+			</td>
+			<td>
+				<a href="@routes.Semiproducts.edit(sp.id)">edit</a>
+			</td>
+		</tr>
+	}
+</table>

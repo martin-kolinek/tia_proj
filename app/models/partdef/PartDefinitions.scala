@@ -5,6 +5,8 @@ import models.basic._
 
 case class PartDefinitionDesc(name:String, filter:String, file:Array[Byte])
 
+case class PartDefinitionForList(id:Int, name:String, filter:String)
+
 trait PartDefinitions extends Tables {
 	this:DBAccess =>
 	import profile.simple._

@@ -1,0 +1,50 @@
+@(cuts:Seq[models.cutting.CuttingForList])
+
+<h3>
+	Cuttings
+</h3>
+
+<table>
+	<tr>
+		<th>
+			Cutting plan name
+		</th>
+		<th>
+			Semiproduct heat no
+		</th>
+		<th>
+			Semiproduct serial no
+		</th>
+		<th>
+			Semiproduct material
+		</th>
+		<th>
+			Semiproduct shape
+		</th>
+		<th>
+			Actions
+		</th>
+	</tr>
+	@for(c<-cuts) {
+		<tr>
+			<td>
+				@c.cutPlan.name
+			</td>
+			<td>
+				@c.pack.heatNo
+			</td>
+			<td>
+				@c.semiproduct.serialNo
+			</td>
+			<td>
+				@c.pack.material
+			</td>
+			<td>
+				@c.pack.shape
+			</td>
+			<td>
+				<a href="@routes.CuttingController.edit(c.id)">edit</a>
+			</td>
+		</tr>
+	}
+</table>
