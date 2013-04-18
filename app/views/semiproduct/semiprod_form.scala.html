@@ -1,28 +1,42 @@
 @(frm:Form[models.semiproduct.PackDesc], replyTo:Call)
 
-@helper.form(action = replyTo) {
-	@helper.inputText(frm("heat"))
-	@helper.inputDate(frm("delivery"))
-	@helper.checkbox(frm("unlimited"))
-	@helper.inputText(frm("material.material"))
-	@helper.inputText(frm("type"))
-	@helper.inputText(frm("sheet.thickness"))
-	@helper.inputText(frm("sheet.width"))
-	@helper.inputText(frm("sheet.height"))
-	@helper.inputText(frm("circ.thickness"))
-	@helper.inputText(frm("circ.radius"))
-	@helper.inputText(frm("circ.length"))
-	@helper.inputText(frm("square.thickness"))
-	@helper.inputText(frm("square.diameter"))
-	@helper.inputText(frm("square.length"))
-	
-	<h4>Semiproducts</h4>
-		@helper.repeat(frm("semiproducts"), 0) { sp =>
-			@helper.inputText(sp("serial"))
-			@defining(sp("id")) { field =>
-				<input type="hidden" id="@field.id" name="@field.name" value="@field.value" />
-			}
-		}
+@import views.html.main
 
-	<input type="submit" value="Submit" />
+@spInput(fld:Field, cls:String) = {
+    <div class="@cls">
+        @helper.inputText(fld("serial"))
+        <input type="hidden" id="@{fld("id").id}" name="@{fld("id").name}" value="@{fld("id").value}" />
+        <a class="removeSemiprod" >remove</a>
+    </div>
+}
+
+@main("Semiproducts") {
+
+	@helper.form(action = replyTo) {
+		@helper.inputText(frm("heat"))
+		@helper.inputDate(frm("delivery"))
+		@helper.checkbox(frm("unlimited"))
+		@helper.inputText(frm("material.material"))
+		@helper.inputText(frm("type"))
+		@helper.inputText(frm("sheet.thickness"))
+		@helper.inputText(frm("sheet.width"))
+		@helper.inputText(frm("sheet.height"))
+		@helper.inputText(frm("circ.thickness"))
+		@helper.inputText(frm("circ.radius"))
+		@helper.inputText(frm("circ.length"))
+		@helper.inputText(frm("square.thickness"))
+		@helper.inputText(frm("square.diameter"))
+		@helper.inputText(frm("square.length"))
+		
+		<h4>Semiproducts</h4>
+		@helper.repeat(frm("semiproducts"), 0) { sp =>
+			@spInput(sp, "semiproduct")
+		}
+		@spInput(frm("semiproducts[x]"), "semiprodTemplate hidden")
+		<br />
+		<a id="addButton" >Add semiproduct</a>
+	    <br />
+		<input type="submit" value="Submit" />
+		@helper.requireJs(core = routes.Assets.at("javascripts/require.js").url, module = routes.Assets.at("javascripts/semiproductForm").url)
+    }
 }

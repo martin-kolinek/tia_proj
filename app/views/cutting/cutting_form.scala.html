@@ -5,7 +5,7 @@
 	@helper.inputText(frm("cuttin_plan"))
 	
 	<h4>Parts</h4>
-	@helper.repeat(frm("parts"), 0) { part =>
+	@helper.repeat(frm("parts"), 10) { part =>
 		@helper.inputText(part("partdefid"))
 		@helper.inputText(part("count"))
         @helper.inputText(part("order"))

@@ -24,7 +24,7 @@ object CuttingController extends Controller with ObjectController[CuttingDesc]
     lazy val model = new DBAccessConf with Cuttings with CuttingList
         with DBSP with DBPartDefs
         with DBOrders with CuttingModel
-
+        
     def partMapping(implicit s:scala.slick.session.Session) = mapping(
         "partdef" -> number.verifying(model.existsPartDef _),
         "order" -> number.verifying(model.existsOrder _),

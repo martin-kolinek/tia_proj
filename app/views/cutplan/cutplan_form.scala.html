@@ -1,15 +1,32 @@
 @(frm:Form[models.cutplan.CuttingPlanDesc], replyTo:Call)
 
-@helper.form(action = replyTo) {
-	@helper.inputText(frm("name"))
-	@helper.inputText(frm("filter"))
-	@tempFileInput(frm("file"))
-	
-	<h4>Part definitions</h4>
-	@helper.repeat(frm("partdefs"), 0) { pdef =>
-		@helper.inputText(pdef("partdefid"))
-		@helper.inputText(pdef("count"))
+@pdefInput(fld:Field, cls:String) = {
+    <div class="@cls">
+        @helper.inputText(fld("partdefid"))
+        @helper.inputText(fld("count"))
+        <a class="removePartDef">remove</a>
+    </div>
+}
+
+@main("Cutting plans") {
+
+	@helper.form(action = replyTo) {
+		@helper.inputText(frm("name"))
+		@helper.inputText(frm("filter"))
+		@tempFileInput(frm("file"))
+		
+		<h4>Part definitions</h4>
+		@helper.repeat(frm("partdefs"), 0) { pdef =>
+			@pdefInput(pdef, "partdef")
+		}
+		
+	    @pdefInput(frm("partdefs[x]"), "partDefTemplate")
+	    <br />
+        <a id="addButton" >Add part definition</a>
+        <br />
+	    
+	   	<input type="submit" value="Submit" />
+	   	<script type="text/javascript" src="@{routes.Assets.at("javascripts/cuttingPlanForm.js")}" ></script>
 	}
-    
-   	<input type="submit" value="Submit" />
+
 }

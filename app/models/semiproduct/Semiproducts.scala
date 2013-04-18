@@ -54,7 +54,9 @@ trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     def insertPack(pck:PackDesc)(implicit session:Session) = {
     	val matId = getOrCreateMaterial(pck.material)
     	val shapeId = getOrCreateShapeId(pck.shape)
-    	Pack.forInsert.insert(matId, pck.unlimited, shapeId, pck.deliveryDate, pck.heatNo)
+    	val ret = Pack.forInsert.insert(matId, pck.unlimited, shapeId, pck.deliveryDate, pck.heatNo)
+    	modifyPackSemiproducts(ret, pck.semiproducts)
+    	ret
     }
     
     def updatePack(id:Int, pck:PackDesc)(implicit session:Session) {

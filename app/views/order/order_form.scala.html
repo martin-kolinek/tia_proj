@@ -1,17 +1,34 @@
 @(frm:Form[models.order.OrderDesc], replyTo:Call)
 
-@helper.form(action = replyTo) {
-	@helper.inputText(frm("name"))
-	@helper.inputDate(frm("filling_date"))
-	@helper.inputDate(frm("due_date"))
-	@helper.inputText(frm("status"))
-	
-	<h4>Part definitions</h4>
-	@helper.repeat(frm("pdefs"), 0) { pdef =>
-		@helper.inputText(pdef("id"))
-		@helper.inputText(pdef("count"))
-		@helper.inputText(frm("filter"))
+@pdefInput(fld:Field, cls:String) = {
+    <div class="@cls">
+        @helper.inputText(fld("id"))
+        @helper.inputText(fld("count"))
+        @helper.inputText(fld("filter"))
+        <a class="removePartDef">remove</a>
+    </div>
+}
+
+@main("Order") {
+
+	@helper.form(action = replyTo) {
+		@helper.inputText(frm("name"))
+		@helper.inputDate(frm("filling_date"))
+		@helper.inputDate(frm("due_date"))
+		@helper.inputText(frm("status"))
+		
+		<h4>Part definitions</h4>
+		@helper.repeat(frm("pdefs"), 0) { pdef =>
+			@pdefInput(pdef, "partdef")
+		}
+		
+		@pdefInput(frm("pdefs[x]"), "partDefTemplate hidden")
+	    <br />
+        <a id="addButton" >Add part definition</a>
+        <br />
+	  	<input type="submit" value="Submit" />
+	  	
+	  	@helper.requireJs(core = routes.Assets.at("javascripts/require.js").url, module = routes.Assets.at("javascripts/orderForm").url)
 	}
-    
-  	<input type="submit" value="Submit" />
+
 }
