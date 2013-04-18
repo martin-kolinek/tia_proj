@@ -21,6 +21,7 @@ object TemporaryFileStorage {
 	} 
 	def addFile(file:TemporaryFile) = synchronized {
 		val ref = nextId
+		println(file)
 		hm(ref) = file
 		ref
 	}
@@ -41,9 +42,10 @@ object TemporaryFileStorage {
 	}
 	
 	def createFile(data:Array[Byte]) = {
-		val tf = TemporaryFile()
+		val tf = TemporaryFile("created")
 		for(wr <- managed(new FileOutputStream(tf.file))) {
 			wr.write(data)
+			wr.close()
 		}
 		synchronized {
 			val res = nextId
@@ -66,7 +68,10 @@ object TemporaryFileManager extends Controller {
 	}
   
     def download(ref:String) = Action{
-        TemporaryFileStorage.getFile(ref).map(x=>Ok(x)).getOrElse(NotFound)
+    	println("adf")
+        TemporaryFileStorage.getFile(ref).map{
+    		Ok(_).withHeaders("Content-Disposition" -> "attachment; filename=file.txt")
+    	}.getOrElse(NotFound)
     }
 	
 	val tempFileMapping = nonEmptyText.

@@ -2,15 +2,13 @@
 
 @helper.input(field, args:_*) { (id, name, value, htmlArgs) =>
     <input type="hidden" id="@id" name="@name" value="@value" />
-    @defining(id+"_file") { fileId =>
-        <input type="file" id="@fileId" @toHtmlArgs(htmlArgs) />
+    <input type="file" id="@{id+"_file"}" @toHtmlArgs(htmlArgs) />
     
-        <a href='@routes.TemporaryFileManager.download(value.getOrElse(""))'>current</a>
-        @helper.requireJs(core = routes.Assets.at("javascripts/require.js").url, module = routes.Assets.at("javascripts/main").url)
-        <script type="text/javascript">
-          require(["tempFileUpload"], function(upl) {
-            upl.upload("@fileId")
-          })
-        </script>
-    }
+    <a id="@{id+"_a"}" href='@routes.TemporaryFileManager.download(value.getOrElse(""))'>current</a>
+    @helper.requireJs(core = routes.Assets.at("javascripts/require.js").url, module = routes.Assets.at("javascripts/main").url)
+    <script type="text/javascript">
+      require(["tempFileUpload"], function(upl) {
+        upl.upload("@{id+"_file"}", "@id", "@{id+"_a"}")
+      })
+    </script>
 }
