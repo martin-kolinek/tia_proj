@@ -12,6 +12,8 @@ import models.cutplan.CuttingPlanForList
 import models.semiproduct.PackForList
 import models.semiproduct.SemiproductForList
 import models.semiproduct.PackForList
+import scala.slick.jdbc.{GetResult, StaticQuery => Q}
+import Q.interpolation
 
 case class CuttingDesc(semiprodId:Int, cutPlanId:Int, parts:List[PartInCuttingDesc])
 
@@ -35,15 +37,17 @@ trait Cuttings extends CuttingPlans {
         cutting.map(x=>(x.hlisted ::: parts :: HNil).tupled).map(CuttingDesc.tupled)
     }
 
-    def getDamagedPartCounts(id:Int)(implicit session:Session) = 
-        Query(Part).filter(_.cuttingId === id).groupBy(_.partDefId).groupBy(_._2.orderId).map {
-            case (partDefId ~ orderId, rows) => (partDefId, orderId, rows.length)
-        }.list.map(FinishedPartInCutting.tupled)
+    def getDamagedPartCounts(id:Int)(implicit session:Session) =
+    	sql"""
+    	SELECT part_def_id, order_id, count(id) FROM part where 
+    	cutting_id = $id and damaged = true group by cutting_id, part_def_id, order_id 
+    	""".as[(Int, Option[Int], Int)].list.map(FinishedPartInCutting.tupled)
     
     private def getPartCounts(id:Int)(implicit session:Session) = 
-    	Query(Part).filter(_.cuttingId === id).filter(_.orderId.isNotNull).groupBy(x=>x.partDefId ~ x.orderId).map{
-            case (partDefId ~ orderId, rows) => (partDefId, orderId.get, rows.length)
-        }.list.map(PartInCuttingDesc.tupled) 
+    	sql"""
+    	SELECT part_def_id, order_id, count(id) FROM part where 
+    	cutting_id = $id and order_id is not null group by cutting_id, part_def_id, order_id 
+    	""".as[(Int, Int, Int)].list.map(PartInCuttingDesc.tupled)
     
     private def getPartDefOrderCounts(parts:Traversable[PartInCuttingDesc]) = 
     	parts.groupBy(x=>x.partDefId).map {
@@ -135,7 +139,8 @@ trait Cuttings extends CuttingPlans {
             ok.foreach(id => Query(Part).filter(_.id === id).map(x=>x.damaged).update(false))
         }
         val q = Query(Cutting).filter(_.id===cutId).map(_.finishTime)
-        if(q.firstOption.map(_.isDefined).getOrElse(false))
+        if(q.firstOption.map(_.isEmpty).getOrElse(false)) {
         	q.update(Some(DateTime.now()))
+        }
     }
 }

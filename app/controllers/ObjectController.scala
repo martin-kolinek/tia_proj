@@ -38,7 +38,10 @@ trait ObjectController[ObjectType] {
             implicit session =>
 		    val binding = form.bindFromRequest
 		    binding.fold(
-			    errFrm => BadRequest(template(errFrm, saveRoute, "Add")),
+			    errFrm => { 
+			    	println(errFrm.errors)
+			    	BadRequest(template(errFrm, saveRoute, "Add"))
+			    },
 			    obj => {
 					m.insert.apply(obj)
 					Redirect(listRoute)

@@ -7,12 +7,12 @@
 
 @helper.form(action = replyTo) {
   	<h4>Parts</h4>
-	@helper.repeat(parts("parts"), 10) { part =>
+	@helper.repeat(parts("parts"), 0) { part =>
 		@helper.inputText(part("partdefid"))
         @helper.inputText(part("order"))
    		@helper.inputText(part("dmgcount"))
 	}
-
+    <input type="submit" value="Submit" />
 }
 
 }
