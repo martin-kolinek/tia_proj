@@ -26,6 +26,9 @@
 			Semiproduct shape
 		</th>
 		<th>
+		    Finish time
+		</th>
+		<th>
 			Actions
 		</th>
 	</tr>
@@ -47,7 +50,15 @@
 				@c.pack.shape
 			</td>
 			<td>
-				<a href="@routes.CuttingController.edit(c.id)">edit</a>
+			    @c.finishTime
+			</td>
+			<td>
+			    @if(c.finished) {
+				    <a href="@routes.CuttingController.finish(c.id)">edit</a>
+				} else {
+				    <a href="@routes.CuttingController.edit(c.id)">edit</a>
+				    <a href="@routes.CuttingController.finish(c.id)">finish</a>
+				}
 			</td>
 		</tr>
 	}

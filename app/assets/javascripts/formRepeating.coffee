@@ -8,9 +8,7 @@ define(["jquery-1.9.0.min"], ->
         remove = (event) ->
             $(this).parents("."+itemClass).remove()
             renumber()
-        alert("klj")
         $("document").ready ->
-            alert("hello")
             $("#"+addBtn).click ->
                 templ = $("."+templateClass).first()
                 newItem = templ.clone()

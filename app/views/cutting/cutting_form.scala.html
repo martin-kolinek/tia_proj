@@ -1,21 +1,35 @@
 @(frm:Form[models.cutting.CuttingDesc], replyTo:Call, header:String)
 
-@main("Cutting plan") {
+@partInput(part:Field, cls:String) = {
+    <div class="@cls">
+        @helper.inputText(part("partdefid"))
+        @helper.inputText(part("count"))
+        @helper.inputText(part("order"))
+        <a class="removePart">remove</a>
+    </div>
+}
+
+@main("Cutting") {
 <h3>
-  @header cutting plan
+  @header cutting
 </h3>
 @helper.form(action = replyTo) {
 	@helper.inputText(frm("semiproduct"))
-	@helper.inputText(frm("cuttin_plan"))
+	@helper.inputText(frm("cutting_plan"))
 	
 	<h4>Parts</h4>
-	@helper.repeat(frm("parts"), 10) { part =>
-		@helper.inputText(part("partdefid"))
-		@helper.inputText(part("count"))
-        @helper.inputText(part("order"))
+	@helper.repeat(frm("parts"), 0) { part =>
+		@partInput(part, "part")
 	}
     
+    @partInput(frm("parts[x]"), "partTemplate hidden")
+    
+    <br />
+    <a id="addButton" >Add part</a>
+    <br />
+    
   	<input type="submit" value="Submit" />
+  	@helper.requireJs(core = routes.Assets.at("javascripts/require.js").url, module = routes.Assets.at("javascripts/cuttingForm").url)
 }
 
 }

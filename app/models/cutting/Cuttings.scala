@@ -19,7 +19,9 @@ case class PartInCuttingDesc(partDefId:Int, orderId:Int, count:Int)
 
 case class FinishedPartInCutting(partDefId:Int, orderId:Option[Int], dmgCount:Int)
 
-case class CuttingForList(id:Int, cutPlan:CuttingPlanForList, semiproduct:SemiproductForList, pack:PackForList)
+case class CuttingForList(id:Int, cutPlan:CuttingPlanForList, semiproduct:SemiproductForList, pack:PackForList, finishTime:Option[DateTime]) {
+	def finished = finishTime.isDefined
+}
 
 trait Cuttings extends CuttingPlans {
     self:DBAccess =>
@@ -34,13 +36,13 @@ trait Cuttings extends CuttingPlans {
     }
 
     def getDamagedPartCounts(id:Int)(implicit session:Session) = 
-        Query(Part).filter(_.cuttingId === id).groupBy(x=>x.partDefId -> x.orderId).map {
-            case ((partDefId, orderId), rows) => (partDefId, orderId, rows.length)
+        Query(Part).filter(_.cuttingId === id).groupBy(_.partDefId).groupBy(_._2.orderId).map {
+            case (partDefId ~ orderId, rows) => (partDefId, orderId, rows.length)
         }.list.map(FinishedPartInCutting.tupled)
     
     private def getPartCounts(id:Int)(implicit session:Session) = 
-    	Query(Part).filter(_.cuttingId === id).filter(_.orderId.isNotNull).groupBy(x=>x.partDefId -> x.orderId).map{
-            case ((partDefId, orderId), rows) => (partDefId, orderId.get, rows.length)
+    	Query(Part).filter(_.cuttingId === id).filter(_.orderId.isNotNull).groupBy(x=>x.partDefId ~ x.orderId).map{
+            case (partDefId ~ orderId, rows) => (partDefId, orderId.get, rows.length)
         }.list.map(PartInCuttingDesc.tupled) 
     
     private def getPartDefOrderCounts(parts:Traversable[PartInCuttingDesc]) = 
@@ -124,7 +126,16 @@ trait Cuttings extends CuttingPlans {
 
     def updateFinished(cutId:Int, fin:List[FinishedPartInCutting])(implicit s:Session) {
         for(p<-fin) {
-            val q = Query(Part).filter(if(p.orderId.isEmpty) x => x.orderId.isNull.? else x=>x.orderId === p.orderId)
+            val ids = Query(Part).
+            	filter(_.cuttingId === cutId).
+                filter(if(p.orderId.isEmpty) x => x.orderId.isNull.? else x=>x.orderId === p.orderId).
+                map(_.id).sortBy(identity).list
+            val (dmg, ok) = ids.splitAt(p.dmgCount)
+            dmg.foreach(id => Query(Part).filter(_.id === id).map(x=>x.orderId ~ x.damaged).update(None, true))
+            ok.foreach(id => Query(Part).filter(_.id === id).map(x=>x.damaged).update(false))
         }
+        val q = Query(Cutting).filter(_.id===cutId).map(_.finishTime)
+        if(q.firstOption.map(_.isDefined).getOrElse(false))
+        	q.update(Some(DateTime.now()))
     }
 }

@@ -13,16 +13,17 @@ trait CuttingList extends ObjectListModel[CuttingForList] {
 	
 	def list(implicit session:Session) = {
 		val q = for {
-			pckq@(shp, mat, pck) <- packQuery
-			sp <- Semiproduct if pck.id === sp.packId
-			cut <- Cutting if cut.semiproductId === sp.id
+			cut <- Cutting 
+			sp <- Semiproduct if cut.semiproductId === sp.id
+			pckq@(shp, pck, mat) <- packQuery  if pck.id === sp.packId
 			cp <- CuttingPlan if cut.cuttingPlanId === cp.id
-		} yield (pckq, semiproductProjection(sp), cuttingPlanProjection(cp), cut.id)
+		} yield (pckq, semiproductProjection(sp), cuttingPlanProjection(cp), cut.id, cut.finishTime)
 		q.list.map {
-			case (pck, sp, cp, cutid) => CuttingForList(cutid,
+			case (pck, sp, cp, cutid, fin) => CuttingForList(cutid,
 					CuttingPlanForList.tupled(cp),
 					SemiproductForList.tupled(sp),
-					(extractPackForList _).tupled(pck))
+					(extractPackForList _).tupled(pck),
+					fin)
 		}
 	}
 	
