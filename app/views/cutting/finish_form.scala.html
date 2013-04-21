@@ -1,13 +1,13 @@
-@(parts:List[models.cutting.FinishedPartInCutting])
+@(parts:Form[List[models.cutting.FinishedPartInCutting]], replyTo:Call)
 
 @main("Finish cutting") {
   <h2>
     Finish cutting
   </h2>
 
-@helper.form(action = routes.CuttingController.updateFinish) {
+@helper.form(action = replyTo) {
   	<h4>Parts</h4>
-	@helper.repeat(frm("parts"), 10) { part =>
+	@helper.repeat(parts("parts"), 10) { part =>
 		@helper.inputText(part("partdefid"))
         @helper.inputText(part("order"))
    		@helper.inputText(part("dmgcount"))

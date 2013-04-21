@@ -17,7 +17,7 @@ case class CuttingDesc(semiprodId:Int, cutPlanId:Int, parts:List[PartInCuttingDe
 
 case class PartInCuttingDesc(partDefId:Int, orderId:Int, count:Int)
 
-case class FinishedPartInCutting(partDefId:Int, orderId:Int, dmgCount:Int)
+case class FinishedPartInCutting(partDefId:Int, orderId:Option[Int], dmgCount:Int)
 
 case class CuttingForList(id:Int, cutPlan:CuttingPlanForList, semiproduct:SemiproductForList, pack:PackForList)
 
@@ -36,7 +36,7 @@ trait Cuttings extends CuttingPlans {
     def getDamagedPartCounts(id:Int)(implicit session:Session) = 
         Query(Part).filter(_.cuttingId === id).groupBy(x=>x.partDefId -> x.orderId).map {
             case ((partDefId, orderId), rows) => (partDefId, orderId, rows.length)
-        }.list.map(FinishedPartInCutting)
+        }.list.map(FinishedPartInCutting.tupled)
     
     private def getPartCounts(id:Int)(implicit session:Session) = 
     	Query(Part).filter(_.cuttingId === id).filter(_.orderId.isNotNull).groupBy(x=>x.partDefId -> x.orderId).map{
@@ -124,7 +124,7 @@ trait Cuttings extends CuttingPlans {
 
     def updateFinished(cutId:Int, fin:List[FinishedPartInCutting])(implicit s:Session) {
         for(p<-fin) {
-            val q = Query(Part).filter(if(p.orderId.isEmpty) x => x.isNull else x=>x===p.orderId)
+            val q = Query(Part).filter(if(p.orderId.isEmpty) x => x.orderId.isNull.? else x=>x.orderId === p.orderId)
         }
     }
 }

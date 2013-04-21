@@ -47,17 +47,20 @@ object CuttingController extends Controller with ObjectController[CuttingDesc]
     
     def listTemplate = views.html.cutting.list.apply
 
-    def finishForm = Form(tuple(
-        "parts" -> play.api.data.Forms.list(mapping(
+    def finMapping = mapping(
             "partdefid" -> number,
-            "order" -> number,
+            "order" -> optional(number),
             "dmgcount" -> number
             )(FinishedPartInCutting)(FinishedPartInCutting.unapply)
+            
+    def finishForm = Form(single(
+        "parts" -> play.api.data.Forms.list(finMapping
         )))
 
     def finish(id:Int) = Action {
         model.withTransaction {implicit s =>
-            Ok(views.html.cutting.finish_form(model.getDamagedPartCounts(id)))
+            Ok(views.html.cutting.finish_form(finishForm.fill(model.getDamagedPartCounts(id)),
+            		routes.CuttingController.updateFinish(id)))
         }
     }
 
@@ -65,7 +68,8 @@ object CuttingController extends Controller with ObjectController[CuttingDesc]
         implicit req =>
         val binding = finishForm.bindFromRequest
         binding.fold(
-            errFrm => BadRequest(views.html.cutting.finish_form(errFrm)),
+            errFrm => BadRequest(views.html.cutting.finish_form(errFrm, 
+            		routes.CuttingController.updateFinish(id))),
             cnts => {
                 model.withTransaction { implicit s =>
                     model.updateFinished(id, cnts)
