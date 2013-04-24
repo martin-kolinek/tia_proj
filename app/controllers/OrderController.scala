@@ -10,11 +10,11 @@ import models.DBAccessConf
 import play.api.Play.current
 import models.enums._
 import models.partdef.{PartDefinitions => DBPartDef}
-import models.order.PartDefInOrder
 import views.html.order.order_form
 import models.order.OrderModel
 import models.order.OrderForList
 import models.order.OrderList
+import models.order.OrderDefinitionDesc
 
 object OrderController extends Controller with ObjectController[OrderDesc] 
 		with ObjectListController[OrderForList] {
@@ -22,15 +22,16 @@ object OrderController extends Controller with ObjectController[OrderDesc]
 	lazy val model = new DBAccessConf with Orders with DBPartDef with OrderModel with OrderList
 	
 	def pdefMapping(implicit s:scala.slick.session.Session) = mapping(
-			"id" -> number.verifying(model.existsPartDef _),
+			"id" -> optional(number),
+			"pdefid" -> number.verifying(model.existsPartDef _),
 			"filter" -> nonEmptyText,
-			"count" -> number(1))(PartDefInOrder)(PartDefInOrder.unapply)
+			"count" -> number(1))(OrderDefinitionDesc)(OrderDefinitionDesc.unapply)
 	
 	def form(implicit s:scala.slick.session.Session) = Form(mapping(
 			"name" -> nonEmptyText,
 			"filling_date" -> jodaDate,
 			"due_date" -> optional(jodaDate),
-			"pdefs" -> play.api.data.Forms.list(pdefMapping))
+			"odefs" -> play.api.data.Forms.list(pdefMapping))
 			(OrderDesc)(OrderDesc.unapply))
 			
 	def template = order_form.apply

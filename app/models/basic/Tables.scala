@@ -51,6 +51,7 @@ trait Tables { this:DBAccess =>
     	def * = id ~ orderId ~ partDefId ~ count ~ filter
     	def order = foreignKey("fk_order_def_order", orderId, Order)(_.id)
     	def partDefinition = foreignKey("fk_order_def_part_def", partDefId, PartDefinition)(_.id)
+    	def forInsert = orderId ~ partDefId ~ count ~ filter
     }
     
     object CuttingPlan extends Table[(Int, String, Array[Byte], Boolean, String)]("cutting_plan") {

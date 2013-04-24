@@ -2,9 +2,10 @@
 
 @pdefInput(fld:Field, cls:String) = {
     <div class="@cls">
-        @helper.inputText(fld("id"))
+        @helper.inputText(fld("pdefid"))
         @helper.inputText(fld("count"))
         @helper.inputText(fld("filter"))
+        <input type="hidden" id="@{fld("id").id}" name="@{fld("id").name}" value="@{fld("id").value}" />
         <a class="removePartDef">remove</a>
     </div>
 }
@@ -20,11 +21,11 @@
 		@helper.inputText(frm("status"))
 		
 		<h4>Part definitions</h4>
-		@helper.repeat(frm("pdefs"), 0) { pdef =>
+		@helper.repeat(frm("odefs"), 0) { pdef =>
 			@pdefInput(pdef, "partdef")
 		}
 		
-		@pdefInput(frm("pdefs[x]"), "partDefTemplate hidden")
+		@pdefInput(frm("odefs[x]"), "partDefTemplate hidden")
 	    <br />
         <a id="addButton" >Add part definition</a>
         <br />

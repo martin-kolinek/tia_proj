@@ -10,13 +10,13 @@ import shapeless.HList._
 import shapeless.Tuples._
 import scalaz.std.option._
 
-case class OrderDesc(name:String, fillingDate:DateTime, dueDate:Option[DateTime], partdefs:List[PartDefInOrder])
+case class OrderDesc(name:String, fillingDate:DateTime, dueDate:Option[DateTime], defs:List[OrderDefinitionDesc])
 
-case class PartDefInOrder(partDefId:Int, filter:String, count:Int)
+case class OrderDefinitionDesc(id:Option[Int], partDefId:Int, filter:String, count:Int)
 
 case class OrderForList(id:Int, name:String, fillingDate:DateTime, dueDate:Option[DateTime], status:OrderStatus)
 
-case class OrderDefStatus(partDefId:Int, parts:List[PartInOrder])
+case class OrderDefStatus(odefId:Int, parts:List[PartInOrder])
 
 case class PartInOrder(cuttingId:Int, count:Int)
 
@@ -30,11 +30,13 @@ trait Orders extends Tables {
             ord <- Order
         } yield (ord.name, ord.fillingDate, ord.dueDate)
         val q2 = for {
-            pdef <- PartDefinitionInOrder if pdef.orderId === id
-        } yield (pdef.partDefId, pdef.filter, pdef.count)
+            odef <- OrderDefinition if odef.orderId === id
+        } yield (odef.id, odef.partDefId, odef.filter, odef.count)
         for {
-            ord <- q.firstOption
-        } yield OrderDesc.tupled((ord.hlisted ::: (q2.list.map(PartDefInOrder.tupled) :: HNil)).tupled)
+            (name, fill, due) <- q.firstOption
+        } yield OrderDesc(name, fill, due, q2.list.map{
+        	case (id, pdef, filt, cnt) => OrderDefinitionDesc(Some(id), pdef, filt, cnt)
+        })
     }
 
     def existsOrder(id:Int)(implicit session:Session) =
@@ -42,7 +44,7 @@ trait Orders extends Tables {
 
     def insertOrder(ord:OrderDesc)(implicit session:Session) = {
         val id:Int = Order.forInsert.insert((ord.name, ord.fillingDate, ord.dueDate, Accepted))
-        PartDefinitionInOrder.insertAll(ord.partdefs.map(x=>(id, x.partDefId, x.count, x.filter)):_*) 
+        OrderDefinition.forInsert.insertAll(ord.defs.map(x=>(id, x.partDefId, x.count, x.filter)):_*) 
         id
     }
     
@@ -52,44 +54,51 @@ trait Orders extends Tables {
     	} yield dbo.name ~ dbo.fillingDate ~ dbo.dueDate
     	q.update(ord.name, ord.fillingDate, ord.dueDate)
     	(for {
-    		pdef <- PartDefinitionInOrder
-    		if pdef.orderId === id
-    		if !pdef.partDefId.inSet(ord.partdefs.map(_.partDefId))
-    	} yield pdef).delete
-    	for (pdef <- ord.partdefs) {
-    		val upd = Query(PartDefinitionInOrder).filter(_.orderId === id).
-    		    filter(_.partDefId===pdef.partDefId).map(x=>x.filter ~ x.count).
-    		    update(pdef.filter, pdef.count)
-    		if(upd == 0) 
-    			PartDefinitionInOrder.insert(id, pdef.partDefId, pdef.count, pdef.filter)
+    		odef <- OrderDefinition
+    		if odef.orderId === id
+    		if !odef.id.inSet(ord.defs.map(_.id).collect{case Some(id) => id})
+    	} yield odef).delete
+    	for (odef <- ord.defs) {
+    		odef.id match {
+    			case Some(odefId) => Query(OrderDefinition).filter(_.orderId === id).
+    					filter(_.id === odefId).map(x=>x.filter ~ x.count).
+    					update(odef.filter, odef.count)
+    			case None => OrderDefinition.
+    			        forInsert.insert((id, odef.partDefId, odef.count, odef.filter))
+    		}
     	}
     }
 
+    def updateCutting(cuttingId:Int, orderDefId:Int, count:Int)(implicit s:Session) {
+    	for {
+    		req <- Query(OrderDefinition).filter(_.id === orderDefId).map(_.count).firstOption
+    		done <- Query(Query(Part).filter(_.orderDefId===some(orderDefId)).length).firstOption
+    	} {
+    		val take = math.min(req - done, count)
+    		val toAdd = Query(Part).filter(_.damaged===false).filter(_.orderDefId.isNull).filter(_.cuttingId === cuttingId).
+    		map(_.id).sortBy(identity).take(take).list
+    		toAdd.foreach(pid => Query(Part).filter(_.id===pid).map(_.orderDefId).update(Some(orderDefId)))
+    	}
+    }
+    
     def updateOrderStatus(id:Int, statuses:List[OrderDefStatus])(implicit s:Session) {
-        Query(Part).filter(_.orderId === some(id)).map(_.orderId).update(None)
+    	val defs = Query(OrderDefinition).filter(_.orderId === id).map(_.id).list
+        Query(Part).filter(_.orderDefId.inSet(defs)).map(_.orderDefId).update(None)
         for{
             status<-statuses
             part<-status.parts
         } {
-            for {
-                req <- Query(PartDefinitionInOrder).filter(_.orderId === id).filter(_.partDefId === status.partDefId).map(_.count).firstOption
-                done <- Query(Query(Part).filter(_.orderId===some(id)).filter(_.partDefId === status.partDefId).length).firstOption
-            } {
-                val take = math.min(req - done, part.count)
-                val toAdd = Query(Part).filter(_.damaged===false).filter(_.orderId.isNull).filter(_.cuttingId===part.cuttingId).
-                    map(_.id).sortBy(identity).take(take).list
-                toAdd.foreach(pid => Query(Part).filter(_.id===pid).map(_.orderId).update(Some(id)))
-            }
+            updateCutting(part.cuttingId, status.odefId, part.count)
         }
     }
 
-    def orderDefParts(orderId:Int, partDefId:Int)(implicit s:Session) = 
-        Query(Part).filter(_.orderId===some(orderId)).filter(_.partDefId === partDefId).groupBy(_.cuttingId).map {
+    def orderDefParts(orderDefId:Int)(implicit s:Session) = 
+        Query(Part).filter(_.orderDefId===some(orderDefId)).groupBy(_.cuttingId).map {
             case (cutId, rows) => (cutId, rows.length)
         }.list.map(PartInOrder.tupled)
 
     def orderStatus(id:Int)(implicit s:Session) = {
-        Query(PartDefinitionInOrder).filter(_.orderId === id).map(_.partDefId).list.map(x=> x -> orderDefParts(id, x)).
+        Query(OrderDefinition).filter(_.orderId === id).map(_.id).list.map(x=> x -> orderDefParts(x)).
             map(OrderDefStatus.tupled)
     }
 }
