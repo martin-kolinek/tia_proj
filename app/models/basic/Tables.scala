@@ -21,15 +21,15 @@ trait Tables { this:DBAccess =>
     
     object Part extends Table[(Int, Option[Int], Int, Int, Boolean)]("part") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    	def orderId = column[Option[Int]]("order_id")
+    	def orderDefId = column[Option[Int]]("order_def_id")
     	def partDefId = column[Int]("part_def_id")
     	def cuttingId = column[Int]("cutting_id")
     	def damaged = column[Boolean]("damaged")
-    	def * = id ~ orderId ~ partDefId ~ cuttingId ~ damaged
-    	def order = foreignKey("fk_part_order", orderId, Order)(_.id)
+    	def * = id ~ orderDefId ~ partDefId ~ cuttingId ~ damaged
+    	def orderDef = foreignKey("fk_part_order_def", orderDefId, OrderDefinition)(_.id)
     	def partDefinition = foreignKey("fk_part_part_def", partDefId, PartDefinition)(_.id)
     	def cutting = foreignKey("fk_part_cutting", cuttingId, Cutting)(_.id)
-    	def forInsert = orderId ~ partDefId ~ cuttingId ~ damaged
+    	def forInsert = orderDefId ~ partDefId ~ cuttingId ~ damaged
     }
     
     object PartDefinition extends Table[(Int, Array[Byte], String, String, Boolean)]("part_definition") {
@@ -42,15 +42,15 @@ trait Tables { this:DBAccess =>
     	def forInsert = file ~ filter ~ name ~ hidden returning id
     }
     
-    object PartDefinitionInOrder extends Table[(Int, Int, Int, String)]("part_def_in_order") {
+    object OrderDefinition extends Table[(Int, Int, Int, Int, String)]("order_def") {
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def orderId = column[Int]("order_id")
     	def partDefId = column[Int]("part_def_id")
     	def count = column[Int]("count")
     	def filter = column[String]("filter")
-    	def * = orderId ~ partDefId ~ count ~ filter
-    	def pk = primaryKey("pk_part_def_in_order", (orderId, partDefId))
-    	def order = foreignKey("fk_part_def_in_order_order", orderId, Order)(_.id)
-    	def partDefinition = foreignKey("fk_part_def_in_order_part_def", partDefId, PartDefinition)(_.id)
+    	def * = id ~ orderId ~ partDefId ~ count ~ filter
+    	def order = foreignKey("fk_order_def_order", orderId, Order)(_.id)
+    	def partDefinition = foreignKey("fk_order_def_part_def", partDefId, PartDefinition)(_.id)
     }
     
     object CuttingPlan extends Table[(Int, String, Array[Byte], Boolean, String)]("cutting_plan") {
@@ -73,7 +73,7 @@ trait Tables { this:DBAccess =>
     	def partDefinition = foreignKey("fk_part_def_in_cut_plan_part_def", partDefId, PartDefinition)(_.id)
     }
     
-    case class DBMaterial(id:Int, name:String) {}
+    case class DBMaterial(id:Int, name:String) {} 
     
     object Material extends Table[DBMaterial]("material") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)

@@ -26,7 +26,7 @@ case class CuttingForList(id:Int, cutPlan:CuttingPlanForList, semiproduct:Semipr
 }
 
 trait Cuttings extends CuttingPlans {
-    self:DBAccess =>
+    self:DBAccess => 
 
     import profile.simple._
 
