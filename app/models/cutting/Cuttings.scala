@@ -39,15 +39,12 @@ trait Cuttings extends CuttingPlans {
 
     def getDamagedPartCounts(id:Int)(implicit session:Session) =
     	sql"""
-    	SELECT part_def_id, order_id, c.cnt FROM part p,
-          (SELECT count(id) as cnt from part p2 
-            where p.part_def_id = p2.part_def_id and p.order_id=p2.order_id and p2.damaged=true and p.cutting_id=p2.cutting_id) c on
-        where 
-    	p.cutting_id = $id group by p.cutting_id, p.part_def_id, p.order_id 
-        UNION
-        SELECT part_def_id, order_id, count(id) FROM part where 
-    	cutting_id = $id and damaged = true group by cutting_id, part_def_id, order_id 
-    	""".as[(Int, Option[Int], Int)].list.map(FinishedPartInCutting.tupled)
+        SELECT deford.part_def_id, deford.order_id, coalesce(cnts.dmg, 0) FROM
+          (SELECT DISTINCT part_def_id, order_id FROM part WHERE cutting_id=$id) deford
+          left join
+          (SELECT part_def_id, order_id, count(id) as dmg FROM part WHERE cutting_id=$id and damaged=true group by part_def_id, order_id, cutting_id) cnts
+            on cnts.part_def_id = deford.part_def_id and (cnts.order_id = deford.order_id or cnts.order_id is null and deford.order_id is null)
+        """.as[(Int, Option[Int], Int)].list.map(FinishedPartInCutting.tupled)
     
     private def getPartCounts(id:Int)(implicit session:Session) = 
     	sql"""
