@@ -8,12 +8,17 @@ import org.joda.time.DateTime
 import shapeless._
 import shapeless.HList._
 import shapeless.Tuples._
+import scalaz.std.option._
 
 case class OrderDesc(name:String, fillingDate:DateTime, dueDate:Option[DateTime], partdefs:List[PartDefInOrder])
 
 case class PartDefInOrder(partDefId:Int, filter:String, count:Int)
 
 case class OrderForList(id:Int, name:String, fillingDate:DateTime, dueDate:Option[DateTime], status:OrderStatus)
+
+case class OrderDefStatus(partDefId:Int, parts:List[PartInOrder])
+
+case class PartInOrder(cuttingId:Int, count:Int)
 
 trait Orders extends Tables {
     self:DBAccess =>
@@ -60,4 +65,31 @@ trait Orders extends Tables {
     	}
     }
 
+    def updateOrderStatus(id:Int, statuses:List[OrderDefStatus])(implicit s:Session) {
+        Query(Part).filter(_.orderId === some(id)).map(_.orderId).update(None)
+        for{
+            status<-statuses
+            part<-status.parts
+        } {
+            for {
+                req <- Query(PartDefinitionInOrder).filter(_.orderId === id).filter(_.partDefId === status.partDefId).map(_.count).firstOption
+                done <- Query(Query(Part).filter(_.orderId===some(id)).filter(_.partDefId === status.partDefId).length).firstOption
+            } {
+                val take = math.min(req - done, part.count)
+                val toAdd = Query(Part).filter(_.damaged===false).filter(_.orderId.isNull).filter(_.cuttingId===part.cuttingId).
+                    map(_.id).sortBy(identity).take(take).list
+                toAdd.foreach(pid => Query(Part).filter(_.id===pid).map(_.orderId).update(Some(id)))
+            }
+        }
+    }
+
+    def orderDefParts(orderId:Int, partDefId:Int)(implicit s:Session) = 
+        Query(Part).filter(_.orderId===some(orderId)).filter(_.partDefId === partDefId).groupBy(_.cuttingId).map {
+            case (cutId, rows) => (cutId, rows.length)
+        }.list.map(PartInOrder.tupled)
+
+    def orderStatus(id:Int)(implicit s:Session) = {
+        Query(PartDefinitionInOrder).filter(_.orderId === id).map(_.partDefId).list.map(x=> x -> orderDefParts(id, x)).
+            map(OrderDefStatus.tupled)
+    }
 }
