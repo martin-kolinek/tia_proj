@@ -18,7 +18,6 @@
 		@helper.inputText(frm("name"))
 		@helper.inputDate(frm("filling_date"))
 		@helper.inputDate(frm("due_date"))
-		@helper.inputText(frm("status"))
 		
 		<h4>Part definitions</h4>
 		@helper.repeat(frm("odefs"), 0) { pdef =>
@@ -27,7 +26,7 @@
 		
 		@pdefInput(frm("odefs[x]"), "partDefTemplate hidden")
 	    <br />
-        <a id="addButton" >Add part definition</a>
+        <a class="addButton" >Add part definition</a>
         <br />
 	  	<input type="submit" value="Submit" />
 	  	

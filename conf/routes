@@ -47,6 +47,12 @@ GET		/order/:id/edit/			controllers.OrderController.edit(id:Int)
 
 POST	/order/:id/edit/			controllers.OrderController.update(id:Int)
         
+GET     /order/:id/status/          controllers.OrderController.status(id:Int)
+        
+POST    /order/:id/status           controllers.OrderController.updateStatus(id:Int)
+        
+GET     /order/:id/definitions      controllers.OrderController.listDefinitions(id:Int)
+        
 GET     /cutting/                   controllers.CuttingController.list
         
 GET     /cutting/add/               controllers.CuttingController.add
@@ -60,6 +66,8 @@ POST	/cutting/:id/edit/			controllers.CuttingController.update(id:Int)
 GET     /cutting/:id/finish/        controllers.CuttingController.finish(id:Int)
         
 POST    /cutting/:id/finish/        controllers.CuttingController.updateFinish(id:Int)
+        
+GET     /cutting/:id/parts/         controllers.CuttingController.listParts(id:Int)
         
 GET     /file/:ref                  controllers.TemporaryFileManager.download(ref)
         

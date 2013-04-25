@@ -15,6 +15,7 @@ import models.semiproduct.PackForList
 import scala.slick.jdbc.{GetResult, StaticQuery => Q}
 import Q.interpolation
 import models.order.Orders
+import scalaz.std.option._
 
 case class CuttingDesc(semiprodId:Int, cutPlanId:Int, parts:List[PartInCuttingDesc])
 
@@ -25,6 +26,8 @@ case class FinishedPartInCutting(partDefId:Int, orderDefId:Option[Int], dmgCount
 case class CuttingForList(id:Int, cutPlan:CuttingPlanForList, semiproduct:SemiproductForList, pack:PackForList, finishTime:Option[DateTime]) {
 	def finished = finishTime.isDefined
 }
+
+case class PartDesc(id:Int, partDefId:Int)
 
 trait Cuttings extends CuttingPlans {
     self:DBAccess with Orders => 
@@ -40,17 +43,19 @@ trait Cuttings extends CuttingPlans {
 
     def getDamagedPartCounts(id:Int)(implicit session:Session) =
     	sql"""
-        SELECT deford.part_def_id, deford.order_id, coalesce(cnts.dmg, 0) FROM
-          (SELECT DISTINCT part_def_id, order_id FROM part WHERE cutting_id=$id) deford
+        SELECT deford.part_def_id, deford.order_def_id, coalesce(cnts.dmg, 0) FROM
+          (SELECT DISTINCT part_def_id, order_def_id FROM part WHERE cutting_id=$id) deford
           left join
-          (SELECT part_def_id, order_id, count(id) as dmg FROM part WHERE cutting_id=$id and damaged=true group by part_def_id, order_id, cutting_id) cnts
-            on cnts.part_def_id = deford.part_def_id and (cnts.order_id = deford.order_id or cnts.order_id is null and deford.order_id is null)
+          (SELECT part_def_id, order_def_id, count(id) as dmg FROM part 
+                WHERE cutting_id=$id and damaged=true group by part_def_id, order_def_id, cutting_id) cnts
+            on cnts.part_def_id = deford.part_def_id and 
+                (cnts.order_def_id = deford.order_def_id or cnts.order_def_id is null and deford.order_def_id is null)
         """.as[(Int, Option[Int], Int)].list.map(FinishedPartInCutting.tupled)
     
     private def getPartCounts(id:Int)(implicit session:Session) = 
     	sql"""
-    	SELECT part_def_id, order_id, count(id) FROM part where 
-    	cutting_id = $id and order_id is not null group by cutting_id, part_def_id, order_id 
+    	SELECT part_def_id, order_def_id, count(id) FROM part where 
+    	cutting_id = $id and order_def_id is not null group by cutting_id, part_def_id, order_def_id 
     	""".as[(Int, Int, Int)].list.map(PartInCuttingDesc.tupled)
     
     private def getPartDefOrderCounts(parts:Traversable[PartInCuttingDesc]) = 
@@ -89,8 +94,21 @@ trait Cuttings extends CuttingPlans {
     def updateCutting(id:Int, cut:CuttingDesc)(implicit s:Session) {
     	Query(Part).filter(_.cuttingId === id).map(_.orderDefId).update(None)
     	for(p <- cut.parts) {
-    		updateCutting(id, p.orderDefId, p.count)
+    		updateCuttingParts(id, p.orderDefId, p.count)
     	} 
+    }
+
+    def updateCuttingParts(cuttingId:Int, orderDefId:Int, count:Int)(implicit s:Session) {
+        println(s"updatecutting $cuttingId, $orderDefId, $count")
+    	for {
+    		req <- Query(OrderDefinition).filter(_.id === orderDefId).map(_.count).firstOption
+    		done <- Query(Query(Part).filter(_.orderDefId===some(orderDefId)).length).firstOption
+    	} {
+    		val take = math.min(req - done, count)
+    		val toAdd = Query(Part).filter(_.damaged===false).filter(_.orderDefId.isNull).filter(_.cuttingId === cuttingId).
+    		map(_.id).sortBy(identity).take(take).list
+    		toAdd.foreach(pid => Query(Part).filter(_.id===pid).map(_.orderDefId).update(Some(orderDefId)))
+    	}
     }
 
     def updateFinished(cutId:Int, fin:List[FinishedPartInCutting])(implicit s:Session) {
@@ -107,5 +125,12 @@ trait Cuttings extends CuttingPlans {
         if(q.firstOption.map(_.isEmpty).getOrElse(false)) {
         	q.update(Some(DateTime.now()))
         }
+        val ordDefs = fin.map(_.orderDefId).flatten
+        val orders = Query(Order).
+            filter(ord => Query(OrderDefinition).filter(_.orderId === ord.id).filter(_.id.inSet(ordDefs)).exists)
+        tryFinishOrders(orders)
     }
+
+    def listParts(cutId:Int)(implicit s:Session) = 
+        Query(Part).filter(_.cuttingId === cutId).filter(_.damaged === false).map(x=>(x.id, x.partDefId)).list.map(PartDesc.tupled)
 }

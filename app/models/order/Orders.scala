@@ -18,7 +18,9 @@ case class OrderForList(id:Int, name:String, fillingDate:DateTime, dueDate:Optio
 
 case class OrderDefStatus(odefId:Int, parts:List[PartInOrder])
 
-case class PartInOrder(cuttingId:Int, count:Int)
+case class PartInOrder(partId:Int)
+
+case class OrderDefDesc(id:Int, partDefId:Int, count:Int)
 
 trait Orders extends Tables {
     self:DBAccess =>
@@ -39,8 +41,8 @@ trait Orders extends Tables {
         })
     }
 
-    def existsOrder(id:Int)(implicit session:Session) =
-        Query(Order).filter(_.id === id).firstOption.isDefined
+    def existsOrderDefinition(id:Int)(implicit session:Session) =
+        Query(OrderDefinition).filter(_.id === id).firstOption.isDefined
 
     def insertOrder(ord:OrderDesc)(implicit session:Session) = {
         val id:Int = Order.forInsert.insert((ord.name, ord.fillingDate, ord.dueDate, Accepted))
@@ -49,6 +51,7 @@ trait Orders extends Tables {
     }
     
     def updateOrder(id:Int, ord:OrderDesc)(implicit session:Session) = {
+        println(s"updateOrder $ord")
     	val q = for {
     		dbo <- Order if dbo.id === id
     	} yield dbo.name ~ dbo.fillingDate ~ dbo.dueDate
@@ -68,37 +71,47 @@ trait Orders extends Tables {
     		}
     	}
     }
-
-    def updateCutting(cuttingId:Int, orderDefId:Int, count:Int)(implicit s:Session) {
-    	for {
-    		req <- Query(OrderDefinition).filter(_.id === orderDefId).map(_.count).firstOption
-    		done <- Query(Query(Part).filter(_.orderDefId===some(orderDefId)).length).firstOption
-    	} {
-    		val take = math.min(req - done, count)
-    		val toAdd = Query(Part).filter(_.damaged===false).filter(_.orderDefId.isNull).filter(_.cuttingId === cuttingId).
-    		map(_.id).sortBy(identity).take(take).list
-    		toAdd.foreach(pid => Query(Part).filter(_.id===pid).map(_.orderDefId).update(Some(orderDefId)))
-    	}
-    }
     
     def updateOrderStatus(id:Int, statuses:List[OrderDefStatus])(implicit s:Session) {
     	val defs = Query(OrderDefinition).filter(_.orderId === id).map(_.id).list
         Query(Part).filter(_.orderDefId.inSet(defs)).map(_.orderDefId).update(None)
-        for{
-            status<-statuses
-            part<-status.parts
-        } {
-            updateCutting(part.cuttingId, status.odefId, part.count)
+        val partCounts = Query(OrderDefinition).filter(_.orderId === id).map(x=>x.id -> x.count).list.toMap
+        for(status<-statuses) {
+            val toAdd = math.min(partCounts(status.odefId), status.parts.size)
+            for(part<-status.parts.take(toAdd)) {
+                Query(Part).filter(_.id === part.partId).map(_.orderDefId).update(some(status.odefId))
+            }
         }
+        tryFinishOrders(Query(Order).filter(_.id===id))
     }
 
-    def orderDefParts(orderDefId:Int)(implicit s:Session) = 
-        Query(Part).filter(_.orderDefId===some(orderDefId)).groupBy(_.cuttingId).map {
-            case (cutId, rows) => (cutId, rows.length)
-        }.list.map(PartInOrder.tupled)
+    def orderDefParts(orderDefId:Int)(implicit s:Session) = {
+        val q = for {
+            p <- Part
+            c <- Cutting if p.cuttingId === c.id && p.orderDefId === some(orderDefId) && 
+                c.finishTime.isNotNull && p.damaged === false
+        } yield p.id
+        q.list.map(PartInOrder)
+    }
 
     def orderStatus(id:Int)(implicit s:Session) = {
         Query(OrderDefinition).filter(_.orderId === id).map(_.id).list.map(x=> x -> orderDefParts(x)).
             map(OrderDefStatus.tupled)
     }
+
+    def tryFinishOrders[E](orders:Query[Order.type, E])(implicit s:Session) {
+        val partQ = Query(Part).groupBy(_.orderDefId).map(x=> x._1 -> x._2.length)
+        val unFinished = Query(OrderDefinition).
+            filter(odef => partQ.filter(_._1 === odef.id).filter(_._2 < odef.count).exists || !partQ.filter(_._1 === odef.id).exists)
+        val toFinish = orders.filter(ord => !unFinished.filter(_.orderId === ord.id).exists).map(_.id)
+        def chStatus(l:List[Int], status:OrderStatus) {
+            l.foreach(id => Query(Order).filter(_.id === id).map(_.status).update(status))
+        }
+        chStatus(toFinish.list, Finished)
+        chStatus(orders.filter(!_.id.in(toFinish)).map(_.id).list, Accepted)
+    }
+  
+    def listOrderDefs(ordId:Int)(implicit s:Session) = 
+        Query(OrderDefinition).filter(_.orderId === ordId).map(x => (x.id, x.partDefId, x.count)).list.map(OrderDefDesc.tupled)
+    
 }

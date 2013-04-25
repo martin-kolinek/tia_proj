@@ -55,6 +55,7 @@
 			<td>
 			    @if(c.finished) {
 				    <a href="@routes.CuttingController.finish(c.id)">edit</a>
+                    <a href="@routes.CuttingController.listParts(c.id)">parts</a>
 				} else {
 				    <a href="@routes.CuttingController.edit(c.id)">edit</a>
 				    <a href="@routes.CuttingController.finish(c.id)">finish</a>

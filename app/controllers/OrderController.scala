@@ -15,6 +15,8 @@ import models.order.OrderModel
 import models.order.OrderForList
 import models.order.OrderList
 import models.order.OrderDefinitionDesc
+import models.order.PartInOrder
+import models.order.OrderDefStatus
 
 object OrderController extends Controller with ObjectController[OrderDesc] 
 		with ObjectListController[OrderForList] {
@@ -43,4 +45,38 @@ object OrderController extends Controller with ObjectController[OrderDesc]
     def listRoute = routes.OrderController.list
 	
 	def listTemplate = views.html.order.list.apply
+
+    def statusForm = Form(single(
+        "statuses" -> play.api.data.Forms.list(mapping(
+            "odefid" -> number,
+            "parts" -> play.api.data.Forms.list(mapping(
+                "part" -> number
+            )(PartInOrder)(PartInOrder.unapply))
+        )(OrderDefStatus)(OrderDefStatus.unapply))))
+
+    def status(id:Int) = Action{
+        model.withTransaction { implicit s =>
+            val frm = statusForm.fill(model.orderStatus(id))
+            Ok(views.html.order.status(frm, routes.OrderController.updateStatus(id)))
+        }
+    }
+
+    def updateStatus(id:Int) = Action{ implicit r =>
+        val binding = statusForm.bindFromRequest
+        binding.fold(
+            errFrm => {println(errFrm.errors);  BadRequest(views.html.order.status(errFrm, routes.OrderController.updateStatus(id)))},
+            statuses => {
+                model.withTransaction { implicit s =>
+                    model.updateOrderStatus(id, statuses)
+                    Redirect(listRoute)
+                }
+            }
+        )
+    }
+
+    def listDefinitions(id:Int) = Action{
+        model.withTransaction { implicit s =>
+            Ok(views.html.order.definitions(model.listOrderDefs(id)))
+        }
+    }
 }

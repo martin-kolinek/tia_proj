@@ -28,7 +28,7 @@ object CuttingController extends Controller with ObjectController[CuttingDesc]
         
     def partMapping(implicit s:scala.slick.session.Session) = mapping(
         "partdef" -> number.verifying(model.existsPartDef _),
-        "order" -> number.verifying(model.existsOrder _),
+        "order_def" -> number.verifying(model.existsOrderDefinition _),
         "count" -> number.verifying(_>0))(PartInCuttingDesc)(PartInCuttingDesc.unapply)
 
     def form(implicit s:scala.slick.session.Session) = Form(mapping(
@@ -76,5 +76,11 @@ object CuttingController extends Controller with ObjectController[CuttingDesc]
                 }
                 Redirect(listRoute)
             })
+    }
+
+    def listParts(id:Int) = Action {
+        model.withTransaction { implicit s =>
+            Ok(views.html.cutting.parts(model.listParts(id)))
+        }
     }
 }

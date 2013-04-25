@@ -4,7 +4,7 @@
     <div class="@cls">
         @helper.inputText(part("partdef"))
         @helper.inputText(part("count"))
-        @helper.inputText(part("order"))
+        @helper.inputText(part("order_def"))
         <a class="removePart">remove</a>
     </div>
 }
@@ -25,7 +25,7 @@
     @partInput(frm("parts[x]"), "partTemplate hidden")
     
     <br />
-    <a id="addButton" >Add part</a>
+    <a class="addButton" >Add part</a>
     <br />
     
   	<input type="submit" value="Submit" />

@@ -3,14 +3,14 @@ define(["jquery-1.9.0.min"], ->
         renumber = ->
             rgx = new RegExp(key+"""\\[.+\\]""", "g")
             $("."+itemClass).each (index, element) =>
-                $(element).find("[name^='"+key+"']").each ->
+                $(element).find("[name*='"+key+"']").each ->
                     $(this).prop("name", $(this).prop("name").replace(rgx, key+"["+index+"]"))
         remove = (event) ->
             $(this).parents("."+itemClass).remove()
             renumber()
         $("document").ready ->
-            $("#"+addBtn).click ->
-                templ = $("."+templateClass).first()
+            $("."+addBtn).click ->
+                templ = $(this).parent().find("."+templateClass).first()
                 newItem = templ.clone()
                 newItem.removeClass(templateClass)
                 newItem.removeClass("hidden")

@@ -1,3 +1,3 @@
 require(["formRepeating"], (rep) ->
-    rep.addRepeated("pdefs", "addButton", "partdef", "partDefTemplate", "removePartDef")
+    rep.addRepeated("odefs", "addButton", "partdef", "partDefTemplate", "removePartDef")
 )
