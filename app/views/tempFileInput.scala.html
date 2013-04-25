@@ -1,14 +1,16 @@
 @(field: play.api.data.Field, args: (Symbol,Any)*)(implicit handler: helper.FieldConstructor, lang: play.api.i18n.Lang)
 
+@import helper.twitterBootstrap._
+
 @helper.input(field, args:_*) { (id, name, value, htmlArgs) =>
     <input type="hidden" id="@id" name="@name" value="@value" />
     <input type="file" id="@{id+"_file"}" @toHtmlArgs(htmlArgs) />
     
-    <a id="@{id+"_a"}" href='@routes.TemporaryFileManager.download(value.getOrElse(""))'>current</a>
-    @helper.requireJs(core = routes.Assets.at("javascripts/require.js").url, module = routes.Assets.at("javascripts/main").url)
+    <a id="@{id+"_a"}" href='@routes.TemporaryFileManager.download(value.getOrElse(""))'>Download</a>
+    <a id="@{id+"_ch"}" class="btn btn-small btn-danger" >Change</a>
     <script type="text/javascript">
       require(["tempFileUpload"], function(upl) {
-        upl.upload("@{id+"_file"}", "@id", "@{id+"_a"}")
+        upl.upload("@{id+"_file"}", "@id", "@{id+"_a"}", "@{id+"_ch"}")
       })
     </script>
 }

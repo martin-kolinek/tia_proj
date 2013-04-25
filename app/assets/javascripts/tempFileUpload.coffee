@@ -1,8 +1,17 @@
-define(["jquery-1.9.0.min", "tempFileRoutes"], ->
-    upload : (fileup, hidden, anchor) ->
+define(["tempFileRoutes"], ->
+    upload : (fileup, hidden, anchor, change) ->
+    	fixDisp = ->
+    	    if($("#"+hidden).val())
+                $("#"+fileup).hide()
+                $("#"+anchor).show()
+                $("#"+change).show()
+            else       
+                $("#"+fileup).show()
+                $("#"+anchor).hide()
+                $("#"+change).hide()
         $("document").ready ->
-            file = $("#"+fileup)
-            file.change ->
+            $("#"+fileup).change ->
+                file = $(this)
                 if(file.prop('files').length == 0)
                     return
                 toSend = file.prop('files')[0]
@@ -16,7 +25,16 @@ define(["jquery-1.9.0.min", "tempFileRoutes"], ->
                         success: (response, status, xhr) ->
                             $("#"+hidden).val(response)
                             $("#"+anchor).prop("href", tempFileRoutes.controllers.TemporaryFileManager.download(response).url)
-                        error: (xhr, status, error) -> alert("error: "+error)
+                            fixDisp()
+                        error: (xhr, status, error) -> 
+                            alert("error: "+error)
+                            fixDisp()
                 reader.readAsArrayBuffer(toSend)
+            $("#"+change).click ->
+                $("#"+hidden).val("")
+                $("#"+fileup).replaceWith($("#"+fileup).clone(true))
+                $("#"+fileup).val("")
+                fixDisp()
+            fixDisp()
                 
 )

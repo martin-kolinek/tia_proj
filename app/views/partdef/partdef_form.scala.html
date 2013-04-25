@@ -1,17 +1,21 @@
 @(frm:Form[models.partdef.PartDefinitionDesc], replyTo:Call, header:String)
 
-@main("Part definitions") {
+@import helper.twitterBootstrap._
+
+@main("Part definitions", views.ObjectType.PartDefinition) {
 
 <h3>
   @header part definition
 </h3>
 
 @helper.form(action = replyTo) {
-	@helper.inputText(frm("name"))
-	@helper.inputText(frm("filter"))
-	@tempFileInput(frm("file"))
+    <fieldset>
+	    @helper.inputText(frm("name"), '_label -> "Name")
+	    @helper.inputText(frm("filter"), '_label -> "Filter")
+	    @tempFileInput(frm("file"), '_label -> "File")
+	</fieldset>
 
-	<input type="submit" value="Submit" />
+	<input type="submit" value="Submit" class="btn btn-success btn-large" />
 }
 
 }

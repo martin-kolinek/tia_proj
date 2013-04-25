@@ -1,4 +1,4 @@
-define(["jquery-1.9.0.min"], ->
+define([], ->
     addRepeated:(key, addBtn, itemClass, templateClass, removeButtonClass) ->
         renumber = ->
             rgx = new RegExp(key+"""\\[.+\\]""", "g")
