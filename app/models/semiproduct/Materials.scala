@@ -3,7 +3,8 @@ package models.semiproduct
 import models.basic.Tables
 import models.DBAccess
 
-case class MaterialDesc(name:String) {}
+case class MaterialDesc(name:String) {
+}
 
 trait Materials extends Tables {
 	self:DBAccess =>

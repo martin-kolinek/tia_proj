@@ -6,16 +6,14 @@
 <h3>
 	Part definitions
 </h3>
-
-<a href="@routes.PartDefinitions.add">new</a>
-
-<table id="main_list">
+<div>
+  <a class="btn btn-success" href="@routes.PartDefinitions.add">new</a>
+</div>
+<div class="top-margin">
+  <table id="main_list">
     <thead>
 		<tr>
 		    <th>
-		        ID
-		    </th>
-			<th>
 				Name
 			</th>
 			<th>
@@ -30,9 +28,6 @@
 		@for(pdef<-pdefs) {
 			<tr>
 			    <td>
-			        @pdef.id
-			    </td>
-				<td>
 					@pdef.name
 				</td>
 				<td>
@@ -44,6 +39,6 @@
 			</tr>
 		}
 	</tbody>
-</table>
-
+  </table>
+</div>
 }

@@ -20,16 +20,24 @@ class ShapeDesc protected() {
 object ShapeDesc extends ShapeDesc {
 }
 
+object ShapeHelpers {
+    implicit class OptionStringContext(sc:StringContext) {
+        def opt(opts:Option[Any]*) = sc.s(opts.map(o => o.map(_.toString).getOrElse("?")):_*)
+    }
+}
+
+import ShapeHelpers._
+
 case class SheetDesc(thickness:Option[BigDecimal], width:Option[BigDecimal], height:Option[BigDecimal]) extends ShapeDesc {
-	override def description = s"sheet - $thickness mm, $width x $height"
+	override def description = opt"sheet - $thickness mm, $width x $height"
 }
 
 case class CirclePipeDesc(thickness:Option[BigDecimal], radius:Option[BigDecimal], length:Option[BigDecimal]) extends ShapeDesc {
-	override def description = s"circle pipe - $thickness, R=$radius, L=$length" 
+	override def description = opt"circle pipe - $thickness, R=$radius, L=$length" 
 } 
 
 case class SquarePipeDesc(thickness:Option[BigDecimal], diameter:Option[BigDecimal], length:Option[BigDecimal]) extends ShapeDesc {
-	override def description = s"square pipe - $thickness, D=$diameter, L=$length"
+	override def description = opt"square pipe - $thickness, D=$diameter, L=$length"
 }
 
 trait Shapes extends Tables { this:DBAccess =>

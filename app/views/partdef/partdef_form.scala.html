@@ -15,8 +15,10 @@
 	    @helper.inputText(frm("filter"), '_label -> "Filter")
 	    @tempFileInput(frm("file"), '_label -> "File")
 	</fieldset>
-
-	<input type="submit" value="Submit" class="btn btn-primary btn-large" />
+    <div class="form-actions">
+	  <input type="submit" value="Submit" class="btn btn-primary" />
+      <a class="btn" href="@routes.PartDefinitions.list" >Cancel</a>
+    </div>
 }
 
 }

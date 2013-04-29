@@ -1,12 +1,15 @@
 require(["jquery.dataTables"], ->
     $(document).ready ->
-        $("#main_list").dataTable(
+        $("main_list").dataTable(
             bFilter:false
             bAutoWidth:false
             aoColumns: [
                 null,
                 null,
-                {bSortable:false, sWidth:"3em"}
+                null,
+                null,
+                {bSortable:false, sWidth:"7em"}
             ]
         )
+            
 )
