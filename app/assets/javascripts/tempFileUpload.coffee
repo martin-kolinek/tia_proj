@@ -1,12 +1,12 @@
 define(["tempFileRoutes"], ->
-    upload : (fileup, hidden, anchor, change) ->
+    upload : (fileup, hidden, anchor, change, choose) ->
     	fixDisp = ->
     	    if($("#"+hidden).val())
-                $("#"+fileup).hide()
+                $("#"+choose).hide()
                 $("#"+anchor).show()
                 $("#"+change).show()
             else       
-                $("#"+fileup).show()
+                $("#"+choose).show()
                 $("#"+anchor).hide()
                 $("#"+change).hide()
         $("document").ready ->
@@ -32,9 +32,10 @@ define(["tempFileRoutes"], ->
                 reader.readAsArrayBuffer(toSend)
             $("#"+change).click ->
                 $("#"+hidden).val("")
-                $("#"+fileup).replaceWith($("#"+fileup).clone(true))
-                $("#"+fileup).val("")
                 fixDisp()
+                $("#"+choose).trigger("click")
+            $("#"+choose).click ->
+            	$("#"+fileup).trigger("click")
             fixDisp()
                 
 )

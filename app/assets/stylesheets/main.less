@@ -5,14 +5,39 @@
     background: -o-linear-gradient(@dir, @start, @end);
 }
 
-h1 {
-    .gradient(right, #000099, #000000);
-    color:#FFFFFF;
-    padding:1em 2em 1em 4em;
-    margin-top:0;
+.rounded(@size) {
+    border-radius: @size;
+    -moz-border-radius: @size;
+}
+
+.rounded-top(@size) {
+    border-top-left-radius: @size @size;
+    border-top-right-radius: @size @size;
+    -moz-border-top-left-radius: @size @size;
+    -moz-border-top-right-radius: @size @size;
+}
+
+body {
+    padding-top:0;
+    background-color:#e0dfe9;
 }
 
 .content {
-    padding-left:3em;
+    background-color:#ffffff;
+    border:solid 1px #d7d7d7;
+    .rounded(20px);
+    margin-top:2em;
 }
 
+.content-body {
+    padding:0 1em 5em 1em;
+    
+}
+
+.header {
+    .gradient(top, #222b5a, #000000);
+    .rounded-top(20px);
+    color:#ffffff;
+    padding:2em 2em 2em 2em;
+    text-align:center;
+}
