@@ -5,51 +5,52 @@
 <h3>
 	Pack list
 </h3>
-
-<a class="btn btn-success" href="@routes.Semiproducts.add">new</a>
-
-<table id="main_list">
-  <thead>
-	<tr>
-		<th>
-			heat no
-		</th>
-		<th>
-			unlimited
-		</th>
-		<th>
-			material
-		</th>
-		<th>
-			shape
-		</th>
-		<th>
-			actions
-		</th>
-	</tr>
-  </thead>
-  <tbody>
-	@for(sp <- sps) {
+<div>
+    <a class="btn btn-success" href="@routes.Semiproducts.add">new</a>
+</div>
+<div class="top-margin">
+	<table id="main_list">
+	  <thead>
 		<tr>
-			<td>
-				@sp.heatNo
-			</td>
-			<td>
-				@sp.unlimited
-			</td>
-			<td>
-				@sp.material.name
-			</td>
-			<td>
-				@sp.shape.description
-			</td>
-			<td>
-				<a href="@routes.Semiproducts.edit(sp.id)">edit</a>
-                <a href="@routes.Semiproducts.listSemiproducts(sp.id)">semiproducts</a>
-			</td>
+			<th>
+				heat no
+			</th>
+			<th>
+				unlimited
+			</th>
+			<th>
+				material
+			</th>
+			<th>
+				shape
+			</th>
+			<th>
+				actions
+			</th>
 		</tr>
-	}
-  </tbody>
-</table>
-
+	  </thead>
+	  <tbody>
+		@for(sp <- sps) {
+			<tr>
+				<td>
+					@sp.heatNo
+				</td>
+				<td>
+					@sp.unlimited
+				</td>
+				<td>
+					@sp.material.name
+				</td>
+				<td>
+					@sp.shape.description
+				</td>
+				<td>
+					<a href="@routes.Semiproducts.edit(sp.id)">edit</a>
+	                <a href="@routes.Semiproducts.listSemiproducts(sp.id)">semiproducts</a>
+				</td>
+			</tr>
+		}
+	  </tbody>
+	</table>
+</div>
 }

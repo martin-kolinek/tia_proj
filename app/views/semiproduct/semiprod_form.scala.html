@@ -1,45 +1,70 @@
 @(frm:Form[models.semiproduct.PackDesc], replyTo:Call, header:String)
 
 @import views.html.main
+@import views.HorizontalForm._
 
 @spInput(fld:Field, cls:String) = {
     <div class="@cls">
-        @helper.inputText(fld("serial"))
+        @helper.input(fld("serial"), '_label -> "Serial no.") {(id, name, value, htmlArgs) =>
+            <input type="text" id="@id" name="@name" @toHtmlArgs(htmlArgs) value="@value" />
+            <a class="removeSemiprod btn btn-danger" >remove</a>
+        }
         <input type="hidden" id="@{fld("id").id}" name="@{fld("id").name}" value="@{fld("id").value}" />
-        <a class="removeSemiprod" >remove</a>
     </div>
 }
 
+@typeInput(fld:Field, args: (Symbol,Any)*) = {
+    @helper.input(fld, args:_*){ (id, name, value, htmlArgs) =>
+        <select class="type_select" id="@id" name="@name" @toHtmlArgs(htmlArgs)>
+            @for((v, text) <- Seq("0"->"Unspecified", 
+                                    "1" -> "Sheet", 
+                                    "2" -> "Circle pipe", 
+                                    "3" -> "Square pipe")) {
+                <option value="@v" @if(value.getOrElse("")==v) {selected="true"}>@text</option>
+            }
+        </select>
+    }
+}
+
 @main("Semiproducts", views.ObjectType.Semiproduct) {
+<script src="@routes.Assets.at("javascripts/semiproduct/form.js")" type="text/javascript"></script>
 } {
     <h3>
-      @header semiproduct
+      @header pack
     </h3>
-	@helper.form(action = replyTo) {
-		@helper.inputText(frm("heat"))
-		@helper.inputDate(frm("delivery"))
-		@helper.checkbox(frm("unlimited"))
-		@helper.inputText(frm("material.material"))
-		@helper.inputText(frm("type"))
-		@helper.inputText(frm("sheet.thickness"))
-		@helper.inputText(frm("sheet.width"))
-		@helper.inputText(frm("sheet.height"))
-		@helper.inputText(frm("circ.thickness"))
-		@helper.inputText(frm("circ.radius"))
-		@helper.inputText(frm("circ.length"))
-		@helper.inputText(frm("square.thickness"))
-		@helper.inputText(frm("square.diameter"))
-		@helper.inputText(frm("square.length"))
+	@helper.form(action = replyTo, 'class -> "form-horizontal") {
+		@helper.inputText(frm("heat"), '_label -> "Heat no.")
+		@helper.inputDate(frm("delivery"), '_label -> "Delivery date")
+		@helper.checkbox(frm("unlimited"), '_label -> "Unlimited", '_showConstraints -> false)
+		@helper.inputText(frm("material.material"), '_label -> "Material")
+		@typeInput(frm("type"), '_label -> "Type", '_showConstraints -> false)
+		<div id="sheet_div">
+		  @helper.inputText(frm("sheet.thickness"), '_label -> "Thickness")
+		  @helper.inputText(frm("sheet.width"), '_label -> "Width")
+		  @helper.inputText(frm("sheet.height"), '_label -> "Height")
+		</div>
+		<div id="circ_pipe_div">
+		  @helper.inputText(frm("circ.thickness"), '_label -> "Thickness")
+		  @helper.inputText(frm("circ.radius"), '_label -> "Radius")
+		  @helper.inputText(frm("circ.length"), '_label -> "Length")
+		</div>
+		<div id="square_pipe_div">
+		  @helper.inputText(frm("square.thickness"), '_label -> "Thickness")
+		  @helper.inputText(frm("square.diameter"), '_label -> "Diameter")
+		  @helper.inputText(frm("square.length"), '_label -> "Length")
+		</div>
 		
 		<h4>Semiproducts</h4>
 		@helper.repeat(frm("semiproducts"), 0) { sp =>
 			@spInput(sp, "semiproduct")
 		}
 		@spInput(frm("semiproducts[x]"), "semiprodTemplate hidden")
-		<br />
-		<a class="addButton" >Add semiproduct</a>
-	    <br />
-		<input type="submit" value="Submit" />
-		@helper.requireJs(core = routes.Assets.at("javascripts/require.js").url, module = routes.Assets.at("javascripts/semiproductForm").url)
+		<div class="form-actions">
+		  <a class="addButton btn btn-invert" >Add semiproduct</a>
+		</div>
+	    <div class="form-actions">
+		  <input type="submit" class="btn btn-primary" value="Submit" />
+		  <a class="btn" href="@routes.Semiproducts.list">Cancel</a>
+		</div>
     }
 }

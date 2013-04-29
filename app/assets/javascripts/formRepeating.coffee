@@ -10,7 +10,7 @@ define([], ->
             renumber()
         $("document").ready ->
             $("."+addBtn).click ->
-                templ = $(this).parent().find("."+templateClass).first()
+                templ = $(this).parents().find("."+templateClass).first()
                 newItem = templ.clone()
                 newItem.removeClass(templateClass)
                 newItem.removeClass("hidden")
