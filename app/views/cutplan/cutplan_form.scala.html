@@ -18,7 +18,7 @@
 	@helper.form(action = replyTo) {
 		@helper.inputText(frm("name"))
 		@helper.inputText(frm("filter"))
-		@tempFileInput(frm("file"))
+		@*@tempFileInput(frm("file"))*@
 		
 		<h4>Part definitions</h4>
 		@helper.repeat(frm("partdefs"), 0) { pdef =>

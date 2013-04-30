@@ -15,9 +15,16 @@ trait PackList extends ObjectListModel[PackForList] {
         val q = for {
             (sp, c) <- Semiproduct.leftJoin(Cutting).on(_.id === _.semiproductId)
             if sp.packId === packId
-        } yield (sp.id, sp.serialNo, c.id.?.isNull)
+        } yield (sp.id, sp.serialNo, c.id.?.isNotNull, c.finishTime.?.isNotNull)
         q.list.map {
-            case (id, serial, used) => SemiproductForList(id, serial, if(used) SemiproductStatus.Used else SemiproductStatus.Available)
+            case (id, serial, reserved, used) => {
+            	val status = (reserved, used) match {
+            		case (false, _) => SemiproductStatus.Available
+            		case (true, false) => SemiproductStatus.Reserved
+            		case (true, true) => SemiproductStatus.Used
+            	}
+            	SemiproductForList(id, serial, status)
+            } 
         }
 	}
 }

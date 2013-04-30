@@ -1,16 +1,15 @@
 @(pdefs:Seq[models.partdef.PartDefinitionForList])
 
 @main("Part definitions", views.ObjectType.PartDefinition) {
-<script src="@routes.Assets.at("javascripts/partdef/list.js")" type="text/javascript"></script>
+@helper.requireJs(core = routes.Assets.at("javascripts/require-jquery.js").url, 
+    module = routes.Assets.at("javascripts/partdef_list.js").url)
 } {
 <h3>
 	Part definitions
 </h3>
-<div>
-  <a class="btn btn-success" href="@routes.PartDefinitions.add">new</a>
-</div>
-<div class="top-margin">
-  <table id="main_list">
+<a class="btn btn-success" href="@routes.PartDefinitions.add">New</a>
+
+<table id="main_list">
     <thead>
 		<tr>
 		    <th>
@@ -34,11 +33,11 @@
 					@pdef.filter
 				</td>
 				<td>
-					<a href="@routes.PartDefinitions.edit(pdef.id)">edit</a>
+					<a class="btn" href="@routes.PartDefinitions.edit(pdef.id)">Edit</a>
 				</td>
 			</tr>
 		}
 	</tbody>
-  </table>
-</div>
+</table>
+
 }

@@ -3,8 +3,12 @@
 @import views.html.main
 @import views.HorizontalForm._
 
-@spInput(fld:Field, cls:String) = {
-    <div class="@cls">
+@spInput(fld:Field, templateId:Option[String] = None) = {
+    <div @if(templateId.isEmpty) {class="semiproduct"} 
+        @if(templateId.isDefined) {
+            id="@templateId.get" data-remove-class="removeSemiprod" data-item-class="semiproduct"
+            class="hide"
+        }>
         @helper.input(fld("serial"), '_label -> "Serial no.") {(id, name, value, htmlArgs) =>
             <input type="text" id="@id" name="@name" @toHtmlArgs(htmlArgs) value="@value" />
             <a class="removeSemiprod btn btn-danger" >remove</a>
@@ -27,7 +31,8 @@
 }
 
 @main("Semiproducts", views.ObjectType.Semiproduct) {
-<script src="@routes.Assets.at("javascripts/semiproduct/form.js")" type="text/javascript"></script>
+@helper.requireJs(core = routes.Assets.at("javascripts/require-jquery.js").url, 
+    module = routes.Assets.at("javascripts/semiproduct_form.js").url)
 } {
     <h3>
       @header pack
@@ -56,11 +61,12 @@
 		
 		<h4>Semiproducts</h4>
 		@helper.repeat(frm("semiproducts"), 0) { sp =>
-			@spInput(sp, "semiproduct")
+			@spInput(sp)
 		}
-		@spInput(frm("semiproducts[x]"), "semiprodTemplate hidden")
+		@spInput(frm("semiproducts[x]"), Some("semiprodTemplate"))
 		<div class="form-actions">
-		  <a class="addButton btn btn-invert" >Add semiproduct</a>
+		  <a id="add-semiproduct" class="btn btn-invert" data-template="semiprodTemplate" 
+		      data-key="semiproducts" >Add semiproduct</a>
 		</div>
 	    <div class="form-actions">
 		  <input type="submit" class="btn btn-primary" value="Submit" />

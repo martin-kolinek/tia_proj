@@ -3,6 +3,8 @@
 @import views.HorizontalForm._
 
 @main("Part definitions", views.ObjectType.PartDefinition) {
+@helper.requireJs(core = routes.Assets.at("javascripts/require-jquery.js").url, 
+    module = routes.Assets.at("javascripts/partdef_form.js").url)
 } {
 
 <h3>
@@ -13,7 +15,7 @@
     <fieldset class="control-group">
 	    @helper.inputText(frm("name"), '_label -> "Name")
 	    @helper.inputText(frm("filter"), '_label -> "Filter")
-	    @tempFileInput(frm("file"), '_label -> "File")
+	    @tempFileInput(frm("file"), "main_file", '_label -> "File")
 	</fieldset>
     <div class="form-actions">
 	  <input type="submit" value="Submit" class="btn btn-primary" />

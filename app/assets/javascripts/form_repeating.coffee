@@ -1,5 +1,10 @@
-define([], ->
-    addRepeated:(key, addBtn, itemClass, templateClass, removeButtonClass) ->
+define(["jquery"], ($) ->
+    addRepeated:(addBtn) ->
+        btn = $("#"+addBtn)
+        template = $("#"+btn.data("template"))
+        key = btn.data("key")
+        itemClass = template.data("item-class")
+        removeButtonClass = template.data("remove-class") 
         renumber = ->
             rgx = new RegExp(key+"""\\[.+\\]""", "g")
             $("."+itemClass).each (index, element) =>
@@ -9,14 +14,11 @@ define([], ->
             $(this).parents("."+itemClass).remove()
             renumber()
         $("document").ready ->
-            $("."+addBtn).click ->
-                templ = $(this).parents().find("."+templateClass).first()
-                newItem = templ.clone()
-                newItem.removeClass(templateClass)
-                newItem.removeClass("hidden")
+            btn.click ->
+                newItem = template.clone(true)
                 newItem.addClass(itemClass)
-                newItem.find("."+removeButtonClass).on("click", remove)
-                templ.before(newItem)
+                template.before(newItem)
+                newItem.show()
                 renumber()
             $("."+removeButtonClass).on("click", remove)
 )

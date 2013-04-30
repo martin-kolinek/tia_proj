@@ -1,15 +1,10 @@
-@(field: play.api.data.Field, args: (Symbol,Any)*)(implicit handler: helper.FieldConstructor, lang: play.api.i18n.Lang)
+@(field: play.api.data.Field, handle:String, args: (Symbol,Any)*)(implicit handler: helper.FieldConstructor, lang: play.api.i18n.Lang)
 
 @helper.input(field, args:_*) { (id, name, value, htmlArgs) =>
-    <input type="hidden" id="@id" name="@name" value="@value" />
-    <input class="hide" type="file" id="@{id+"_file"}" @toHtmlArgs(htmlArgs) />
+    <input type="hidden" id="@id" class="@{handle+"_hf"}" name="@name" value="@value" />
+    <input class="hide @{handle+"_file"}" type="file" id="@{id+"_file"}" @toHtmlArgs(htmlArgs) />
     
-    <a id="@{id+"_a"}" href='@routes.TemporaryFileManager.download(value.getOrElse(""))'>Download</a>
-    <a id="@{id+"_ch"}" class="btn btn-small btn-danger" >Change</a>
-    <a id="@{id+"_cho"}" class="btn btn-small btn-inverse" >Choose</a>
-    <script type="text/javascript">
-      require(["tempFileUpload"], function(upl) {
-        upl.upload("@{id+"_file"}", "@id", "@{id+"_a"}", "@{id+"_ch"}", "@{id+"_cho"}")
-      })
-    </script>
+    <a id="@{id+"_a"}" class="@{handle+"_down"}" href='@routes.TemporaryFileManager.download(value.getOrElse(""))'>Download</a>
+    <a id="@{id+"_ch"}" class="btn btn-small btn-danger @{handle+"_change"}" >Change</a>
+    <a id="@{id+"_cho"}" class="btn btn-small btn-inverse @{handle+"_choose"}" >Choose</a>
 }(handler, lang)
