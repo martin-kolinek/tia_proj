@@ -75,6 +75,8 @@ POST    /file/upload/               controllers.TemporaryFileManager.upload
 
 GET     /assets/javascripts/tempFileRoutes.js controllers.JSRoutes.tempFileRoutes
 
+GET     /assets/javascripts/semiproductRoutes.js controllers.JSRoutes.semiproductRoutes
+
 GET     /assets/javascripts/jquery.js controllers.Assets.at(path="/public", file="/javascripts/jquery-1.9.0.min.js")
         
 GET     /assets/img/glyphicons-halflings-white.png      controllers.Assets.at(path="/public", file="/images/glyphicons-halflings-white.png")

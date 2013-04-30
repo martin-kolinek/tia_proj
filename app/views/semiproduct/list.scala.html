@@ -46,11 +46,15 @@
 				</td>
 				<td>
 					<a href="@routes.Semiproducts.edit(sp.id)">edit</a>
-	                <a href="@routes.Semiproducts.listSemiproducts(sp.id)">semiproducts</a>
+                <a class="btn" data-pack-id="@sp.id">Semiproducts</a>
 				</td>
 			</tr>
 		}
 	  </tbody>
 	</table>
 </div>
+
+<div id="sp_div" class="hide modal">
+</div>
+
 }
