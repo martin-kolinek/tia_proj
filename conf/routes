@@ -27,6 +27,10 @@ GET		/partdef/:id/edit/			controllers.PartDefinitions.edit(id:Int)
 
 POST	/partdef/:id/edit/			controllers.PartDefinitions.update(id:Int)
 
+GET     /partdef/:id/description    controllers.PartDefinitions.partDefDescription(id:Int)
+
+GET     /partdef/select_list        controllers.PartDefinitions.selectList
+
 GET     /cuttingplan/               controllers.CuttingPlans.list
 
 GET		/cuttingplan/add/			controllers.CuttingPlans.add

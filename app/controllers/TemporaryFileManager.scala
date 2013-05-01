@@ -31,12 +31,6 @@ object TemporaryFileStorage {
 		hm.remove(ref)
 	}
 	
-	def retrieveFile(ref:String) = synchronized {
-		val res = getFile(ref)
-		deleteFile(ref)
-		res
-	}
-	
 	def hasFile(ref:String) = synchronized {
 		hm.isDefinedAt(ref)
 	}
@@ -75,7 +69,7 @@ object TemporaryFileManager extends Controller {
     }
 	
 	val tempFileMapping = nonEmptyText.
-			transform(TemporaryFileStorage.retrieveFile, {
+			transform(TemporaryFileStorage.getFile, {
 				case None => ""
 				case Some(data) => TemporaryFileStorage.createFile(data)
 			}:Option[Array[Byte]] => String).

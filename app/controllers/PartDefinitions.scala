@@ -34,4 +34,16 @@ object PartDefinitions extends Controller with ObjectController[PartDefinitionDe
 	def template = partdef_form.apply
 	
 	def listTemplate = views.html.partdef.list.apply
+	
+	def selectList = Action {
+    	model.withTransaction { implicit s =>
+    		Ok(views.html.partdef.select_list(model.list))
+    	}
+    }
+    
+    def partDefDescription(id:Int) = Action{
+    	model.withTransaction {implicit s=>
+    		Ok(model.getPartDefDescription(id).getOrElse("unknown"))
+    	}
+    }
 }

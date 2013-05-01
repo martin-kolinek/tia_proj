@@ -1,10 +1,26 @@
 define(["jquery"], ($) ->
-    addRepeated:(addBtn) ->
-        btn = $("#"+addBtn)
-        template = $("#"+btn.data("template"))
+    addRepeated:(handle) ->
+        btn = $("#"+handle+"_add")
+        template = $("#"+handle+"_template")
         key = btn.data("key")
-        itemClass = template.data("item-class")
-        removeButtonClass = template.data("remove-class") 
+        itemClass = handle+"_item"
+        removeButtonClass = handle+"_rem"
+        ret = 
+            added : (handler) ->
+                $(ret).on("added", handler)
+            disableAdding: ->
+                btn.off("click")
+            enableAdding: ->
+            	btn.click ->
+                    newItem = template.clone(true)
+                    newItem.addClass(itemClass)
+                    template.before(newItem)
+                    
+                    evnt = $.Event("added")
+                    evnt.newItem = newItem
+                    newItem.show()
+                    renumber()
+                    $(ret).trigger(evnt)	
         renumber = ->
             rgx = new RegExp(key+"""\\[.+\\]""", "g")
             $("."+itemClass).each (index, element) =>
@@ -14,11 +30,7 @@ define(["jquery"], ($) ->
             $(this).parents("."+itemClass).remove()
             renumber()
         $("document").ready ->
-            btn.click ->
-                newItem = template.clone(true)
-                newItem.addClass(itemClass)
-                template.before(newItem)
-                newItem.show()
-                renumber()
+            ret.enableAdding()
             $("."+removeButtonClass).on("click", remove)
+        ret
 )

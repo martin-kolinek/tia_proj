@@ -1,0 +1,26 @@
+@(lst:List[models.partdef.PartDefinitionForList])
+
+<table>
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Filter
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @for(pd <- lst) {
+            <tr data-id="@pd.id" data-description="@pd.description">
+                <td>
+                    @pd.name
+                </td>
+                <td>
+                    @pd.filter
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -5,7 +5,9 @@ import models.basic._
 
 case class PartDefinitionDesc(name:String, filter:String, file:Array[Byte])
 
-case class PartDefinitionForList(id:Int, name:String, filter:String)
+case class PartDefinitionForList(id:Int, name:String, filter:String) {
+	def description = s"$name ($filter)"
+}
 
 trait PartDefinitions extends Tables {
 	this:DBAccess =>
@@ -40,5 +42,10 @@ trait PartDefinitions extends Tables {
 	
 	def insertPartDef(pd:PartDefinitionDesc)(implicit session:Session) = {
 		PartDefinition.forInsert.insert((pd.file, pd.filter, pd.name, false))
+	}
+	
+	def getPartDefDescription(id:Int)(implicit session:Session) = {
+		Query(PartDefinition).filter(_.id === id).map(x=>(x.id, x.name, x.filter)).firstOption.
+		    map(PartDefinitionForList.tupled).map(_.description)
 	}
 }

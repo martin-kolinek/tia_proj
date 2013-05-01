@@ -3,18 +3,14 @@
 @import views.html.main
 @import views.HorizontalForm._
 
-@spInput(fld:Field, templateId:Option[String] = None) = {
-    <div @if(templateId.isEmpty) {class="semiproduct"} 
-        @if(templateId.isDefined) {
-            id="@templateId.get" data-remove-class="removeSemiprod" data-item-class="semiproduct"
-            class="hide"
-        }>
+@spInput(frm:String => Field, key:String) = {
+    @repeatingHelper(frm, key, "Add semiproduct", "sp_handle"){ (fld, remove) =>
         @helper.input(fld("serial"), '_label -> "Serial no.") {(id, name, value, htmlArgs) =>
             <input type="text" id="@id" name="@name" @toHtmlArgs(htmlArgs) value="@value" />
-            <a class="removeSemiprod btn btn-danger" >remove</a>
+            @remove
         }
         <input type="hidden" id="@{fld("id").id}" name="@{fld("id").name}" value="@{fld("id").value}" />
-    </div>
+    }
 }
 
 @typeInput(fld:Field, args: (Symbol,Any)*) = {
@@ -60,14 +56,7 @@
 		</div>
 		
 		<h4>Semiproducts</h4>
-		@helper.repeat(frm("semiproducts"), 0) { sp =>
-			@spInput(sp)
-		}
-		@spInput(frm("semiproducts[x]"), Some("semiprodTemplate"))
-		<div class="form-actions">
-		  <a id="add-semiproduct" class="btn btn-invert" data-template="semiprodTemplate" 
-		      data-key="semiproducts" >Add semiproduct</a>
-		</div>
+		@spInput(frm.apply _, "semiproducts")
 	    <div class="form-actions">
 		  <input type="submit" class="btn btn-primary" value="Submit" />
 		  <a class="btn" href="@routes.Semiproducts.list">Cancel</a>

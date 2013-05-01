@@ -1,0 +1,15 @@
+@(parent:String => Field, key:String, addCaption:String, handle:String)(inside : (Field, Html) => Html)
+
+@removeButton() = {
+    <a class="btn btn-danger @{handle+"_rem"}">Remove</a>
+}
+
+@helper.repeat(parent(key), 0) { fld =>
+    <div class="@{handle+"_item"}" >
+        @inside(fld, removeButton())
+    </div>
+}
+<div id="@{handle+"_template"}" class="hide">
+    @inside(parent(key+"[x]"), removeButton())
+</div>
+<a class="btn input" id="@{handle+"_add"}" data-key="@key">@addCaption</a>

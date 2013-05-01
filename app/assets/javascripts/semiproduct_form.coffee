@@ -1,6 +1,6 @@
 require(["common"], (common) ->
     require(["jquery", "form_repeating"], ($, rep) ->
-        rep.addRepeated("add-semiproduct")
+        rep.addRepeated("sp_handle")
         typeMapping = 
             "0":""
             "1":"sheet_div"

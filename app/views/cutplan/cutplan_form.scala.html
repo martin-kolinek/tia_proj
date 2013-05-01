@@ -1,37 +1,39 @@
 @(frm:Form[models.cutplan.CuttingPlanDesc], replyTo:Call, header:String)
 
-@pdefInput(fld:Field, cls:String) = {
-    <div class="@cls">
-        @helper.inputText(fld("partdefid"))
-        @helper.inputText(fld("count"))
-        <a class="removePartDef">remove</a>
-    </div>
-}
+@import views.HorizontalForm._
 
 @main("Cutting plans", views.ObjectType.CuttingPlan) {
+@helper.requireJs(core = routes.Assets.at("javascripts/require-jquery.js").url, 
+    module = routes.Assets.at("javascripts/cutplan_form.js").url)
 } {
 
     <h3>
       @header cutting plan
     </h3>
     
-	@helper.form(action = replyTo) {
-		@helper.inputText(frm("name"))
-		@helper.inputText(frm("filter"))
-		@*@tempFileInput(frm("file"))*@
+	@helper.form(action = replyTo, 'class -> "form-horizontal") {
+		@helper.inputText(frm("name"), '_label -> "Name")
+		@helper.inputText(frm("filter"), '_label -> "Filter")
+		@tempFileInput(frm("file"), "cutplanfile", '_label -> "File")
 		
 		<h4>Part definitions</h4>
-		@helper.repeat(frm("partdefs"), 0) { pdef =>
-			@pdefInput(pdef, "partdef")
-		}
 		
-	    @pdefInput(frm("partdefs[x]"), "partDefTemplate hidden")
-	    <br />
-        <a class="addButton" >Add part definition</a>
-        <br />
+		@repeatingHelper(frm.apply _, "partdefs", "Add part definition", "pd_handle") { (fld, remove) =>
+		  <div class="well">
+			  @helper.input(fld("partdefid"), '_label -> "Part definition") { (id, name, value, htmlArgs) =>
+			      <div class="uneditable-input pdef-desc"></div>
+			      <input type="hidden" class="pdef-id-hf" name="@name" id="@id" value="@value" />
+			  }
+	          @helper.inputText(fld("count"), '_label -> "Count")
+	          @horizontalInput(remove)
+          </div>
+		}
 	    
-	   	<input type="submit" value="Submit" />
-	   	<script type="text/javascript" src="@{routes.Assets.at("javascripts/cuttingPlanForm.js")}" ></script>
+	    <div class="form-actions">
+	   	   <input class="btn btn-primary" type="submit" value="Submit" />
+	   	   <a class="btn" href="@routes.CuttingPlans.list">Cancel</a>
+	   	</div>
 	}
-
+    
+    @modalDiv("Choose part definition", "part_def_modal", "part_def_modal_content")
 }

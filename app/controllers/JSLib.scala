@@ -12,7 +12,9 @@ object JSLib extends Controller {
           Routes.javascriptRouter("jsRouter")(
               TemporaryFileManager.upload,
               TemporaryFileManager.download,
-              Semiproducts.listSemiproducts
+              Semiproducts.listSemiproducts,
+              PartDefinitions.selectList,
+              PartDefinitions.partDefDescription
           )
       ).as("text/javascript")
     }
