@@ -1,53 +1,59 @@
 @(ords:Seq[models.order.OrderForList])
 
 @main("Orders", views.ObjectType.Order) {
+@helper.requireJs(core = routes.Assets.at("javascripts/require-jquery.js").url, 
+    module = routes.Assets.at("javascripts/order_list.js").url)
 } {
 
 <h3>
 	Orders
 </h3>
 
-<a href="@routes.OrderController.add">new</a>
+<a class="btn btn-success" href="@routes.OrderController.add">New</a>
 
-<table>
-	<tr>
-		<th>
-			Name
-		</th>
-		<th>
-			Filling date
-		</th>
-		<th>
-			Due date
-		</th>
-		<th>
-			Status
-		</th>
-		<th>
-			Actions
-		</th>
-	</tr>
-	@for(ord<-ords) {
+<table id="main_list">
+    <thead>
 		<tr>
-			<td>
-				@ord.name
-			</td>
-			<td>
-				@ord.fillingDate
-			</td>
-			<td>
-				@ord.dueDate
-			</td>
-			<td>
-				@ord.status
-			</td>
-			<td>
-				<a href="@routes.OrderController.edit(ord.id)">edit</a>
-                <a href="@routes.OrderController.status(ord.id)">status</a>
-                <a href="@routes.OrderController.listDefinitions(ord.id)">definitions</a>
-			</td>
+			<th>
+				Name
+			</th>
+			<th>
+				Filling date
+			</th>
+			<th>
+				Due date
+			</th>
+			<th>
+				Status
+			</th>
+			<th>
+				Actions
+			</th>
 		</tr>
-	}
+	</thead>
+	<tbody>
+		@for(ord<-ords) {
+			<tr>
+				<td>
+					@ord.name
+				</td>
+				<td>
+					@ord.fillingDate
+				</td>
+				<td>
+					@ord.dueDate
+				</td>
+				<td>
+					@ord.status
+				</td>
+				<td>
+					<a class="btn" href="@routes.OrderController.edit(ord.id)">Edit</a>
+	                <a class="btn" href="@routes.OrderController.status(ord.id)">Status</a>
+	                <a class="btn" href="@routes.OrderController.listDefinitions(ord.id)">Definitions</a>
+				</td>
+			</tr>
+		}
+	</tbody>
 </table>
 
 }

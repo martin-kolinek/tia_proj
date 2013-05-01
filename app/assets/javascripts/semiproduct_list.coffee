@@ -1,17 +1,7 @@
 require(["common"], (common) ->
-    require(["jquery", "dataTables", "bootstrap", "router"], ($, dt, bs, router) ->
+    require(["jquery", "dataTables", "bootstrap", "router", "list_util"], ($, dt, bs, router, lutil) ->
         $(document).ready ->
-            $("#main_list").dataTable(
-                bFilter:false
-                bLengthChange:false
-                aoColumns: [
-                    null,
-                    null,
-                    null,
-                    null,
-                    {bSortable:false}
-                ]
-            )
+            $("#main_list").dataTable(lutil.listDt(5))
 
             $("[data-pack-id]").each ->
                 pckid = $(this).data("pack-id")

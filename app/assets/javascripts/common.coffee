@@ -5,7 +5,9 @@ requirejs.config
     shim:
     	"dataTables" : ["jquery"]
     	"bootstrap" : ["jquery"]
+    	"underscore" :
+    		exports : "_"
     	"router" : 
-    	   deps : ["jquery"]
-    	   exports : "jsRouter"
+    	    deps : ["jquery"]
+    	    exports : "jsRouter"
     	   
