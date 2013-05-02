@@ -85,13 +85,20 @@ object Semiproducts extends Controller with ObjectController[PackDesc] with Obje
 	
 	def updateRoute = routes.Semiproducts.update
 
-    def listRoute = routes.Semiproducts.list
+    def listRoute = routes.Semiproducts.list()
 	
-	def listTemplate = views.html.semiproduct.list.apply
+	def listTemplates = {
+        case _ => views.html.semiproduct.list.apply
+    }
 
-    def listSemiproducts(id:Int) = Action {
+    def spListTemplates: String => Seq[models.semiproduct.SemiproductForList] => Html = {
+        case "table" => views.html.semiproduct.list_semiprod.apply
+        case "_" => views.html.semiproduct.list_semiprod_main.apply
+    }
+
+    def listSemiproducts(id:Int, template:String) = Action {
         model.withTransaction { implicit s=>
-            Ok(views.html.semiproduct.list_semiprod(model.listSemiproducts(id)))
+            Ok(spListTemplates(template)(model.listSemiproducts(id)))
         }
     }
 }

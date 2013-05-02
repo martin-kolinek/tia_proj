@@ -1,0 +1,38 @@
+@(sps:Seq[models.semiproduct.PackForList])
+
+<table>
+  <thead>
+    <tr>
+	  <th>
+		Heat no.
+	  </th>
+	  <th>
+		Unlimited
+	  </th>
+	  <th>
+		Material
+	  </th>
+	  <th>
+		Shape
+	  </th>
+    </tr>
+  </thead>
+  <tbody>
+    @for(sp <- sps) {
+	  <tr data-pack-id="@sp.id">
+		<td>
+		  @sp.heatNo
+		</td>
+		<td>
+		  @sp.unlimited
+		</td>
+		<td>
+		  @sp.material.name
+		</td>
+		<td>
+		  @sp.shape.description
+		</td>
+      </tr>
+    }
+  </tbody>
+</table>

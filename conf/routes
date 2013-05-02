@@ -5,7 +5,7 @@
 # Home page
 GET     /                           controllers.Application.index
 
-GET     /semiproduct/	            controllers.Semiproducts.list
+GET     /semiproduct/	            controllers.Semiproducts.list(template ?= "")
 
 GET		/semiproduct/add/			controllers.Semiproducts.add
 
@@ -15,9 +15,9 @@ GET		/semiproduct/:pack/edit/	controllers.Semiproducts.edit(pack:Int)
 
 POST	/semiproduct/:pack/edit/	controllers.Semiproducts.update(pack:Int)
 
-GET     /semiproduct/:pack/semiproducts/  controllers.Semiproducts.listSemiproducts(pack:Int)
+GET     /semiproduct/:pack/semiproducts/  controllers.Semiproducts.listSemiproducts(pack:Int, template ?= "")
 
-GET	    /partdef/					controllers.PartDefinitions.list
+GET	    /partdef/					controllers.PartDefinitions.list(template ?= "")
 
 GET		/partdef/add/				controllers.PartDefinitions.add
 
@@ -29,9 +29,7 @@ POST	/partdef/:id/edit/			controllers.PartDefinitions.update(id:Int)
 
 GET     /partdef/:id/description    controllers.PartDefinitions.partDefDescription(id:Int)
 
-GET     /partdef/select_list        controllers.PartDefinitions.selectList
-
-GET     /cuttingplan/               controllers.CuttingPlans.list
+GET     /cuttingplan/               controllers.CuttingPlans.list(template ?= "")
 
 GET		/cuttingplan/add/			controllers.CuttingPlans.add
 
@@ -41,7 +39,7 @@ GET		/cuttingplan/:id/edit/		controllers.CuttingPlans.edit(id:Int)
 
 POST	/cuttingplan/:id/edit/		controllers.CuttingPlans.update(id:Int)
 
-GET     /order/                     controllers.OrderController.list
+GET     /order/                     controllers.OrderController.list(template ?= "")
         
 GET		/order/add/					controllers.OrderController.add
 
@@ -57,7 +55,7 @@ POST    /order/:id/status           controllers.OrderController.updateStatus(id:
         
 GET     /order/:id/definitions      controllers.OrderController.listDefinitions(id:Int)
         
-GET     /cutting/                   controllers.CuttingController.list
+GET     /cutting/                   controllers.CuttingController.list(template ?= "")
         
 GET     /cutting/add/               controllers.CuttingController.add
 

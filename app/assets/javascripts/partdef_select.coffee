@@ -4,7 +4,7 @@ define(["jquery", "router", "dataTables", "bootstrap"], ($, router, dt, bs) ->
     register: (rep, modal, content, handle) ->
     	rep.added((ev) ->
             rep.disableAdding()
-            router.controllers.PartDefinitions.selectList().ajax
+            router.controllers.PartDefinitions.list("table").ajax
                 success: (data, status, xhr) ->
                     content.html(data)
                     content.find("tbody tr").addClass("pointer")

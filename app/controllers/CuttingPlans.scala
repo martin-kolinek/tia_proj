@@ -39,7 +39,9 @@ object CuttingPlans extends Controller with ObjectController[CuttingPlanDesc]
 	
 	def updateRoute = routes.CuttingPlans.update
 
-    def listRoute = routes.CuttingPlans.list
+    def listRoute = routes.CuttingPlans.list()
 	
-	def listTemplate = views.html.cutplan.list.apply 
+	def listTemplates = {
+        case _ => views.html.cutplan.list.apply 
+    }
 }

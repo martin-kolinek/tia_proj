@@ -42,9 +42,11 @@ object OrderController extends Controller with ObjectController[OrderDesc]
 	
 	def updateRoute = routes.OrderController.update _
 
-    def listRoute = routes.OrderController.list
+    def listRoute = routes.OrderController.list()
 	
-	def listTemplate = views.html.order.list.apply
+	def listTemplates = {
+        case _ => views.html.order.list.apply
+    }
 
     def statusForm = Form(single(
         "statuses" -> play.api.data.Forms.list(mapping(

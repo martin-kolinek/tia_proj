@@ -13,7 +13,7 @@ object JSLib extends Controller {
               TemporaryFileManager.upload,
               TemporaryFileManager.download,
               Semiproducts.listSemiproducts,
-              PartDefinitions.selectList,
+              PartDefinitions.list,
               PartDefinitions.partDefDescription
           )
       ).as("text/javascript")

@@ -6,7 +6,7 @@ require(["common"], (common) ->
             $("[data-pack-id]").each ->
                 pckid = $(this).data("pack-id")
                 $(this).click ->
-                    router.controllers.Semiproducts.listSemiproducts(pckid).ajax
+                    router.controllers.Semiproducts.listSemiproducts(pckid, "table").ajax
                         success : (data, status, xhr) ->
                             $("#sp_content_div").html(data)
                             $("#sp_div").modal("show")

@@ -13,12 +13,12 @@ trait ObjectListController[ObjectType] {
 	
 	def model:ModelType
 	
-	def listTemplate: Seq[ObjectType] => Html
+	def listTemplates: String => Seq[ObjectType] => Html
 	
-	def list = Action { implicit request =>
+	def list(template:String = "") = Action { implicit request =>
 		val m = model
 		m.withTransaction { implicit s =>
-			Ok(listTemplate(m.list))
+			Ok(listTemplates(template)(m.list))
 		}
 	}
 }

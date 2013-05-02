@@ -43,9 +43,11 @@ object CuttingController extends Controller with ObjectController[CuttingDesc]
 
     def updateRoute = routes.CuttingController.update _
 
-    def listRoute = routes.CuttingController.list
+    def listRoute = routes.CuttingController.list()
     
-    def listTemplate = views.html.cutting.list.apply
+    def listTemplates = {
+        case _ => views.html.cutting.list.apply
+    }
 
     def finMapping = mapping(
             "partdefid" -> number,

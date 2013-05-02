@@ -29,11 +29,14 @@ object PartDefinitions extends Controller with ObjectController[PartDefinitionDe
 	
 	def saveRoute = routes.PartDefinitions.save
 	def updateRoute = routes.PartDefinitions.update
-    def listRoute = routes.PartDefinitions.list
+    def listRoute = routes.PartDefinitions.list()
 	
 	def template = partdef_form.apply
 	
-	def listTemplate = views.html.partdef.list.apply
+	def listTemplates = {
+        case "table" => views.html.partdef.select_list.apply
+        case _ => views.html.partdef.list.apply
+    }
 	
 	def selectList = Action {
     	model.withTransaction { implicit s =>
