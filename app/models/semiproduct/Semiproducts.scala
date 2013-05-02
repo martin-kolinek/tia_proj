@@ -85,5 +85,15 @@ trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     	}
     }
 
-    def existsSemiproduct(id:Int)(implicit session:Session) = Query(Semiproduct).filter(_.id === id).firstOption.isDefined
+    def existsSemiproduct(id:Int)(implicit s:Session) = Query(Semiproduct).filter(_.id === id).firstOption.isDefined
+    
+    def getSemiproductDescription(id:Int)(implicit s:Session) = {
+    	val q = for {
+    		sp <- Semiproduct if sp.id === id
+    		value@(shp, pck, mat) <- packQuery if pck.id === sp.packId
+    	} yield (value, sp.serialNo)
+    	q.firstOption.map {
+    		case (pck, serial) => (extractPackForList _).tupled(pck).description + " " + serial
+    	}
+    }
 }

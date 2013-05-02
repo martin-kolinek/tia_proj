@@ -37,7 +37,7 @@ object CuttingController extends Controller with ObjectController[CuttingDesc]
         "parts" -> play.api.data.Forms.list(partMapping)
     )(CuttingDesc)(CuttingDesc.unapply))
 
-    def template = cutting_form.apply
+    def template = cutting_form(None)
 
     def saveRoute = routes.CuttingController.save
 
@@ -51,7 +51,7 @@ object CuttingController extends Controller with ObjectController[CuttingDesc]
 
     def addWithCP(cutPlanId:Int) = Action {
         model.withTransaction{ implicit s =>
-            Ok(views.html.cutting.cutting_form(form.bind(Map("cutting_plan" -> cutPlanId.toString)), saveRoute, "Add"))
+            Ok(views.html.cutting.cutting_form(Some(cutPlanId))(form, saveRoute, "Add"))
         }
     }
 

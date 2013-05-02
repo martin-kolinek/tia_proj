@@ -1,4 +1,4 @@
-define(["jquery", "router", "bootstrap"], ($, router, bs) ->
+define(["jquery", "router", "bootstrap", "dataTables"], ($, router, bs, dt) ->
     selectSemiproduct: (modal, content, idCtl, descCtl) ->
         router.controllers.Semiproducts.list("table").ajax
             error: (xhr, status, err) ->
@@ -10,7 +10,8 @@ define(["jquery", "router", "bootstrap"], ($, router, bs) ->
                 content.find("tbody tr").addClass("pointer")
                 content.find("tbody tr").click ->
                     desc = $(this).data("description")
-                    router.controllers.Semiproducts.listSemiproducts("dropdown").ajax
+                    packid = $(this).data("pack-id")
+                    router.controllers.Semiproducts.listSemiproducts(packid, "dropdown").ajax
                         error: (xhr, status, err) ->
                             alert("error retrieving semiproducts: "+err)
                         success: (data, status, xhr) ->
@@ -19,10 +20,10 @@ define(["jquery", "router", "bootstrap"], ($, router, bs) ->
                             inContent.html(data)
                             inContent.find("a").click ->
                                 sel = inContent.find("select")
-                                serial = sel.text()
+                                serial = sel.find(":selected").text()
                                 id = sel.val()
                                 idCtl.val(id)
-                                descCtl.html(desc + " " + serial)
+                                descCtl.text(desc + " " + serial)
                                 inModal.modal("hide")
                                 modal.modal("hide")
                             inModal.modal("show")

@@ -44,4 +44,10 @@ object CuttingPlans extends Controller with ObjectController[CuttingPlanDesc]
 	def listTemplates = {
         case _ => views.html.cutplan.list.apply 
     }
+    
+    def cutPlanDescription(id:Int) = Action {
+    	model.withTransaction { implicit s =>
+    		Ok(model.cutPlanDescription(id).getOrElse("unknown"))
+    	}
+    }
 }

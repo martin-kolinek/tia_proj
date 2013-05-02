@@ -1,4 +1,4 @@
-@(frm:Form[models.cutting.CuttingDesc], replyTo:Call, header:String)
+@(cpid:Option[Int])(frm:Form[models.cutting.CuttingDesc], replyTo:Call, header:String)
 
 @import views.HorizontalForm._
 
@@ -10,14 +10,10 @@
   @header cutting
 </h3>
 @helper.form(action = replyTo, 'class -> "form-horizontal") {
-	@helper.input(frm("semiproduct"), '_label -> "Semiproduct") { (id, name, value, htmlArgs) =>
-        <input type="hidden" id="@id" name="@name" value="@value" @toHtmlArgs(htmlArgs) />
-        <div class="uneditable-input">
-        </div>
-    }
-	@helper.input(frm("cutting_plan"), '_label -> "Cutting plan") { (id, name, value, htmlArgs) =>
-        <input type="hidden" id="@id" name="@name" value="@value" @toHtmlArgs(htmlArgs) />
-        <div class="uneditable-input">
+	
+	@helper.input(frm("cutting_plan"), '_label -> "Cutting plan", '_showConstraints -> false) { (id, name, value, htmlArgs) =>
+        <input type="hidden" class="cutplan-id" id="@id" name="@name" value="@{cpid.map(_.toString).getOrElse(value)}" @toHtmlArgs(htmlArgs) />
+        <div class="uneditable-input cutplan-desc">
         </div>
     }
 	
@@ -27,12 +23,20 @@
         @helper.inputText(part("count"), '_label -> "Count")
         @helper.inputText(part("order_def"), '_label -> "Order")
         @horizontalInput(remove)
-    }    
+    }
+    <h4>Semiproduct</h4>
+    @helper.input(frm("semiproduct"), '_label -> "", '_showConstraints -> false) { (id, name, value, htmlArgs) =>
+        <a class="btn" id="semiprod-button">Choose</a>
+        <input type="hidden" class="semiprod-id" id="@id" name="@name" value="@value" @toHtmlArgs(htmlArgs) />
+    }
+    <div class="semiproduct-desc"></div>
     
-    <div class="form-horizontal">
-  	  <input class="btn btn-primary" type="submit" value="Submit" >Submit</input>
+    <div class="form-actions">
+  	  <input class="btn btn-primary" type="submit" value="Submit" />
       <a class="btn" href="@routes.CuttingController.list()">Cancel</a>
     </div>
 }
+
+@modalDiv("Choose semiproduct", "modal-sp", "modal-sp-content")
 
 }

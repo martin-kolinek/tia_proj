@@ -35,7 +35,7 @@ define(["jquery", "router", "dataTables", "bootstrap"], ($, router, dt, bs) ->
                 div = $(this)
                 router.controllers.PartDefinitions.partDefDescription(id).ajax
                     success: (data, status, xhr) ->
-                        div.html(data)
+                        div.text(data)
                     error: (xhr, status, err) ->
-                        div.html("unknown")
+                        div.text("unknown")
 )

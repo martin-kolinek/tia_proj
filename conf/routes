@@ -5,17 +5,19 @@
 # Home page
 GET     /                           controllers.Application.index
 
-GET     /semiproduct/	            controllers.Semiproducts.list(template ?= "")
+GET     /pack/	            controllers.Semiproducts.list(template ?= "")
 
-GET		/semiproduct/add/			controllers.Semiproducts.add
+GET		/pack/add/			controllers.Semiproducts.add
 
-POST	/semiproduct/add/			controllers.Semiproducts.save
+POST	/pack/add/			controllers.Semiproducts.save
 
-GET		/semiproduct/:pack/edit/	controllers.Semiproducts.edit(pack:Int)
+GET		/pack/:pack/edit/	controllers.Semiproducts.edit(pack:Int)
 
-POST	/semiproduct/:pack/edit/	controllers.Semiproducts.update(pack:Int)
+POST	/pack/:pack/edit/	controllers.Semiproducts.update(pack:Int)
 
-GET     /semiproduct/:pack/semiproducts/  controllers.Semiproducts.listSemiproducts(pack:Int, template ?= "")
+GET     /pack/:pack/semiproducts/  controllers.Semiproducts.listSemiproducts(pack:Int, template ?= "")
+
+GET     /pack/semiproduct/:id/description/ controllers.Semiproducts.getSemiproductDescription(id:Int)
 
 GET	    /partdef/					controllers.PartDefinitions.list(template ?= "")
 
@@ -38,6 +40,8 @@ POST	/cuttingplan/add/			controllers.CuttingPlans.save
 GET		/cuttingplan/:id/edit/		controllers.CuttingPlans.edit(id:Int)
 
 POST	/cuttingplan/:id/edit/		controllers.CuttingPlans.update(id:Int)
+
+GET     /cuttingplan/:id/description/ controllers.CuttingPlans.cutPlanDescription(id:Int)
 
 GET     /order/                     controllers.OrderController.list(template ?= "")
         

@@ -103,4 +103,10 @@ object Semiproducts extends Controller with ObjectController[PackDesc] with Obje
             Ok(spListTemplates(template)(model.listSemiproducts(id)))
         }
     }
+    
+    def getSemiproductDescription(id:Int) = Action {
+    	model.withTransaction { implicit s =>
+    		Ok(model.getSemiproductDescription(id).getOrElse("unknown"))
+    	}
+    }
 }

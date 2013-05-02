@@ -60,4 +60,6 @@ trait CuttingPlans extends Tables {
 	
 	def cuttingPlanProjection(cp:CuttingPlan.type) = (cp.id, cp.name, cp.filter)
 
+	def cutPlanDescription(cp:Int)(implicit s:Session) = 
+		Query(CuttingPlan).filter(_.id === cp).map(_.name).firstOption
 }
