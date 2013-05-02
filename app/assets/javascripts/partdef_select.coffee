@@ -1,5 +1,7 @@
-define(["jquery", "router"], ($, router) ->
-    register: (rep, modal, content, idClass, descClass) ->
+define(["jquery", "router", "dataTables", "bootstrap"], ($, router, dt, bs) ->
+    idSelector = (handle) -> "."+handle+"_id"
+    descSelector = (handle) -> "."+handle+"_desc"
+    register: (rep, modal, content, handle) ->
     	rep.added((ev) ->
             rep.disableAdding()
             router.controllers.PartDefinitions.selectList().ajax
@@ -9,8 +11,8 @@ define(["jquery", "router"], ($, router) ->
                     content.find("tbody tr").click ->
                         id = $(this).data("id")
                         desc = $(this).data("description")
-                        ev.newItem.find("."+idClass).val(id)
-                        ev.newItem.find("."+descClass).html(desc)
+                        ev.newItem.find(idSelector(handle)).val(id)
+                        ev.newItem.find(descSelector(handle)).html(desc)
                         rep.enableAdding()
                         modal.off("hidden")
                         modal.modal("hide")
@@ -24,10 +26,10 @@ define(["jquery", "router"], ($, router) ->
                     rep.enableAdding()
                     alert("Error getting part definitions for selection: "+err)
         )
-    initDesc: (idClass, descClass) ->
+    initDesc: (handle) ->
         $(document).ready ->
-    	   $("."+descClass).each ->
-                id = $(this).parent().find("."+idClass).val()
+    	   $(descSelector(handle)).each ->
+                id = $(this).parent().find(idSelector(handle)).val()
                 if(!id)
                    return
                 div = $(this)

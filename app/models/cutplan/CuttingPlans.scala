@@ -59,4 +59,5 @@ trait CuttingPlans extends Tables {
 	}
 	
 	def cuttingPlanProjection(cp:CuttingPlan.type) = (cp.id, cp.name, cp.filter)
+
 }

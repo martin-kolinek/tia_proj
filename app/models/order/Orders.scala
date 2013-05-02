@@ -113,5 +113,5 @@ trait Orders extends Tables {
   
     def listOrderDefs(ordId:Int)(implicit s:Session) = 
         Query(OrderDefinition).filter(_.orderId === ordId).map(x => (x.id, x.partDefId, x.count)).list.map(OrderDefDesc.tupled)
-    
+  
 }

@@ -43,7 +43,7 @@ trait PartDefinitions extends Tables {
 	def insertPartDef(pd:PartDefinitionDesc)(implicit session:Session) = {
 		PartDefinition.forInsert.insert((pd.file, pd.filter, pd.name, false))
 	}
-	
+
 	def getPartDefDescription(id:Int)(implicit session:Session) = {
 		Query(PartDefinition).filter(_.id === id).map(x=>(x.id, x.name, x.filter)).firstOption.
 		    map(PartDefinitionForList.tupled).map(_.description)

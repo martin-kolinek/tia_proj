@@ -1,37 +1,34 @@
 @(frm:Form[models.order.OrderDesc], replyTo:Call, header:String)
 
-@pdefInput(fld:Field, cls:String) = {
-    <div class="@cls">
-        @helper.inputText(fld("pdefid"))
-        @helper.inputText(fld("count"))
-        @helper.inputText(fld("filter"))
-        <input type="hidden" id="@{fld("id").id}" name="@{fld("id").name}" value="@{fld("id").value}" />
-        <a class="removePartDef">remove</a>
-    </div>
-}
+@import views.HorizontalForm._
 
 @main("Order", views.ObjectType.Order) {
+@helper.requireJs(core = routes.Assets.at("javascripts/require-jquery.js").url, 
+    module = routes.Assets.at("javascripts/order_form.js").url)
 } {
     <h3>
       @header order
     </h3>
-	@helper.form(action = replyTo) {
-		@helper.inputText(frm("name"))
-		@helper.inputDate(frm("filling_date"))
-		@helper.inputDate(frm("due_date"))
+	@helper.form(action = replyTo, 'class -> "form-horizontal") {
+		@helper.inputText(frm("name"), '_label -> "Name")
+		@helper.inputDate(frm("filling_date"), '_label -> "Filling date")
+		@helper.inputDate(frm("due_date"), '_label -> "Due date")
 		
 		<h4>Part definitions</h4>
-		@helper.repeat(frm("odefs"), 0) { pdef =>
-			@pdefInput(pdef, "partdef")
+        @repeatingHelper(frm.apply _, "odefs", "Add part definition", "od_handle") { (fld, remove) =>
+		  <div class="well">
+              @views.html.partdef.pdefInput(fld("pdefid"), "partdef_input")
+              @helper.inputText(fld("count"), '_label -> "Count")
+              @helper.inputText(fld("filter"), '_label -> "Filter")
+              <input type="hidden" id="@{fld("id").id}" name="@{fld("id").name}" value="@{fld("id").value}" />
+	          @horizontalInput(remove)
+          </div>
 		}
-		
-		@pdefInput(frm("odefs[x]"), "partDefTemplate hidden")
-	    <br />
-        <a class="addButton" >Add part definition</a>
-        <br />
-	  	<input type="submit" value="Submit" />
+        <div class="form-actions" >
+	  	  <input class="btn btn-primary" type="submit" value="Submit" />
+          <a class="btn" href="@routes.OrderController.list">Cancel</a>
+        </div>
 	  	
-	  	@helper.requireJs(core = routes.Assets.at("javascripts/require.js").url, module = routes.Assets.at("javascripts/orderForm").url)
 	}
-
+    @modalDiv("Choose part definition", "pdef_modal", "pdef_modal_content")
 }
