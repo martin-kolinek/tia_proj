@@ -25,11 +25,11 @@
         @horizontalInput(remove)
     }
     <h4>Semiproduct</h4>
-    @helper.input(frm("semiproduct"), '_label -> "", '_showConstraints -> false) { (id, name, value, htmlArgs) =>
-        <a class="btn" id="semiprod-button">Choose</a>
-        <input type="hidden" class="semiprod-id" id="@id" name="@name" value="@value" @toHtmlArgs(htmlArgs) />
-    }
     <div class="semiproduct-desc"></div>
+    @defining(frm("semiproduct")){ fld =>
+        <input class="semiprod-id" type="hidden" id="@fld.id" name="@fld.name" value="@fld.value" />
+    }
+    <a class="btn" id="semiprod-button">Choose</a>
     
     <div class="form-actions">
   	  <input class="btn btn-primary" type="submit" value="Submit" />

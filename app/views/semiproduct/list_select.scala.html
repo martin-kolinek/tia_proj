@@ -15,11 +15,13 @@
 	  <th>
 		Shape
 	  </th>
+	  <th>
+	  </th>
     </tr>
   </thead>
   <tbody>
     @for(sp <- sps) {
-	  <tr data-pack-id="@sp.id" data-description="@sp.description">
+	  <tr>
 		<td>
 		  @sp.heatNo
 		</td>
@@ -32,16 +34,16 @@
 		<td>
 		  @sp.shape.description
 		</td>
+		<td>
+		  <div class="btn-group sp-action-div">
+		      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" 
+		          data-pack-id="@sp.id" data-desc="@sp.description">Select</a>
+		      <ul class="dropdown-menu" role="menu">
+		      </ul>
+		  </div>
+		</td>
       </tr>
     }
   </tbody>
 </table>
 
-<div id="sel-list-modal" class="hide modal fade">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3>Pick semiproduct</h3>
-  </div>
-  <div id="sel-list-modal-content">
-  </div>
-</div>

@@ -1,8 +1,7 @@
 @(sps:Seq[models.semiproduct.SemiproductForList])
 
-<select>
-  @for(sp <- sps){
-    <option value="@sp.id" >@sp.serialNo</option>
-  }
-</select>
-<a class="btn">Choose</a>
+@for(sp <- sps){
+    <li>
+        <a href="#" data-id="@sp.id" data-serial="@sp.serialNo">@sp.serialNo</a>
+    </li>
+}

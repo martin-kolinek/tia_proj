@@ -7,24 +7,20 @@ define(["jquery", "router", "bootstrap", "dataTables"], ($, router, bs, dt) ->
                 content.html(data)
                 modal.modal("show")
                 content.find("table").dataTable()
-                content.find("tbody tr").addClass("pointer")
-                content.find("tbody tr").click ->
-                    desc = $(this).data("description")
-                    packid = $(this).data("pack-id")
-                    router.controllers.Semiproducts.listSemiproducts(packid, "dropdown").ajax
-                        error: (xhr, status, err) ->
-                            alert("error retrieving semiproducts: "+err)
-                        success: (data, status, xhr) ->
-                            inModal = content.find("#sel-list-modal")
-                            inContent = content.find("#sel-list-modal-content")
-                            inContent.html(data)
-                            inContent.find("a").click ->
-                                sel = inContent.find("select")
-                                serial = sel.find(":selected").text()
-                                id = sel.val()
-                                idCtl.val(id)
-                                descCtl.text(desc + " " + serial)
-                                inModal.modal("hide")
-                                modal.modal("hide")
-                            inModal.modal("show")
+                content.find("a").click ->
+                    ddl = $(this)
+                    ul = ddl.parent().find("ul")
+                    if(ul.children().size() == 0)
+                    	router.controllers.Semiproducts.listSemiproducts(ddl.data("pack-id"), "dropdown").ajax
+                    	    error:(xhr, status, err) ->
+                    	        alert("error retrieving semiproducts: "+err)
+                    	    success:(data, status, xhr) ->
+                    	        ul.html(data)
+                    	        ul.find("a").click ->
+                    	            id = $(this).data("id")
+                    	            serial = $(this).data("serial")
+                    	            desc = ddl.data("desc")
+                    	            idCtl.val(id)
+                    	            descCtl.text(desc + " " + serial)
+                    	            modal.modal("hide")
 )
