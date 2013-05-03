@@ -17,6 +17,8 @@ import models.order.OrderList
 import models.order.OrderDefinitionDesc
 import models.order.PartInOrder
 import models.order.OrderDefStatus
+import models.order.OrderDefForList
+import play.api.templates.Html
 
 object OrderController extends Controller with ObjectController[OrderDesc] 
 		with ObjectListController[OrderForList] {
@@ -45,6 +47,7 @@ object OrderController extends Controller with ObjectController[OrderDesc]
     def listRoute = routes.OrderController.list()
 	
 	def listTemplates = {
+		case "table" => views.html.order.list_select.apply
         case _ => views.html.order.list.apply
     }
 
@@ -75,10 +78,15 @@ object OrderController extends Controller with ObjectController[OrderDesc]
             }
         )
     }
+    
+    def listDefTemplates:String => Seq[OrderDefForList] => Html = {
+    	case "dropdown" => views.html.order.definitions_dropdown.apply
+    	case _ => views.html.order.definitions.apply
+    }
 
-    def listDefinitions(id:Int) = Action{
+    def listDefinitions(id:Int, template:String) = Action{
         model.withTransaction { implicit s =>
-            Ok(views.html.order.definitions(model.listOrderDefs(id)))
+            Ok(listDefTemplates(template)(model.listOrderDefs(id)))
         }
     }
 }

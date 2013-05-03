@@ -1,0 +1,9 @@
+@(defs:Seq[models.order.OrderDefForList]) 
+
+@for(odef <- defs) {
+    <li>
+        @defining(odef.partDefName +"("+odef.filter+")") { desc =>
+            <a data-id="@odef.id" data-description="@desc" href="#">@desc</a>
+        }
+    </li>
+}

@@ -19,7 +19,7 @@ import scalaz.std.option._
 
 case class CuttingDesc(semiprodId:Int, cutPlanId:Int, parts:List[PartInCuttingDesc])
 
-case class PartInCuttingDesc(partDefId:Int, orderDefId:Int, count:Int)
+case class PartInCuttingDesc(orderDefId:Int, count:Int)
 
 case class FinishedPartInCutting(partDefId:Int, orderDefId:Option[Int], dmgCount:Int)
 
@@ -54,16 +54,9 @@ trait Cuttings extends CuttingPlans {
     
     private def getPartCounts(id:Int)(implicit session:Session) = 
     	sql"""
-    	SELECT part_def_id, order_def_id, count(id) FROM part where 
+    	SELECT order_def_id, count(id) FROM part where 
     	cutting_id = $id and order_def_id is not null group by cutting_id, part_def_id, order_def_id 
-    	""".as[(Int, Int, Int)].list.map(PartInCuttingDesc.tupled)
-    
-    private def getPartDefOrderCounts(parts:Traversable[PartInCuttingDesc]) = 
-    	parts.groupBy(x=>x.partDefId).map {
-        	case (pdef, parts) => pdef -> parts.groupBy(x=>x.orderDefId).map {
-        	    case (ord, parts) => ord -> parts.map(_.count).sum
-        	}
-        }
+    	""".as[(Int, Int)].list.map(PartInCuttingDesc.tupled)
 
     def insertCutting(cut:CuttingDesc)(implicit s:Session) = {
         val cutid = Cutting.forInsert.insert(None, cut.semiprodId, cut.cutPlanId)

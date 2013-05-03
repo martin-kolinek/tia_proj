@@ -1,4 +1,4 @@
-@(defs:List[models.order.OrderDefDesc]) 
+@(defs:Seq[models.order.OrderDefForList]) 
 
 @main("Order definitions", views.ObjectType.Order) {
 } {
@@ -8,7 +8,10 @@
       id
     </th>
     <th>
-      Part definition id
+      Part definition name
+    </th>
+    <th>
+      Filter
     </th>
     <th>
       count
@@ -20,7 +23,10 @@
         @d.id
       </td>
       <td>
-        @d.partDefId
+        @d.partDefName
+      </td>
+      <td>
+        @d.filter
       </td>
       <td>
         @d.count

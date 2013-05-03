@@ -17,7 +17,9 @@ object JSLib extends Controller {
               PartDefinitions.list,
               PartDefinitions.partDefDescription,
               CuttingPlans.cutPlanDescription,
-              Semiproducts.getSemiproductDescription
+              Semiproducts.getSemiproductDescription,
+              OrderController.list,
+              OrderController.listDefinitions
           )
       ).as("text/javascript")
     }

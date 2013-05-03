@@ -9,18 +9,23 @@ import shapeless._
 import shapeless.HList._
 import shapeless.Tuples._
 import scalaz.std.option._
+import org.joda.time.format.DateTimeFormat
+import models.partdef.PartDefinitionForList
 
 case class OrderDesc(name:String, fillingDate:DateTime, dueDate:Option[DateTime], defs:List[OrderDefinitionDesc])
 
 case class OrderDefinitionDesc(id:Option[Int], partDefId:Int, filter:String, count:Int)
 
-case class OrderForList(id:Int, name:String, fillingDate:DateTime, dueDate:Option[DateTime], status:OrderStatus)
+case class OrderForList(id:Int, name:String, fillingDate:DateTime, dueDate:Option[DateTime], status:OrderStatus) {
+	def fillDateString = fillingDate.toString(DateTimeFormat.shortDate())
+	def dueDateString = dueDate.map(_.toString(DateTimeFormat.shortDate())).getOrElse("")
+}
 
 case class OrderDefStatus(odefId:Int, parts:List[PartInOrder])
 
 case class PartInOrder(partId:Int)
 
-case class OrderDefDesc(id:Int, partDefId:Int, count:Int)
+case class OrderDefForList(id:Int, partDefName:String, filter:String, count:Int)
 
 trait Orders extends Tables {
     self:DBAccess =>
@@ -111,7 +116,12 @@ trait Orders extends Tables {
         chStatus(orders.filter(!_.id.in(toFinish)).map(_.id).list, Accepted)
     }
   
-    def listOrderDefs(ordId:Int)(implicit s:Session) = 
-        Query(OrderDefinition).filter(_.orderId === ordId).map(x => (x.id, x.partDefId, x.count)).list.map(OrderDefDesc.tupled)
+    def listOrderDefs(ordId:Int)(implicit s:Session) = {
+    	val q = for {
+    		odef <- OrderDefinition if odef.orderId === ordId
+    		pdef <- PartDefinition if odef.partDefId === pdef.id
+    	} yield (odef.id, pdef.name, odef.filter, odef.count)
+    	q.list.map(OrderDefForList.tupled)
+    }
   
 }

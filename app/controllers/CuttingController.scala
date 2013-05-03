@@ -27,7 +27,6 @@ object CuttingController extends Controller with ObjectController[CuttingDesc]
         with DBOrders with CuttingModel
         
     def partMapping(implicit s:scala.slick.session.Session) = mapping(
-        "partdef" -> number.verifying(model.existsPartDef _),
         "order_def" -> number.verifying(model.existsOrderDefinition _),
         "count" -> number.verifying(_>0))(PartInCuttingDesc)(PartInCuttingDesc.unapply)
 

@@ -1,0 +1,42 @@
+@(ords:Seq[models.order.OrderForList])
+
+<table>
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Filling date
+            </th>
+            <th>
+                Due date
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @for(ord<-ords) {
+            <tr>
+                <td>
+                    @ord.name
+                </td>
+                <td>
+                    @ord.fillDateString
+                </td>
+                <td>
+                    @ord.dueDateString
+                </td>
+                <td>
+                    <div class="btn-group ord-action-div">
+                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" 
+                            data-ord-id="@ord.id" data-ord-name="@ord.name">Select</a>
+                        <ul class="dropdown-menu" role="menu">
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

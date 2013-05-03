@@ -19,9 +19,12 @@
 	
 	<h4>Parts</h4>
     @repeatingHelper(frm.apply, "parts", "Add part", "part_handle") { (part, remove) =>
-        @helper.inputText(part("partdef"), '_label -> "Part definition")
+        @helper.input(part("order_def"), '_label -> "Order definition") { (id, name, value, htmlArgs) =>
+            <input type="hidden" id="@id" name="@name" value="@value" @toHtmlArgs(htmlArgs) class="order-def-id" />
+            <div class="uneditable-input order-def-desc">
+            </div>
+        }
         @helper.inputText(part("count"), '_label -> "Count")
-        @helper.inputText(part("order_def"), '_label -> "Order")
         @horizontalInput(remove)
     }
     <h4>Semiproduct</h4>
@@ -38,5 +41,7 @@
 }
 
 @modalDiv("Choose semiproduct", "modal-sp", "modal-sp-content")
+
+@modalDiv("Choose order", "modal-order", "modal-order-content")
 
 }
