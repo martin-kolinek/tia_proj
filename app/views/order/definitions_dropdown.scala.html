@@ -2,8 +2,6 @@
 
 @for(odef <- defs) {
     <li>
-        @defining(odef.partDefName +"("+odef.filter+")") { desc =>
-            <a data-id="@odef.id" data-description="@desc" href="#">@desc</a>
-        }
+        <a data-id="@odef.id" data-description="@odef.description" href="#">@odef.description</a>
     </li>
 }

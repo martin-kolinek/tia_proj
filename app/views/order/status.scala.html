@@ -1,5 +1,7 @@
 @(frm:Form[List[models.order.OrderDefStatus]], replyTo:Call)
 
+@import views.HorizonatalForm._
+
 @partField(fld:Field, cls:String) = {
   <div class="@cls">
     @helper.inputText(fld("part"))
@@ -12,7 +14,7 @@
     <h3>
         Order status
     </h3>
-	@helper.form(action = replyTo) {
+	@helper.form(action = replyTo, 'class -> "form-horizontal") {
         @helper.repeat(frm("statuses"), 0) { st =>
             <div>
               <h5>Order definition </h5>

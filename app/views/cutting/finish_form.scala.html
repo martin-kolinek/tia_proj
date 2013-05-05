@@ -1,19 +1,28 @@
 @(parts:Form[List[models.cutting.FinishedPartInCutting]], replyTo:Call)
 
+@import views.HorizontalForm._
+
 @main("Finish cutting", views.ObjectType.Cutting) {
+@helper.requireJs(core = routes.Assets.at("javascripts/require-jquery.js").url, 
+    module = routes.Assets.at("javascripts/cutting_finish.js").url)
 } {
   <h2>
     Finish cutting
   </h2>
 
-@helper.form(action = replyTo) {
+@helper.form(action = replyTo, 'class -> "form-horizontal") {
   	<h4>Parts</h4>
 	@helper.repeat(parts("parts"), 0) { part =>
-		@helper.inputText(part("partdefid"))
-        @helper.inputText(part("order"))
-   		@helper.inputText(part("dmgcount"))
+	    <div class="well">
+	        @views.html.partdef.pdefInput(part("partdefid"), "pdefhandle")
+	        @views.html.order.odefInput(part("order"), "odefhandle")
+   		    @helper.inputText(part("dmgcount"), '_label -> "Damaged")
+   		</div>
 	}
-    <input type="submit" value="Submit" />
+	<div class="form-actions">
+        <input class="btn btn-primary" type="submit" value="Submit" />
+        <a class="btn" href="@routes.CuttingController.list()">Cancel</a>
+    </div>
 }
 
 }

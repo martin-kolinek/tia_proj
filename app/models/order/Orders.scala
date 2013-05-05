@@ -25,7 +25,9 @@ case class OrderDefStatus(odefId:Int, parts:List[PartInOrder])
 
 case class PartInOrder(partId:Int)
 
-case class OrderDefForList(id:Int, partDefName:String, filter:String, count:Int)
+case class OrderDefForList(id:Int, orderName:String, partDefName:String, filter:String, count:Int) {
+	def description = s"$orderName - $partDefName ($filter)"
+}
 
 trait Orders extends Tables {
     self:DBAccess =>
@@ -115,13 +117,24 @@ trait Orders extends Tables {
         chStatus(toFinish.list, Finished)
         chStatus(orders.filter(!_.id.in(toFinish)).map(_.id).list, Accepted)
     }
+    
+    def orderDefQuery = for {
+    	odef <- OrderDefinition
+    	ord <- Order if ord.id === odef.orderId
+    	pdef <- PartDefinition if odef.partDefId === pdef.id
+    } yield (odef, ord, pdef)
   
+    def orderDefForListProjection(odef:OrderDefinition.type, ord:Order.type, pdef:PartDefinition.type) = 
+    	(odef.id, ord.name, pdef.name, odef.filter, odef.count)
+    
     def listOrderDefs(ordId:Int)(implicit s:Session) = {
-    	val q = for {
-    		odef <- OrderDefinition if odef.orderId === ordId
-    		pdef <- PartDefinition if odef.partDefId === pdef.id
-    	} yield (odef.id, pdef.name, odef.filter, odef.count)
-    	q.list.map(OrderDefForList.tupled)
+    	orderDefQuery.filter(_._2.id === ordId).map((orderDefForListProjection _).tupled).
+    	    list.map(OrderDefForList.tupled)
+    }
+    
+    def orderDefDescription(id:Int)(implicit s:Session) = {
+    	orderDefQuery.filter(_._1.id === id).map((orderDefForListProjection _).tupled).
+    	    firstOption.map(OrderDefForList.tupled)
     }
   
 }

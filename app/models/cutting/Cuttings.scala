@@ -16,6 +16,7 @@ import scala.slick.jdbc.{GetResult, StaticQuery => Q}
 import Q.interpolation
 import models.order.Orders
 import scalaz.std.option._
+import org.joda.time.format.DateTimeFormat
 
 case class CuttingDesc(semiprodId:Int, cutPlanId:Int, parts:List[PartInCuttingDesc])
 
@@ -25,6 +26,7 @@ case class FinishedPartInCutting(partDefId:Int, orderDefId:Option[Int], dmgCount
 
 case class CuttingForList(id:Int, cutPlan:CuttingPlanForList, semiproductSerial:String, pack:PackForList, finishTime:Option[DateTime]) {
 	def finished = finishTime.isDefined
+	def finishTimeString = finishTime.map(_.toString(DateTimeFormat.shortDateTime()))
 }
 
 case class PartDesc(id:Int, partDefId:Int)
@@ -50,6 +52,7 @@ trait Cuttings extends CuttingPlans {
                 WHERE cutting_id=$id and damaged=true group by part_def_id, order_def_id, cutting_id) cnts
             on cnts.part_def_id = deford.part_def_id and 
                 (cnts.order_def_id = deford.order_def_id or cnts.order_def_id is null and deford.order_def_id is null)
+          ORDER BY deford.part_def_id, deford.order_def_id
         """.as[(Int, Option[Int], Int)].list.map(FinishedPartInCutting.tupled)
     
     private def getPartCounts(id:Int)(implicit session:Session) = 
@@ -94,12 +97,14 @@ trait Cuttings extends CuttingPlans {
     def updateCuttingParts(cuttingId:Int, orderDefId:Int, count:Int)(implicit s:Session) {
         println(s"updatecutting $cuttingId, $orderDefId, $count")
     	for {
-    		req <- Query(OrderDefinition).filter(_.id === orderDefId).map(_.count).firstOption
+    		(req, pdefId) <- Query(OrderDefinition).filter(_.id === orderDefId).map(x => x.count -> x.partDefId).firstOption
     		done <- Query(Query(Part).filter(_.orderDefId===some(orderDefId)).length).firstOption
     	} {
     		val take = math.min(req - done, count)
-    		val toAdd = Query(Part).filter(_.damaged===false).filter(_.orderDefId.isNull).filter(_.cuttingId === cuttingId).
-    		map(_.id).sortBy(identity).take(take).list
+    		val toAdd = Query(Part).filter(_.damaged===false).filter(_.orderDefId.isNull).
+    		    filter(_.cuttingId === cuttingId).
+    		    filter(_.partDefId === pdefId).
+    		    map(_.id).sortBy(identity).take(take).list
     		toAdd.foreach(pid => Query(Part).filter(_.id===pid).map(_.orderDefId).update(Some(orderDefId)))
     	}
     }

@@ -89,4 +89,10 @@ object OrderController extends Controller with ObjectController[OrderDesc]
             Ok(listDefTemplates(template)(model.listOrderDefs(id)))
         }
     }
+    
+    def orderDefDescription(id:Int) = Action {
+    	model.withTransaction { implicit s =>
+    		Ok(model.orderDefDescription(id).map(_.description).getOrElse("unknown"))
+    	}
+    }
 }
