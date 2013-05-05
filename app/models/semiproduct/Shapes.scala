@@ -51,9 +51,7 @@ trait Shapes extends Tables { this:DBAccess =>
 		
 	def optionExtendedSheet(s:ExtendedSheet.type) = s.id.? ~ s.width ~ s.height //<> (OptionExtendedSheet, OptionExtendedSheet.unapply _)
 		
-	def optionExtendedCirclePipe(p:ExtendedCirclePipe.type) = p.id.? ~ p.length //<> (OptionExtendedPipe, OptionExtendedPipe.unapply _)
-		
-	def optionExtendedSquarePipe(p:ExtendedSquarePipe.type) = p.id.? ~ p.length //<> (OptionExtendedPipe, OptionExtendedPipe.unapply _)
+	def optionExtendedPipe(p:ExtendedPipe.type) = p.id.? ~ p.length //<> (OptionExtendedPipe, OptionExtendedPipe.unapply _)
 		
     def basicShapeJoin = for{
     	((((((shape, sheet), circ), square), extSheet), extCirc), extSquare) <- Shape leftJoin 

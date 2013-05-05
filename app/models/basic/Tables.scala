@@ -83,7 +83,17 @@ trait Tables { this:DBAccess =>
     	def forInsert = name returning id
     }
     
-    object Shape extends Table[(Int)]("shape") {
+    object Shape extends Table[(Int, Int, Option[Int])]("shape") {
+    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
+    	def basicShapeId = column[Int]("basic_shape_id")
+    	def extendedShapeId = column[Option[Int]]("extended_shape_id")
+    	def * = id ~ basicShapeId ~ extendedShapeId
+    	def basicShape = foreignKey("fk_shape_basic_shape", basicShapeId, CommonShape)(_.id)
+    	def extendedShape = foreignKey("fk_shape_extended_shape", extendedShapeId, CommonShape)(_.id)
+    	def forInsert = id returning id
+    }
+    
+    object CommonShape extends Table[(Int)]("common_shape") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def * = id
     	def forInsert = id returning id
@@ -91,59 +101,50 @@ trait Tables { this:DBAccess =>
     
     object Sheet extends Table[(Int, Int, Option[BigDecimal])]("sheet") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    	def shapeId = column[Int]("shape_id")
+    	def commonShapeId = column[Int]("common_shape_id")
     	def thickness = column[Option[BigDecimal]]("thickness")
-    	def * = id ~ shapeId ~ thickness
-    	def shape = foreignKey("fk_sheet_shape", shapeId, Sheet)(_.id)
-    	def forInsert = shapeId ~ thickness returning id
+    	def * = id ~ commonShapeId ~ thickness
+    	def shape = foreignKey("fk_sheet_common_shape", commonShapeId, CommonShape)(_.id)
+    	def forInsert = commonShapeId ~ thickness returning id
     }
     
     object CirclePipe extends Table[(Int, Int, Option[BigDecimal], Option[BigDecimal])]("circle_pipe") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    	def shapeId = column[Int]("shape_id")
+    	def commonShapeId = column[Int]("common_shape_id")
     	def thickness = column[Option[BigDecimal]]("thickness")
     	def radius = column[Option[BigDecimal]]("radius")
-    	def * = id ~ shapeId ~ thickness ~ radius
-    	def shape = foreignKey("fk_circle_pipe_shape", shapeId, Shape)(_.id)
-    	def forInsert = shapeId ~ thickness ~ radius returning id
+    	def * = id ~ commonShapeId ~ thickness ~ radius
+    	def shape = foreignKey("fk_circle_pipe_common_shape", commonShapeId, CommonShape)(_.id)
+    	def forInsert = commonShapeId ~ thickness ~ radius returning id
     }
     
     object SquarePipe extends Table[(Int, Int, Option[BigDecimal], Option[BigDecimal])]("square_pipe") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    	def shapeId = column[Int]("shape_id")
+    	def commonShapeId = column[Int]("common_shape_id")
     	def thickness = column[Option[BigDecimal]]("thickness")
     	def diameter = column[Option[BigDecimal]]("diameter")
-    	def * = id ~ shapeId ~ thickness ~ diameter
-    	def shape = foreignKey("fk_square_pipe_shape", shapeId, Shape)(_.id)
-    	def forInsert = shapeId ~ thickness ~ diameter returning id
+    	def * = id ~ commonShapeId ~ thickness ~ diameter
+    	def shape = foreignKey("fk_square_pipe_common_shape", commonShapeId, CommonShape)(_.id)
+    	def forInsert = commonShapeId ~ thickness ~ diameter returning id
     }
     
     object ExtendedSheet extends Table[(Int, Int, Option[BigDecimal], Option[BigDecimal])]("extended_sheet") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    	def sheetId = column[Int]("sheet_id")
+    	def commonShapeId = column[Int]("common_shape_id")
     	def width = column[Option[BigDecimal]]("width")
     	def height = column[Option[BigDecimal]]("height")
-    	def * = id ~ sheetId ~ width ~ height
-    	def sheet = foreignKey("fk_extended_sheet_sheet", sheetId, Sheet)(_.id)
-    	def forInsert = sheetId ~ width ~ height returning id
+    	def * = id ~ commonShapeId ~ width ~ height
+    	def shape = foreignKey("fk_extended_common_shape", commonShapeId, CommonShape)(_.id)
+    	def forInsert = commonShapeId ~ width ~ height returning id
     }
     
-    object ExtendedCirclePipe extends Table[(Int, Int, Option[BigDecimal])]("extended_circle_pipe") {
+    object ExtendedPipe extends Table[(Int, Int, Option[BigDecimal])]("extended_pipe") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    	def circlePipeId = column[Int]("circle_pipe_id")
+    	def commonShapeId = column[Int]("common_shape_id")
     	def length = column[Option[BigDecimal]]("length")
-    	def * = id ~ circlePipeId ~ length
-    	def circlePipe = foreignKey("fk_extended_circle_pipe_circle_pipe", circlePipeId, CirclePipe)(_.id)
-    	def forInsert = circlePipeId ~ length returning id
-    }
-    
-    object ExtendedSquarePipe extends Table[(Int, Int, Option[BigDecimal])]("extended_square_pipe") {
-    	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    	def squarePipeId = column[Int]("square_pipe_id")
-    	def length = column[Option[BigDecimal]]("length")
-    	def * = id ~ squarePipeId ~ length
-    	def squarePipe = foreignKey("fk_extended_square_pipe_square_pipe", squarePipeId, SquarePipe)(_.id)
-    	def forInsert = squarePipeId ~ length returning id
+    	def * = id ~ commonShapeId ~ length
+    	def shape = foreignKey("fk_extended_pipe_common_shape", commonShapeId, CommonShape)(_.id)
+    	def forInsert = commonShapeId ~ length returning id
     }
     
     case class DBPack(id:Int, materialId:Int, shapeId:Int, unlimited:Boolean, deliveryDate:DateTime, heatNo:String) {}
