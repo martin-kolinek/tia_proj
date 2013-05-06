@@ -21,7 +21,7 @@ class BasicModelsTest extends FunSuite {
 		val r = running(FakeApplication(additionalConfiguration = inMemoryDatabase() ++ Map(SlickConf.slickDriverConfigOption->"scala.slick.driver.PostgresDriver"))) {
 			val tbls = getTables
 			assert(tbls.profile.isInstanceOf[scala.slick.driver.PostgresDriver])
-			val ddl = tbls.CirclePipe.ddl ++ tbls.Cutting.ddl ++ tbls.CuttingPlan.ddl ++ tbls.ExtendedCirclePipe.ddl ++ tbls.ExtendedSheet.ddl ++ tbls.ExtendedSquarePipe.ddl ++ tbls.Material.ddl ++ tbls.Order.ddl ++ tbls.Pack.ddl ++ tbls.Part.ddl ++ tbls.PartDefinition.ddl ++ tbls.PartDefinitionInCuttingPlan.ddl ++ tbls.OrderDefinition.ddl ++ tbls.Semiproduct.ddl ++ tbls.Shape.ddl ++ tbls.Sheet.ddl ++ tbls.SquarePipe.ddl
+			val ddl = tbls.CirclePipe.ddl ++ tbls.Cutting.ddl ++ tbls.CuttingPlan.ddl ++ tbls.ExtendedPipe.ddl ++ tbls.ExtendedSheet.ddl ++ tbls.CommonShape.ddl ++ tbls.Material.ddl ++ tbls.Order.ddl ++ tbls.Pack.ddl ++ tbls.Part.ddl ++ tbls.PartDefinition.ddl ++ tbls.PartDefinitionInCuttingPlan.ddl ++ tbls.OrderDefinition.ddl ++ tbls.Semiproduct.ddl ++ tbls.Shape.ddl ++ tbls.Sheet.ddl ++ tbls.SquarePipe.ddl
 			/*ddl.createStatements.foreach(x=>info(x+";"))
 			info("DROP")
 			ddl.dropStatements.foreach(x=>info(x+";"))*/

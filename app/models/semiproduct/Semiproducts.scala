@@ -27,8 +27,8 @@ trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     import profile.simple._
     
     val packQuery = for {
-    		shp@(shapeId, _, _, _, _, _, _) <- basicShapeJoin
-    		pack <- Pack if pack.shapeId === shapeId
+    		shp <- shapeQuery
+    		pack <- Pack if pack.shapeId === shp._1.id
     		mat <- pack.material
         } yield (shp, pack, mat)
         

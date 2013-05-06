@@ -90,7 +90,7 @@ trait Tables { this:DBAccess =>
     	def * = id ~ basicShapeId ~ extendedShapeId
     	def basicShape = foreignKey("fk_shape_basic_shape", basicShapeId, CommonShape)(_.id)
     	def extendedShape = foreignKey("fk_shape_extended_shape", extendedShapeId, CommonShape)(_.id)
-    	def forInsert = id returning id
+    	def forInsert = basicShapeId ~ extendedShapeId returning id
     }
     
     object CommonShape extends Table[(Int)]("common_shape") {

@@ -14,6 +14,7 @@ import models.semiproduct.CirclePipeDesc
 import models.semiproduct.SheetDesc
 import models.semiproduct.CirclePipeDesc
 import models.semiproduct.CirclePipeDesc
+import models.semiproduct.UnknownShapeDesc
 
 class SemiproductTest extends FunSuite {
 	test("listing and inserting of semiproducts works") {
@@ -23,7 +24,7 @@ class SemiproductTest extends FunSuite {
 			val dt = new DateTime(2011, 11, 11, 11, 11, 11)
 			sp.withTransaction{ implicit session => 
 				val should = Set(
-						PackDesc("heat", dt, false, MaterialDesc("material"), ShapeDesc, Nil),
+						PackDesc("heat", dt, false, MaterialDesc("material"), UnknownShapeDesc, Nil),
 						PackDesc("heat", dt+1.minute, true, MaterialDesc("material"), CirclePipeDesc(Some(9.0), Some(200.0), Some(20.0)), Nil),
 						PackDesc("heat", dt, false, MaterialDesc("material"), SheetDesc(Some(10.0), None, None), Nil))
 				should.foreach(sp.insertPack(_))
@@ -39,7 +40,7 @@ class SemiproductTest extends FunSuite {
 			import sp.profile.simple._
 			val dt = new DateTime(2011, 11, 11, 11, 11, 11)
 			sp.withTransaction{ implicit session => 
-				val old = PackDesc("heat", dt, false, MaterialDesc("material"), ShapeDesc, Nil)
+				val old = PackDesc("heat", dt, false, MaterialDesc("material"), UnknownShapeDesc, Nil)
 				val id = sp.insertPack(old)
 				val should = PackDesc("heat2", dt+2.seconds, true, MaterialDesc("material2"), SheetDesc(Some(10.0), None, None), Nil)
 				sp.updatePack(id, should)

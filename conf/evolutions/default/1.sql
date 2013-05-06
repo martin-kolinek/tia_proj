@@ -35,7 +35,7 @@ create table "semiproduct" ("id" int NOT NULL DEFAULT nextval('semiproduct_id_se
 create table "shape" ("id" int NOT NULL DEFAULT nextval('shape_id_seq') PRIMARY KEY, "basic_shape_id" INTEGER NOT NULL, "extended_shape_id" INTEGER NULL);
 create table "sheet" ("id" int NOT NULL DEFAULT nextval('sheet_id_seq') PRIMARY KEY,"common_shape_id" INTEGER NOT NULL,"thickness" DECIMAL(21,2) NULL);
 create table "square_pipe" ("id" int NOT NULL DEFAULT nextval('square_pipe_id_seq') PRIMARY KEY,"common_shape_id" INTEGER NOT NULL,"thickness" DECIMAL(21,2) NULL,"diameter" DECIMAL(21,2) NULL);
-create table "common_shape" ("id" int NOT NULL DEFAULT nextval('common_shape_id_seq') PRIMARY KEY)
+create table "common_shape" ("id" int NOT NULL DEFAULT nextval('common_shape_id_seq') PRIMARY KEY);
 alter table "circle_pipe" add constraint "fk_circle_pipe_common_shape" foreign key("common_shape_id") references "common_shape"("id") on update NO ACTION on delete NO ACTION;
 alter table "extended_pipe" add constraint "fk_extended_pipe_common_shape" foreign key("common_shape_id") references "common_shape"("id") on update NO ACTION on delete NO ACTION;
 alter table "extended_sheet" add constraint "fk_extended_sheet_common_shape" foreign key("common_shape_id") references "common_shape"("id") on update NO ACTION on delete NO ACTION;

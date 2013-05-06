@@ -38,7 +38,7 @@ object Semiproducts extends Controller with ObjectController[PackDesc] with Obje
 			"material" -> nonEmptyText)(MaterialDesc)(MaterialDesc.unapply _)
 
 	def formPackExtract(heat:String, date:DateTime, unlim:Boolean, mat:MaterialDesc, shType:Int, sheet:SheetDesc, circ:CirclePipeDesc, square:SquarePipeDesc, semiprods:List[WithID[SemiproductDesc]]) = { 
-		val shp = IndexedSeq(ShapeDesc, sheet, circ, square)(shType)
+		val shp = IndexedSeq(UnknownShapeDesc, sheet, circ, square)(shType)
 		PackDesc(heat, date, unlim, mat, shp, semiprods)
 	}
 	
