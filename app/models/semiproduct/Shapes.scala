@@ -22,6 +22,12 @@ object ShapeHelpers {
     implicit class OptionStringContext(sc:StringContext) {
         def opt(opts:Option[Any]*) = sc.s(opts.map(o => o.map(_.toString).getOrElse("?")):_*)
     }
+    
+    def pipeExtDesc(len:Option[BigDecimal]) = len match {
+    	case None => ""
+    	case Some(l) => s", L=$l mm"
+    } 
+    	
 }
 
 import ShapeHelpers._
@@ -31,15 +37,21 @@ case object UnknownShapeDesc extends ShapeDesc {
 }
 
 case class SheetDesc(thickness:Option[BigDecimal], width:Option[BigDecimal], height:Option[BigDecimal]) extends ShapeDesc {
-    def description = opt"sheet - $thickness mm, $width x $height"
+	def extDesc = 
+		if(width.isEmpty && height.isEmpty)
+			""
+		else
+			opt", $width x $height mm"
+	
+    def description = opt"sheet - $thickness mm" + extDesc
 }
 
 case class CirclePipeDesc(thickness:Option[BigDecimal], radius:Option[BigDecimal], length:Option[BigDecimal]) extends ShapeDesc {
-    def description = opt"circle pipe - $thickness, R=$radius, L=$length" 
+    def description = opt"circle pipe - $thickness mm, R=$radius mm" + ShapeHelpers.pipeExtDesc(length) 
 } 
 
 case class SquarePipeDesc(thickness:Option[BigDecimal], diameter:Option[BigDecimal], length:Option[BigDecimal]) extends ShapeDesc {
-    def description = opt"square pipe - $thickness, D=$diameter, L=$length"
+    def description = opt"square pipe - $thickness mm, D=$diameter mm" + ShapeHelpers.pipeExtDesc(length)
 }
 
 trait Shapes extends Tables { this:DBAccess =>
@@ -77,12 +89,20 @@ trait Shapes extends Tables { this:DBAccess =>
     type OptionShape = ((Int, Int, Option[Int]), 
                         OptionSheet, OptionCirclePipe, OptionSquarePipe, OptionExtendedSheet, OptionExtendedPipe)
     
+    type OptionBasicShape = (Int, OptionSheet, OptionCirclePipe, OptionSquarePipe)
+                        
     def extractShape: OptionShape => ShapeDesc = {
     	case (_, (Some(_), thick), _, _, (_, width, height), _) => SheetDesc(thick, width, height)
     	case (_, _, (Some(_), thick, rad), _, _, (_, len)) => CirclePipeDesc(thick, rad, len)
     	case (_, _, _, (Some(_), thick, diam), _, (_, len)) => SquarePipeDesc(thick, diam, len)
     	case _ => UnknownShapeDesc
     }
+    
+    def extractBasicShape: OptionBasicShape => ShapeDesc = {
+    	case (_, (Some(_), thick), _, _) => SheetDesc(thick, None, None)
+    	case (_, _, (Some(_), thick, rad), _) => CirclePipeDesc(thick, rad, None)
+    	case (_, _, _, (Some(_), thick, diam)) => SquarePipeDesc(thick, diam, None)
+    } 
     
     private val nextval = SimpleFunction.unary[String, Int]("nextval")
     
@@ -162,4 +182,7 @@ trait Shapes extends Tables { this:DBAccess =>
     			None
     	getShapeId(basicId, extId).getOrElse(insertShape(basicId, extId))
     }
+    
+    def getBasicShapeDescription(id:Int)(implicit s:Session) =
+    	basicShapeJoin.filter(_._1 === id).firstOption.map(extractBasicShape).map(_.description)
 }

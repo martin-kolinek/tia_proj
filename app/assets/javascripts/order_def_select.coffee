@@ -1,6 +1,4 @@
-define(["jquery", "dataTables", "router"], ($, dt, router) ->
-    idSelector = (handle) -> "."+handle+"_id"
-    descSelector = (handle) -> "."+handle+"_desc"
+define(["jquery", "dataTables", "router", "id_desc"], ($, dt, router, iddesc) ->
     register : (rep, handle, modal, content) ->
         rep.added (ev) ->
             router.controllers.OrderController.list("table").ajax
@@ -25,16 +23,8 @@ define(["jquery", "dataTables", "router"], ($, dt, router) ->
                                 ul.find("a").click ->
                                     modal.off("hidden")
                                     modal.modal("hide")
-                                    ev.newItem.find(idSelector(handle)).val($(this).data("id"))
-                                    ev.newItem.find(descSelector(handle)).text($(this).data("description"))
+                                    ev.newItem.find(iddesc.id(handle)).val($(this).data("id"))
+                                    ev.newItem.find(iddesc.desc(handle)).text($(this).data("description"))
     initDesc : (handle) ->
-        $(idSelector(handle)).each ->
-            id = $(this).val()
-            if(id)
-                desc = $(this).parent().find(descSelector(handle))
-                router.controllers.OrderController.orderDefDescription(id).ajax
-                    success: (data, status, xhr) ->
-                        desc.text(data)
-                    error: (xhr, status, err) ->
-                       desc.text("unknown")
+        iddesc.init(handle, router.controllers.OrderController.orderDefDescription)
 )

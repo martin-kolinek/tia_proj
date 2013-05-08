@@ -1,6 +1,4 @@
-define(["jquery", "router", "dataTables", "bootstrap"], ($, router, dt, bs) ->
-    idSelector = (handle) -> "."+handle+"_id"
-    descSelector = (handle) -> "."+handle+"_desc"
+define(["jquery", "router", "dataTables", "bootstrap", "id_desc"], ($, router, dt, bs, iddesc) ->
     register: (rep, modal, content, handle) ->
     	rep.added((ev) ->
             rep.disableAdding()
@@ -11,8 +9,8 @@ define(["jquery", "router", "dataTables", "bootstrap"], ($, router, dt, bs) ->
                     content.find("tbody tr").click ->
                         id = $(this).data("id")
                         desc = $(this).data("description")
-                        ev.newItem.find(idSelector(handle)).val(id)
-                        ev.newItem.find(descSelector(handle)).html(desc)
+                        ev.newItem.find(iddesc.id(handle)).val(id)
+                        ev.newItem.find(iddesc.desc(handle)).html(desc)
                         rep.enableAdding()
                         modal.off("hidden")
                         modal.modal("hide")
@@ -27,15 +25,5 @@ define(["jquery", "router", "dataTables", "bootstrap"], ($, router, dt, bs) ->
                     alert("Error getting part definitions for selection: "+err)
         )
     initDesc: (handle) ->
-        $(document).ready ->
-    	   $(descSelector(handle)).each ->
-                id = $(this).parent().find(idSelector(handle)).val()
-                if(!id)
-                   return
-                div = $(this)
-                router.controllers.PartDefinitions.partDefDescription(id).ajax
-                    success: (data, status, xhr) ->
-                        div.text(data)
-                    error: (xhr, status, err) ->
-                        div.text("unknown")
+    	iddesc.init(handle, router.controllers.PartDefinitions.partDefDescription)
 )

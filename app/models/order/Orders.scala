@@ -106,15 +106,17 @@ trait Orders extends Tables {
 
     def orderStatus(id:Int)(implicit s:Session) = {
         sql"""
-        select od.id, count(p.id), sp.material_id, shp.basic_id from "order" o 
-          inner join order_definition od on o.id = od.order_id 
-          inner join part p on p.order_def_id = od.id
-          inner join cutting c on c.id = p.cutting_id
-          inner join pack sp on sp.id = c.semiproduct_id
-          inner join shape shp on shp.id = sp.shape_id
-        where o.id=$id
-        group by shp.basic_id, sp.material_id, od.id""".as[(Int, Int, Int, Int)].list.groupBy(_._1).map {
-            case (odid, lst) => OrderDefStatus(odid, lst.map(x=>(x._2, x._3, x._4)).map(PartInOrder.tupled))
+        select od.id, count(p.id), sp.material_id, shp.basic_shape_id from "order" o 
+          inner join order_def od on o.id = od.order_id 
+          left join part p on p.order_def_id = od.id
+          left join cutting c on c.id = p.cutting_id
+          left join pack sp on sp.id = c.semiproduct_id
+          left join shape shp on shp.id = sp.shape_id
+        where o.id=$id and c.finish_time is not null
+        group by shp.basic_shape_id, sp.material_id, od.id""".as[(Int, Int, Option[Int], Option[Int])].list.groupBy(_._1).map {
+            case (odid, lst) => OrderDefStatus(odid, lst.collect {
+            	case (_, cnt, Some(mat), Some(shp)) if cnt > 0 => PartInOrder(shp, mat, cnt)
+            })
         }.toList
     }
 

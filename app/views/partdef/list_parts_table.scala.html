@@ -1,0 +1,32 @@
+@(lst:Seq[models.partdef.CutPart])
+
+<table>
+    <thead>
+        <tr>
+            <th>
+                Shape
+            </th>
+            <th>
+                Material
+            </th>
+            <th>
+                Available
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @for(p <- lst) {
+            <tr data-shape="@p.shapeId" data-shape-desc="@p.shape.description" data-mat="@p.materialId" data-mat-desc="@p.material.name">
+                <td>
+                    p.shape.description
+                </td>
+                <td>
+                    p.material.name
+                </td>
+                <td>
+                    p.count
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

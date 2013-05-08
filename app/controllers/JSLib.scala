@@ -16,8 +16,11 @@ object JSLib extends Controller {
               Semiproducts.list,
               PartDefinitions.list,
               PartDefinitions.partDefDescription,
+              PartDefinitions.listFinishedParts,
               CuttingPlans.cutPlanDescription,
               Semiproducts.getSemiproductDescription,
+              Semiproducts.basicShapeDescription,
+              Semiproducts.materialDescription,
               OrderController.list,
               OrderController.listDefinitions,
               OrderController.orderDefDescription

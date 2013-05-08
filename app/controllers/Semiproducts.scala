@@ -109,4 +109,16 @@ object Semiproducts extends Controller with ObjectController[PackDesc] with Obje
     		Ok(model.getSemiproductDescription(id).getOrElse("unknown"))
     	}
     }
+    
+    def basicShapeDescription(id:Int) = Action {
+    	model.withTransaction {implicit s=>
+    		Ok(model.getBasicShapeDescription(id).getOrElse("unknown"))
+    	}
+    }
+    
+    def materialDescription(id:Int) = Action {
+    	model.withTransaction {implicit s=>
+    	    Ok(model.getMaterialDescription(id).getOrElse("unknown"))
+    	}
+    }
 }

@@ -14,12 +14,14 @@ import models.partdef.PartDefinitionModel
 import models.partdef.PartDefinitionModel
 import models.partdef.PartDefinitionList
 import models.partdef.PartDefinitionForList
+import models.semiproduct.Shapes
+import play.api.templates.Html
 
 object PartDefinitions extends Controller with ObjectController[PartDefinitionDesc]
 		with ObjectListController[PartDefinitionForList]{
     type ModelType = DBAccessConf with PartDefinitionModel with PartDefinitionList 
 
-	lazy val model = new DBAccessConf with DBPartDef with PartDefinitionModel with PartDefinitionList
+	lazy val model = new DBAccessConf with DBPartDef with Shapes with PartDefinitionModel with PartDefinitionList
 	
 	def form(implicit session:scala.slick.session.Session) = Form(mapping(
 			"name" -> nonEmptyText,
@@ -47,6 +49,17 @@ object PartDefinitions extends Controller with ObjectController[PartDefinitionDe
     def partDefDescription(id:Int) = Action{
     	model.withTransaction {implicit s=>
     		Ok(model.getPartDefDescription(id).getOrElse("unknown"))
+    	}
+    }
+    
+    def finishedPartsTemplate : String => Seq[models.partdef.CutPart] => Html = {
+    	case "table" => views.html.partdef.list_parts_table.apply
+    	case _ => views.html.partdef.list_parts.apply
+    }
+    
+    def listFinishedParts(template:String) = Action {
+    	model.withTransaction { implicit s =>
+    		Ok(finishedPartsTemplate(template)(model.listFinishedParts))
     	}
     }
 }

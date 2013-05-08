@@ -19,4 +19,7 @@ trait Materials extends Tables {
 		
 	def getOrCreateMaterial(mat:MaterialDesc)(implicit session:Session) =
 		getMaterialId(mat).getOrElse(insertMaterial(mat))
+		
+	def getMaterialDescription(id:Int)(implicit s:Session) = 
+	    Query(Material).filter(_.id === id).map(_.name).firstOption
 } 

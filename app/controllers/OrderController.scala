@@ -19,16 +19,17 @@ import models.order.PartInOrder
 import models.order.OrderDefStatus
 import models.order.OrderDefForList
 import play.api.templates.Html
+import models.semiproduct.Shapes
 
 object OrderController extends Controller with ObjectController[OrderDesc] 
 		with ObjectListController[OrderForList] {
 	type ModelType = DBAccessConf with OrderModel with OrderList
-	lazy val model = new DBAccessConf with Orders with DBPartDef with OrderModel with OrderList
+	lazy val model = new DBAccessConf with Orders with DBPartDef with Shapes with OrderModel with OrderList
 	
 	def pdefMapping(implicit s:scala.slick.session.Session) = mapping(
 			"id" -> optional(number),
 			"pdefid" -> number.verifying(model.existsPartDef _),
-			"filter" -> nonEmptyText,
+			"filter" -> text,
 			"count" -> number(1))(OrderDefinitionDesc)(OrderDefinitionDesc.unapply)
 	
 	def form(implicit s:scala.slick.session.Session) = Form(mapping(
@@ -55,7 +56,7 @@ object OrderController extends Controller with ObjectController[OrderDesc]
         "statuses" -> play.api.data.Forms.list(mapping(
             "odefid" -> number,
             "parts" -> play.api.data.Forms.list(mapping(
-                "semiproduct" -> number,
+                "shape" -> number,
                 "material" -> number,
                 "count" -> number
             )(PartInOrder)(PartInOrder.unapply))

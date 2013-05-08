@@ -10,6 +10,8 @@
 }
 
 @main("Order status", views.ObjectType.Order) {
+@helper.requireJs(core = routes.Assets.at("javascripts/require-jquery.js").url, 
+    module = routes.Assets.at("javascripts/order_status.js").url)
 } {
     <h3>
         Order status
@@ -17,16 +19,23 @@
 	@helper.form(action = replyTo, 'class -> "form-horizontal") {
         @helper.repeat(frm("statuses"), 0) { st =>
             <div class="well">
-              @odefInput(st("odefid"), "odefhandle")
-              @helper.repeat(st("parts"), 0) { part =>
-                  @partField(part, "part")
+              @views.html.order.odefInput(st("odefid"), "odefhandle")
+              @views.html.repeatingHelper(st.apply _, "parts", "Add parts", "parthandle") { (fld, remove) =>
+                  <div class="well">
+                    @views.html.inputHfWithDesc(fld("shape"), "shphandle", '_label -> "Shape")
+                    @views.html.inputHfWithDesc(fld("material"), "mathandle", '_label -> "Material")
+                    @helper.inputText(fld("count"), '_label -> "Count")
+                    @views.html.horizontalInput(remove)
+                  </div>  
               }
-              @partField(st("parts[x]"), "partTemplate hidden")
-              <a class="addButton">Add parts</a>
             </div>
         }
-	  	<input type="submit" value="Submit" />
-	  	@helper.requireJs(core = routes.Assets.at("javascripts/require.js").url, module = routes.Assets.at("javascripts/orderStatusForm").url)
+        <div class="form-actions">
+	  	    <input type="submit" class="btn btn-primary" value="Submit" />
+	  	    <a href="@routes.OrderController.list()" class="btn">Cancel</a>
+	  	</div>
+	  	
 	}
-         
+    @modalDiv("Choose parts", "part-modal", "part-modal-content")        
 }
+ 

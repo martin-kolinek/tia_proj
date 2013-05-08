@@ -12,7 +12,7 @@ object ApplicationBuild extends Build {
     jdbc,
     anorm,
     "org.scalatest" %% "scalatest" % "1.9.1" % "test",
-    "com.typesafe.slick" %% "slick" % "1.0.0",
+    "com.typesafe.slick" %% "slick" % "1.0.1-RC1",
     "org.scalaz" %% "scalaz-core" % "7.0.0-M8",
     "org.slf4j" % "slf4j-nop" % "1.6.6",
     "org.xerial" % "sqlite-jdbc" % "3.7.2",

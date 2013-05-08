@@ -17,6 +17,7 @@ import Q.interpolation
 import models.order.Orders
 import scalaz.std.option._
 import org.joda.time.format.DateTimeFormat
+import models.SlickExtensions._
 
 case class CuttingDesc(semiprodId:Int, cutPlanId:Int, parts:List[PartInCuttingDesc])
 
@@ -43,23 +44,24 @@ trait Cuttings extends CuttingPlans {
         cutting.map(x=>(x.hlisted ::: parts :: HNil).tupled).map(CuttingDesc.tupled)
     }
 
-    def getDamagedPartCounts(id:Int)(implicit session:Session) =
+    def getDamagedPartCounts(id:Int)(implicit session:Session) = {
     	sql"""
         SELECT deford.part_def_id, deford.order_def_id, coalesce(cnts.dmg, 0) FROM
           (SELECT DISTINCT part_def_id, order_def_id FROM part WHERE cutting_id=$id) deford
           left join
-          (SELECT part_def_id, order_def_id, count(id) as dmg FROM part 
+          (SELECT part_def_id, order_def_id, count(id) as dmg FROM part
                 WHERE cutting_id=$id and damaged=true group by part_def_id, order_def_id, cutting_id) cnts
-            on cnts.part_def_id = deford.part_def_id and 
+            on cnts.part_def_id = deford.part_def_id and
                 (cnts.order_def_id = deford.order_def_id or cnts.order_def_id is null and deford.order_def_id is null)
           ORDER BY deford.part_def_id, deford.order_def_id
         """.as[(Int, Option[Int], Int)].list.map(FinishedPartInCutting.tupled)
+    }
     
     private def getPartCounts(id:Int)(implicit session:Session) = 
-    	sql"""
-    	SELECT order_def_id, count(id) FROM part where 
-    	cutting_id = $id and order_def_id is not null group by cutting_id, part_def_id, order_def_id 
-    	""".as[(Int, Int)].list.map(PartInCuttingDesc.tupled)
+    	Query(Part).filter(_.cuttingId === id).filter(_.orderDefId.isNotNull).
+    	    groupBy(x=>(x.orderDefId, x.partDefId)).map{
+    	        case ((odefid, pdefid), rows) => (odefid.get, rows.length)
+    	    }.list.map(PartInCuttingDesc.tupled)
 
     def insertCutting(cut:CuttingDesc)(implicit s:Session) = {
         val cutid = Cutting.forInsert.insert(None, cut.semiprodId, cut.cutPlanId)

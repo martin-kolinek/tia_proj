@@ -1,0 +1,9 @@
+@(lst:Seq[models.partdef.CutPart])
+
+@main("Cut parts", views.ObjectType.PartDefinition) {
+} {
+<h3>
+    Cut parts
+</h3>
+@list_parts_table(lst)
+}

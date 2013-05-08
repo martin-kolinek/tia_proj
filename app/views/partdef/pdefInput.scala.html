@@ -1,6 +1,4 @@
 @(fld:Field, handle:String)(implicit handler: helper.FieldConstructor, lang: play.api.i18n.Lang)
 
-@helper.input(fld, '_label -> "Part definition") { (id, name, value, htmlArgs) =>
-    <div class="uneditable-input @{handle+"_desc"}"></div>
-	<input type="hidden" class="@{handle+"_id"}" name="@name" id="@id" value="@value" />
-}
+@views.html.inputHfWithDesc(fld, handle, '_label -> "Part definition") 
+

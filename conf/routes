@@ -19,6 +19,10 @@ GET     /pack/:pack/semiproducts/  controllers.Semiproducts.listSemiproducts(pac
 
 GET     /pack/semiproduct/:id/description/ controllers.Semiproducts.getSemiproductDescription(id:Int)
 
+GET     /material/:id/name/         controllers.Semiproducts.materialDescription(id:Int)
+
+GET     /shape/basic/:id/name       controllers.Semiproducts.basicShapeDescription(id:Int)
+
 GET	    /partdef/					controllers.PartDefinitions.list(template ?= "")
 
 GET		/partdef/add/				controllers.PartDefinitions.add
@@ -30,6 +34,8 @@ GET		/partdef/:id/edit/			controllers.PartDefinitions.edit(id:Int)
 POST	/partdef/:id/edit/			controllers.PartDefinitions.update(id:Int)
 
 GET     /partdef/:id/description    controllers.PartDefinitions.partDefDescription(id:Int)
+
+GET     /parts                      controllers.PartDefinitions.listFinishedParts(template ?= "")
 
 GET     /cuttingplan/               controllers.CuttingPlans.list(template ?= "")
 

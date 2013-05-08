@@ -11,11 +11,7 @@
 </h3>
 @helper.form(action = replyTo, 'class -> "form-horizontal") {
 	
-	@helper.input(frm("cutting_plan"), '_label -> "Cutting plan", '_showConstraints -> false) { (id, name, value, htmlArgs) =>
-        <input type="hidden" class="cutplan-id" id="@id" name="@name" value="@{cpid.map(_.toString).getOrElse(value)}" @toHtmlArgs(htmlArgs) />
-        <div class="uneditable-input cutplan-desc">
-        </div>
-    }
+	@views.html.inputHfWithDesc(frm("cutting_plan"), "cphandle", '_label -> "Cutting plan", '_showConstraints -> false)
 	
 	<h4>Parts</h4>
     @repeatingHelper(frm.apply, "parts", "Add part", "part_handle") { (part, remove) =>
@@ -26,9 +22,9 @@
         </div>
     }
     <h4>Semiproduct</h4>
-    <div class="semiproduct-desc"></div>
+    <div class="@{views.IdDescHandle.descClass("sphandle")}"></div>
     @defining(frm("semiproduct")){ fld =>
-        <input class="semiprod-id" type="hidden" id="@fld.id" name="@fld.name" value="@fld.value" />
+        <input class="@{views.IdDescHandle.idClass("sphandle")}" type="hidden" id="@fld.id" name="@fld.name" value="@fld.value" />
     }
     <a class="btn" id="semiprod-button">Choose</a>
     

@@ -1,0 +1,7 @@
+@(field: play.api.data.Field, handle:String, args: (Symbol,Any)*)(implicit handler: helper.FieldConstructor, lang: play.api.i18n.Lang)
+
+@helper.input(field, args:_*) { (id, name, value, htmlArgs) =>
+    <input type="hidden" id="@id" name="@name" value="@value" @toHtmlArgs(htmlArgs) class="@views.IdDescHandle.idClass(handle)" />
+    <div class="uneditable-input @views.IdDescHandle.descClass(handle)">
+    </div>
+}
