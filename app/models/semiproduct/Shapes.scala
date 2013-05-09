@@ -82,13 +82,13 @@ trait Shapes extends Tables { this:DBAccess =>
             ExtendedPipe on (_._1.id === _.commonShapeId)
     } yield (shape.id, optionExtendedSheet(extSheet), optionExtendedPipe(extPipe))
 
-    def shapeQuery:ShapeQueryType = for {
+    def shapeQuery = for {
         shp <- Shape
         (bid, sheet, circ, square) <- basicShapeJoin if bid === shp.basicShapeId
         (eid, extSheet, extPipe) <- extendedShapeJoin if eid === shp.extendedShapeId
     } yield (shp, sheet, circ, square, extSheet, extPipe)
 
-   type ShapeQueryType = Query[(Shape.type, Projection2[Option[Int],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection2[Option[Int],Option[BigDecimal]]),((Int, Int, Option[Int]), (Option[Int], Option[BigDecimal]), (Option[Int], Option[BigDecimal], Option[BigDecimal]), (Option[Int], Option[BigDecimal], Option[BigDecimal]), (Option[Int], Option[BigDecimal], Option[BigDecimal]), (Option[Int], Option[BigDecimal]))]
+    type ShapeFilterInput = (Shape.type, Projection2[Option[Int],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection2[Option[Int],Option[BigDecimal]])
 
     type OptionShape = ((Int, Int, Option[Int]), 
                         OptionSheet, OptionCirclePipe, OptionSquarePipe, OptionExtendedSheet, OptionExtendedPipe)

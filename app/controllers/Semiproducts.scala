@@ -17,7 +17,7 @@ import views.html.semiproduct.semiprod_form
 object Semiproducts extends Controller with ObjectController[PackDesc] with ObjectListController[PackForList] { 
     type ModelType = DBAccessConf with SemiproductModel with PackList
 	
-	lazy val model = new DBAccessConf with DBSemiprods with SemiproductModel with PackList
+	lazy val model = new DBAccessConf with DBSemiprods with SemiproductModel with PackList with SemiproductFilter with ShapeFilter
 	
 	val sheetMapping = mapping(
 			"thickness" -> optional(bigDecimal),

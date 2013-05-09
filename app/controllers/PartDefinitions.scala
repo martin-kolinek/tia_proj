@@ -39,12 +39,6 @@ object PartDefinitions extends Controller with ObjectController[PartDefinitionDe
         case "table" => views.html.partdef.select_list.apply
         case _ => views.html.partdef.list.apply
     }
-	
-	def selectList = Action {
-    	model.withTransaction { implicit s =>
-    		Ok(views.html.partdef.select_list(model.list))
-    	}
-    }
     
     def partDefDescription(id:Int) = Action{
     	model.withTransaction {implicit s=>

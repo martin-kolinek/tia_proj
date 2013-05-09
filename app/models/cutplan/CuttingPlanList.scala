@@ -1,6 +1,7 @@
 package models.cutplan
 
 import models.basic.Tables
+import scalaz._
 import models.ObjectListModel
 import models.DBAccess
 
@@ -11,7 +12,10 @@ trait CuttingPlanList extends Tables with ObjectListModel[CuttingPlanForList] {
 	
 	import profile.simple._
 	
-	def list(implicit s:Session) = {
+	type FilterType = Unit
+	
+	def list(u:Unit)(implicit s:Session) = {
 		Query(CuttingPlan).map(x=>(x.id, x.name, x.filter)).list.map(CuttingPlanForList.tupled)
 	}
+	def parseFilter(str:String) = Success({})
 }

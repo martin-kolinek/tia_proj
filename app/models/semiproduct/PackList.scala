@@ -6,10 +6,15 @@ import models.ObjectListModel
 import models.enums._
 
 trait PackList extends ObjectListModel[PackForList] {
-	self:DBAccess with Semiproducts =>
+	self:DBAccess with Semiproducts with SemiproductFilter with ShapeFilter =>
 	import profile.simple._
 
-	def list(implicit s:Session) = packQuery.list.map((extractPackForList _).tupled)
+	type FilterType = List[PackFilter]
+	
+	def list(flt:FilterType)(implicit s:Session) = {
+		val q = (packQuery /: flt)(_.filter(_))
+		q.list.map((extractPackForList _).tupled)
+	}
 	
 	def listSemiproducts(packId:Int)(implicit session:Session) = {
         val q = for {
@@ -26,5 +31,13 @@ trait PackList extends ObjectListModel[PackForList] {
             	SemiproductForList(id, serial, status)
             } 
         }
+	}
+	
+	def parseFilter(str:String) = {
+		val result = parseAll(packFilterParser, str)
+		result match {
+			case Success(flt, _) => scalaz.Success(flt)
+			case ns:NoSuccess => scalaz.Failure(ns.msg)
+		}
 	}
 }

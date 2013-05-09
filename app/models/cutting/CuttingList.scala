@@ -1,6 +1,7 @@
 package models.cutting
 
 import models.DBAccess
+import scalaz._
 import models.semiproduct.Semiproducts
 import models.cutplan.CuttingPlanForList
 import models.cutplan.CuttingPlans
@@ -11,7 +12,7 @@ trait CuttingList extends ObjectListModel[CuttingForList] {
 	self:DBAccess with Semiproducts with CuttingPlans =>
 	import profile.simple._
 	
-	def list(implicit session:Session) = {
+	def list(u:Unit)(implicit session:Session) = {
 		val q = for {
 			cut <- Cutting 
 			sp <- Semiproduct if cut.semiproductId === sp.id
@@ -27,4 +28,7 @@ trait CuttingList extends ObjectListModel[CuttingForList] {
 		}
 	}
 	
+	type FilterType = Unit
+	
+	def parseFilter(str:String) = Success({})
 }

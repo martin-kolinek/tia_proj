@@ -1,6 +1,8 @@
 package controllers
 
 import play.api._
+import scalaz._
+import scalaz.Validation
 import play.api.mvc._
 import play.api.templates.Html
 import models.ObjectListModel
@@ -15,10 +17,15 @@ trait ObjectListController[ObjectType] {
 	
 	def listTemplates: String => Seq[ObjectType] => Html
 	
-	def list(template:String = "") = Action { implicit request =>
+	def list(filter:String, template:String = "") = Action { implicit request =>
 		val m = model
-		m.withTransaction { implicit s =>
-			Ok(listTemplates(template)(m.list))
+		val filt = m.parseFilter(filter)
+		filt match {
+			case Success(filt) => m.withTransaction { implicit s =>
+			    Ok(listTemplates(template)(m.list(filt)))
+			}
+			case Failure(err) => BadRequest(err)
 		}
+		
 	}
 }

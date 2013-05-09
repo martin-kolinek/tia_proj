@@ -1,6 +1,7 @@
 package models.order
 
 import models.ObjectListModel
+import scalaz._
 import models.DBAccess
 
 trait OrderList extends ObjectListModel[OrderForList] {
@@ -8,8 +9,12 @@ trait OrderList extends ObjectListModel[OrderForList] {
 		
 	import profile.simple._
 		
-	def list(implicit session:Session) = {
+	def list(u:Unit)(implicit session:Session) = {
 		Query(Order).map(x=>(x.id, x.name, x.fillingDate, x.dueDate, x.status)).
 		    list.map(OrderForList.tupled)
 	}
+	
+	type FilterType = Unit
+	
+	def parseFilter(str:String) = Success({})
 }

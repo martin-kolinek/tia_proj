@@ -1,6 +1,7 @@
 package models.partdef
 
 import models.ObjectListModel
+import scalaz._
 import models.DBAccess
 
 trait PartDefinitionList extends ObjectListModel[PartDefinitionForList] {
@@ -8,8 +9,12 @@ trait PartDefinitionList extends ObjectListModel[PartDefinitionForList] {
 		
 	import profile.simple._
 		
-	def list(implicit s:Session) = {
+	def list(u:Unit)(implicit s:Session) = {
 	    Query(PartDefinition).map(x=>(x.id, x.name, x.filter)).
 	        list.map(PartDefinitionForList.tupled)
 	}
+	
+	type FilterType = Unit
+	
+	def parseFilter(str:String) = Success({})
 }
