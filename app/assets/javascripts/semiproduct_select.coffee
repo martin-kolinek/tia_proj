@@ -1,6 +1,6 @@
 define(["jquery", "router", "bootstrap", "dataTables"], ($, router, bs, dt) ->
-    selectSemiproduct: (modal, content, idCtl, descCtl) ->
-        router.controllers.Semiproducts.list("table").ajax
+    selectSemiproduct: (modal, content, idCtl, descCtl, filter) ->
+        router.controllers.Semiproducts.list(filter,"table").ajax
             error: (xhr, status, err) ->
                 alert("error retrieving packs: "+err)
             success: (data, status, xhr) ->

@@ -13,11 +13,12 @@ import org.joda.time.DateTime
 import models.WithID
 import models.semiproduct.{Semiproducts => DBSemiprods}
 import views.html.semiproduct.semiprod_form
+import play.api.libs.json.Json
 
 object Semiproducts extends Controller with ObjectController[PackDesc] with ObjectListController[PackForList] { 
     type ModelType = DBAccessConf with SemiproductModel with PackList
 	
-	lazy val model = new DBAccessConf with DBSemiprods with SemiproductModel with PackList with SemiproductFilter with ShapeFilter
+	lazy val model = new DBAccessConf with DBSemiprods with SemiproductModel with PackList with ShapeFilter with SemiproductFilter 
 	
 	val sheetMapping = mapping(
 			"thickness" -> optional(bigDecimal),
@@ -106,19 +107,22 @@ object Semiproducts extends Controller with ObjectController[PackDesc] with Obje
     
     def getSemiproductDescription(id:Int) = Action {
     	model.withTransaction { implicit s =>
-    		Ok(model.getSemiproductDescription(id).getOrElse("unknown"))
+    		val desc = model.getSemiproductDescription(id).getOrElse("unknown") 
+    		Ok(Json.obj("desc" -> desc))
     	}
     }
     
     def basicShapeDescription(id:Int) = Action {
     	model.withTransaction {implicit s=>
-    		Ok(model.getBasicShapeDescription(id).getOrElse("unknown"))
+    		val desc = model.getBasicShapeDescription(id).getOrElse("unknown") 
+    		Ok(Json.obj("desc" -> desc))
     	}
     }
     
     def materialDescription(id:Int) = Action {
     	model.withTransaction {implicit s=>
-    	    Ok(model.getMaterialDescription(id).getOrElse("unknown"))
+    		val desc = model.getMaterialDescription(id).getOrElse("unknown") 
+    	    Ok(Json.obj("desc" -> desc))
     	}
     }
 }

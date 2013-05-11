@@ -11,7 +11,7 @@
 </h3>
 @helper.form(action = replyTo, 'class -> "form-horizontal") {
 	
-	@views.html.inputHfWithDesc(frm("cutting_plan"), "cphandle", '_label -> "Cutting plan", '_showConstraints -> false)
+	@views.html.inputHfWithDesc(frm("cutting_plan"), "cphandle", '_default -> cpid.map(_.toString).getOrElse(""), '_label -> "Cutting plan", '_showConstraints -> false)
 	
 	<h4>Parts</h4>
     @repeatingHelper(frm.apply, "parts", "Add part", "part_handle") { (part, remove) =>

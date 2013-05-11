@@ -9,6 +9,9 @@ require(["common"], (common) ->
         odef.register(repHandle, "order-def", $("#modal-order"), $("#modal-order-content"))
             
         $("#semiprod-button").click ->
-            ss.selectSemiproduct($("#modal-sp"), $("#modal-sp-content"), $(".semiprod-id"), $(".semiproduct-desc"))
+            filters = $(iddesc.id("order-def")).map ->
+                $(this).data("filter")
+            filter = filters.get().join()+","+$(iddesc.id("cphandle")).data("filter")+",hasfree"
+            ss.selectSemiproduct($("#modal-sp"), $("#modal-sp-content"), $(".semiprod-id"), $(".semiproduct-desc"), filter)
     )
 )

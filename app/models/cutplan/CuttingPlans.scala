@@ -8,6 +8,8 @@ case class CuttingPlanDesc(name:String, filter:String, file:Array[Byte], partdef
 
 case class PartDefInCutPlan(partDefId:Int, count:Int)
 
+case class CuttingPlanWithFullFilter(name:String, fullFilter:String)
+
 trait CuttingPlans extends Tables {
 	self:DBAccess =>
 		
@@ -60,6 +62,14 @@ trait CuttingPlans extends Tables {
 	
 	def cuttingPlanProjection(cp:CuttingPlan.type) = (cp.id, cp.name, cp.filter)
 
-	def cutPlanDescription(cp:Int)(implicit s:Session) = 
-		Query(CuttingPlan).filter(_.id === cp).map(_.name).firstOption
+	def cutPlanDescription(cp:Int)(implicit s:Session) = {
+		val cpinfo = Query(CuttingPlan).filter(_.id === cp).map(x => (x.name, x.filter)).firstOption
+		val pdefFilters = for {
+			pdcp <- PartDefinitionInCuttingPlan if pdcp.cutPlanId === cp
+			pd <- PartDefinition if pdcp.partDefId === pd.id
+		} yield pd.filter
+		for ((name, filter) <- cpinfo)
+			yield CuttingPlanWithFullFilter(name, (filter::pdefFilters.list).mkString(","))
+	} 
+		
 }

@@ -5,7 +5,7 @@
 # Home page
 GET     /                           controllers.Application.index
 
-GET     /pack/	            controllers.Semiproducts.list(template ?= "")
+GET     /pack/              controllers.Semiproducts.list(filter?="", template ?= "")
 
 GET		/pack/add/			controllers.Semiproducts.add
 
@@ -23,7 +23,7 @@ GET     /material/:id/name/         controllers.Semiproducts.materialDescription
 
 GET     /shape/basic/:id/name       controllers.Semiproducts.basicShapeDescription(id:Int)
 
-GET	    /partdef/					controllers.PartDefinitions.list(template ?= "")
+GET	    /partdef/       			controllers.PartDefinitions.list(filter?="", template ?= "")
 
 GET		/partdef/add/				controllers.PartDefinitions.add
 
@@ -35,9 +35,9 @@ POST	/partdef/:id/edit/			controllers.PartDefinitions.update(id:Int)
 
 GET     /partdef/:id/description    controllers.PartDefinitions.partDefDescription(id:Int)
 
-GET     /parts                      controllers.PartDefinitions.listFinishedParts(template ?= "")
+GET     /parts                      controllers.PartDefinitions.listFinishedParts(filter ?= "", template ?= "")
 
-GET     /cuttingplan/               controllers.CuttingPlans.list(template ?= "")
+GET     /cuttingplan/               controllers.CuttingPlans.list(filter?="", template ?= "")
 
 GET		/cuttingplan/add/			controllers.CuttingPlans.add
 
@@ -49,7 +49,7 @@ POST	/cuttingplan/:id/edit/		controllers.CuttingPlans.update(id:Int)
 
 GET     /cuttingplan/:id/description/ controllers.CuttingPlans.cutPlanDescription(id:Int)
 
-GET     /order/                     controllers.OrderController.list(template ?= "")
+GET     /order/                     controllers.OrderController.list(filter?="", template ?= "")
         
 GET		/order/add/					controllers.OrderController.add
 
@@ -67,7 +67,7 @@ GET     /order/:id/definitions      controllers.OrderController.listDefinitions(
 
 GET     /order/definition/:id/description controllers.OrderController.orderDefDescription(id:Int)
         
-GET     /cutting/                   controllers.CuttingController.list(template ?= "")
+GET     /cutting/                   controllers.CuttingController.list(filter?="", template ?= "")
         
 GET     /cutting/add/               controllers.CuttingController.add
 

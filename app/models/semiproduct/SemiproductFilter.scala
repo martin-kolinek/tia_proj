@@ -3,8 +3,9 @@ package models.semiproduct
 import scala.util.parsing.combinator.RegexParsers
 import models.DBAccess
 import scalaz.std.option._
+import models.ValidationParser
 
-trait SemiproductFilter extends RegexParsers {
+trait SemiproductFilter extends RegexParsers with ValidationParser {
     self:Semiproducts with ShapeFilter with DBAccess =>
 
     import profile.simple._
@@ -24,7 +25,7 @@ trait SemiproductFilter extends RegexParsers {
     val hasfree:SemiproductQueryParser = "hasfree" ^^ { x => pck =>
         (for {
         	sp <- Semiproduct if sp.packId === pck._2.id
-        	c <- Cutting if c.semiproductId === sp.id && c.finishTime.isNull
+        	if !Query(Cutting).filter(_.semiproductId === sp.id).exists
         } yield sp.id).exists
     }
     
@@ -32,9 +33,13 @@ trait SemiproductFilter extends RegexParsers {
     	pars ^^ {filt => pck:PackFilterInput => filt(pck._1)}
     }
     
+    val none:SemiproductQueryParser = "" ^^ {x => y => true.?}
+    
     val packParsers = List(serial, heat, hasfree) ++ packShapeParsers
     
-    val packElement = (packParsers.head /: packParsers.tail)(_|_)
+    val packElement = (packParsers.head /: packParsers.tail)(_|_) | none
     
     val packFilterParser = repsep(packElement, ",")
+    
+    def parseSemiproductFitler(str:String) = toValidation(parseAll(packFilterParser, str))
 }

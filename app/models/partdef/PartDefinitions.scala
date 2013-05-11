@@ -5,6 +5,11 @@ import models.basic._
 import models.semiproduct.Shapes
 import models.semiproduct.MaterialDesc
 import models.semiproduct.ShapeDesc
+import models.semiproduct.SemiproductFilter
+import models.semiproduct.ShapeFilter
+import models.semiproduct.Semiproducts
+import scalaz.Success
+import scalaz.Success
 
 case class PartDefinitionDesc(name:String, filter:String, file:Array[Byte])
 
@@ -15,7 +20,7 @@ case class PartDefinitionForList(id:Int, name:String, filter:String) {
 case class CutPart(shapeId:Int, shape:ShapeDesc, materialId:Int, material:MaterialDesc, count:Int)
 
 trait PartDefinitions extends Tables {
-	this:DBAccess with Shapes =>
+	this:DBAccess with Shapes with Semiproducts with ShapeFilter with SemiproductFilter =>
 	import profile.simple._
 	
     private def idQuery(id:Int) = for(pd<-PartDefinition if pd.id === id) yield (pd.name, pd.filter, pd.file)
@@ -49,29 +54,38 @@ trait PartDefinitions extends Tables {
 		PartDefinition.forInsert.insert((pd.file, pd.filter, pd.name, false))
 	}
 
-	def getPartDefDescription(id:Int)(implicit session:Session) = {
+	def getPartDefForList(id:Int)(implicit session:Session) = {
 		Query(PartDefinition).filter(_.id === id).map(x=>(x.id, x.name, x.filter)).firstOption.
-		    map(PartDefinitionForList.tupled).map(_.description)
+		    map(PartDefinitionForList.tupled)
 	}
 	
-	def listFinishedParts(implicit s:Session) = {
+	def listFinishedParts(forOrderDef:Int)(implicit s:Session) = {
+		val filt = Query(OrderDefinition).filter(_.id === forOrderDef).map(_.filter).firstOption
+		val filter = filt.map(parseSemiproductFitler) match {
+			case Some(scalaz.Success(f)) => f
+			case _ => Nil
+		}
 		val join = for {
-			p <- Part
+			p <- Part if p.orderDefId.isNull
 			c <- p.cutting
 			sp <- c.semiproduct
 			pck <- sp.pack
 			shp <- pck.shape
-		} yield (shp.basicShapeId, pck.materialId, p.id)
-		val grouped =  join.groupBy(x=>(x._1, x._2)).map {
+			pck2 <- (packQuery /: filter)(_.filter(_)) if pck2._2.id === pck.id
+		} yield (shp, pck)
+		val grouped =  join.groupBy(x=>(x._1.basicShapeId, x._2.materialId)).map {
 			case ((shpid, matid), rows) => (shpid, matid, rows.length)
 		}
+		val lst = grouped.list
+		
 		val q = for {
 			(shpid, matid, cnt) <- grouped
 			shp <- basicShapeJoin if shp._1 === shpid
 			mat <- Material if mat.id === matid
 		} yield (shp, mat, cnt)
+		
 		q.list.map {
-			case (shp, mat, cnt) => CutPart(shp._1, extractBasicShape(shp), 0, MaterialDesc(mat.name), cnt)
+		    case (shp, mat, cnt) => CutPart(shp._1, extractBasicShape(shp), 0, MaterialDesc(mat.name), cnt)
 		}
 	}
 }

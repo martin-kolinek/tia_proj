@@ -18,7 +18,7 @@
     </h3>
 	@helper.form(action = replyTo, 'class -> "form-horizontal") {
         @helper.repeat(frm("statuses"), 0) { st =>
-            <div class="well">
+            <div class="well odef-wrapper">
               @views.html.order.odefInput(st("odefid"), "odefhandle")
               @views.html.repeatingHelper(st.apply _, "parts", "Add parts", "parthandle") { (fld, remove) =>
                   <div class="well">

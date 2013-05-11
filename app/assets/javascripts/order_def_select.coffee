@@ -1,7 +1,7 @@
 define(["jquery", "dataTables", "router", "id_desc"], ($, dt, router, iddesc) ->
     register : (rep, handle, modal, content) ->
         rep.added (ev) ->
-            router.controllers.OrderController.list("table").ajax
+            router.controllers.OrderController.list("", "table").ajax
                 error: (xhr, status, err) ->
                     alert("Error getting orders: " +err)
                 success: (data, status, xhr) ->
@@ -24,6 +24,7 @@ define(["jquery", "dataTables", "router", "id_desc"], ($, dt, router, iddesc) ->
                                     modal.off("hidden")
                                     modal.modal("hide")
                                     ev.newItem.find(iddesc.id(handle)).val($(this).data("id"))
+                                    ev.newItem.find(iddesc.id(handle)).data("filter", $(this).data("filter"))
                                     ev.newItem.find(iddesc.desc(handle)).text($(this).data("description"))
     initDesc : (handle) ->
         iddesc.init(handle, router.controllers.OrderController.orderDefDescription)

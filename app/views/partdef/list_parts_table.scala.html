@@ -18,13 +18,13 @@
         @for(p <- lst) {
             <tr data-shape="@p.shapeId" data-shape-desc="@p.shape.description" data-mat="@p.materialId" data-mat-desc="@p.material.name">
                 <td>
-                    p.shape.description
+                    @p.shape.description
                 </td>
                 <td>
-                    p.material.name
+                    @p.material.name
                 </td>
                 <td>
-                    p.count
+                    @p.count
                 </td>
             </tr>
         }

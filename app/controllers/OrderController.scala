@@ -1,6 +1,7 @@
 package controllers
 
 import play.api._
+import models.semiproduct.{Semiproducts => MSemiproducts}
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
@@ -20,16 +21,19 @@ import models.order.OrderDefStatus
 import models.order.OrderDefForList
 import play.api.templates.Html
 import models.semiproduct.Shapes
+import models.semiproduct.ShapeFilter
+import models.semiproduct.SemiproductFilter
+import play.api.libs.json.Json
 
 object OrderController extends Controller with ObjectController[OrderDesc] 
 		with ObjectListController[OrderForList] {
 	type ModelType = DBAccessConf with OrderModel with OrderList
-	lazy val model = new DBAccessConf with Orders with DBPartDef with Shapes with OrderModel with OrderList
+	lazy val model = new DBAccessConf with Orders with DBPartDef with Shapes with OrderModel with OrderList with MSemiproducts with ShapeFilter with SemiproductFilter
 	
 	def pdefMapping(implicit s:scala.slick.session.Session) = mapping(
 			"id" -> optional(number),
 			"pdefid" -> number.verifying(model.existsPartDef _),
-			"filter" -> text,
+			"filter" -> text.verifying(SemiproductFilterHelpers.filterConstraint(model)),
 			"count" -> number(1))(OrderDefinitionDesc)(OrderDefinitionDesc.unapply)
 	
 	def form(implicit s:scala.slick.session.Session) = Form(mapping(
@@ -95,7 +99,11 @@ object OrderController extends Controller with ObjectController[OrderDesc]
     
     def orderDefDescription(id:Int) = Action {
     	model.withTransaction { implicit s =>
-    		Ok(model.orderDefDescription(id).map(_.description).getOrElse("unknown"))
+    		model.orderDefDescription(id) match {
+    			case Some(odef) => Ok(Json.obj("desc" -> odef.description, "filter" -> odef.filter))
+    			case None => NotFound("Order definition not found")
+    		} 
+    		
     	}
     }
 }

@@ -16,12 +16,16 @@ import models.cutplan.CuttingPlanModel
 import models.cutplan.CuttingPlanForList
 import models.cutplan.CuttingPlanList
 import models.semiproduct.Shapes
+import models.semiproduct.SemiproductFilter
+import models.semiproduct.ShapeFilter
+import models.semiproduct.{Semiproducts => MSemiproducts}
+import play.api.libs.json.Json
 
 object CuttingPlans extends Controller with ObjectController[CuttingPlanDesc] 
 		with ObjectListController[CuttingPlanForList] {
     type ModelType = DBAccessConf with CuttingPlanModel with CuttingPlanList
     
-	lazy val model = new DBAccessConf with DBCutPlans with DBPartDefs with Shapes with CuttingPlanModel with CuttingPlanList
+	lazy val model = new DBAccessConf with DBCutPlans with DBPartDefs with Shapes with CuttingPlanModel with CuttingPlanList with ShapeFilter with SemiproductFilter with MSemiproducts
 	
 	def partDefMapping(implicit s:scala.slick.session.Session) = mapping(
 			"partdefid" -> number.verifying(model.existsPartDef _),
@@ -29,7 +33,7 @@ object CuttingPlans extends Controller with ObjectController[CuttingPlanDesc]
 	
 	def form(implicit s:scala.slick.session.Session) = Form(mapping(
 			"name" -> nonEmptyText,
-			"filter" -> text,
+			"filter" -> text.verifying(SemiproductFilterHelpers.filterConstraint(model)),
 			"file" -> TemporaryFileManager.tempFileMapping,
 			"partdefs" -> play.api.data.Forms.list(partDefMapping)
 			)(CuttingPlanDesc)(CuttingPlanDesc.unapply))
@@ -48,7 +52,12 @@ object CuttingPlans extends Controller with ObjectController[CuttingPlanDesc]
     
     def cutPlanDescription(id:Int) = Action {
     	model.withTransaction { implicit s =>
-    		Ok(model.cutPlanDescription(id).getOrElse("unknown"))
+    		model.cutPlanDescription(id) match {
+    			case None => NotFound("Cutting plan not found")
+    			case Some(cp) => Ok(Json.obj("desc" -> cp.name, "filter" -> cp.fullFilter))
+    		}
+    		
+    		
     	}
     }
 }

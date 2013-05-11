@@ -87,6 +87,7 @@ trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     	for(sp <- sps.filter(_.id.isEmpty)) {
     		Semiproduct.forInsert.insert((packId, sp.obj.serialNo))
     	}
+    	fixUnlimitedPack(packId)
     }
 
     def existsSemiproduct(id:Int)(implicit s:Session) = Query(Semiproduct).filter(_.id === id).firstOption.isDefined
@@ -98,6 +99,30 @@ trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     	} yield (value, sp.serialNo)
     	q.firstOption.map {
     		case (pck, serial) => (extractPackForList _).tupled(pck).description + " " + serial
+    	}
+    }
+    
+    def fixUnlimitedSemiproduct(spId:Int)(implicit s:Session) {
+    	val q = for {
+    		sp <- Semiproduct if sp.id === spId
+    		pck <- Pack if pck.id === sp.packId && pck.unlimited
+    	} yield pck.id
+    	
+    	for(pckId <- q.firstOption) {
+    		fixUnlimitedPack(pckId)
+    	}
+    }
+    
+    def fixUnlimitedPack(pckId:Int)(implicit s:Session) {
+    	val freeSps = for {
+    		sp <- Semiproduct
+    		if !Query(Cutting).filter(_.semiproductId === sp.id).exists
+    	} yield sp.id
+    	for {
+    		sps <- Query(freeSps.length).firstOption
+    		if sps < 1
+    	} {
+    		Semiproduct.forInsert.insert(pckId -> "generated")
     	}
     }
 }

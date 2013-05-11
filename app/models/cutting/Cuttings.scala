@@ -18,6 +18,7 @@ import models.order.Orders
 import scalaz.std.option._
 import org.joda.time.format.DateTimeFormat
 import models.SlickExtensions._
+import models.semiproduct.Semiproducts
 
 case class CuttingDesc(semiprodId:Int, cutPlanId:Int, parts:List[PartInCuttingDesc])
 
@@ -33,7 +34,7 @@ case class CuttingForList(id:Int, cutPlan:CuttingPlanForList, semiproductSerial:
 case class PartDesc(id:Int, partDefId:Int)
 
 trait Cuttings extends CuttingPlans {
-    self:DBAccess with Orders => 
+    self:DBAccess with Orders with Semiproducts => 
 
     import profile.simple._
 
@@ -72,6 +73,7 @@ trait Cuttings extends CuttingPlans {
         }
         
         updateCutting(cutid, cut)
+        fixUnlimitedSemiproduct(cut.semiprodId)
         cutid
     }
     

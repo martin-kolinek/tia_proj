@@ -18,12 +18,14 @@ import models.cutting.CuttingModel
 import models.cutting.CuttingForList
 import models.cutting.CuttingList
 import models.cutting.FinishedPartInCutting
+import models.semiproduct.SemiproductFilter
+import models.semiproduct.ShapeFilter
 
 object CuttingController extends Controller with ObjectController[CuttingDesc] 
 		with ObjectListController[CuttingForList] {
     type ModelType = DBAccessConf with CuttingModel with CuttingList 
     lazy val model = new DBAccessConf with Cuttings with CuttingList
-        with DBSP with DBPartDefs
+        with DBSP with DBPartDefs with ShapeFilter with SemiproductFilter
         with DBOrders with CuttingModel
         
     def partMapping(implicit s:scala.slick.session.Session) = mapping(
