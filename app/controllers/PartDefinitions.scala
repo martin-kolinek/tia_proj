@@ -70,4 +70,11 @@ object PartDefinitions extends Controller with ObjectController[PartDefinitionDe
     		}
     	}
     }
+    
+    def hidePartDefinition(id:Int) = Action {
+    	model.withTransaction { implicit s=>
+    		model.hidePartDefinition(id)
+    		Ok("Success")
+    	}
+    }
 }

@@ -99,9 +99,9 @@ object Semiproducts extends Controller with ObjectController[PackDesc] with Obje
         case "_" => views.html.semiproduct.list_semiprod_main.apply
     }
 
-    def listSemiproducts(id:Int, template:String) = Action {
+    def listSemiproducts(id:Int, onlyFree:Boolean, template:String) = Action {
         model.withTransaction { implicit s=>
-            Ok(spListTemplates(template)(model.listSemiproducts(id)))
+            Ok(spListTemplates(template)(model.listSemiproducts(id, onlyFree)))
         }
     }
     

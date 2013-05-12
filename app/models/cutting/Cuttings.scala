@@ -99,7 +99,6 @@ trait Cuttings extends CuttingPlans {
     }
 
     def updateCuttingParts(cuttingId:Int, orderDefId:Int, count:Int)(implicit s:Session) {
-        println(s"updatecutting $cuttingId, $orderDefId, $count")
     	for {
     		(req, pdefId) <- Query(OrderDefinition).filter(_.id === orderDefId).map(x => x.count -> x.partDefId).firstOption
     		done <- Query(Query(Part).filter(_.orderDefId===some(orderDefId)).length).firstOption

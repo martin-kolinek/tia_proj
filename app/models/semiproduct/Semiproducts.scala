@@ -114,8 +114,10 @@ trait Semiproducts extends Shapes with Materials { this: DBAccess =>
     }
     
     def fixUnlimitedPack(pckId:Int)(implicit s:Session) {
+    	if(Query(Pack).filter(_.unlimited).map(_.id).firstOption.isEmpty)
+    		return
     	val freeSps = for {
-    		sp <- Semiproduct
+    		sp <- Semiproduct if sp.packId === pckId
     		if !Query(Cutting).filter(_.semiproductId === sp.id).exists
     	} yield sp.id
     	for {

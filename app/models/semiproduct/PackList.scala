@@ -16,12 +16,12 @@ trait PackList extends ObjectListModel[PackForList] {
 		q.list.map((extractPackForList _).tupled)
 	}
 	
-	def listSemiproducts(packId:Int)(implicit session:Session) = {
+	def listSemiproducts(packId:Int, onlyFree:Boolean)(implicit session:Session) = {
         val q = for {
             (sp, c) <- Semiproduct.leftJoin(Cutting).on(_.id === _.semiproductId)
-            if sp.packId === packId
+            if sp.packId === packId && (c.id.isNull || !onlyFree)
         } yield (sp.id, sp.serialNo, c.id.?.isNotNull, c.finishTime.?.isNotNull)
-        q.list.map {
+        q.sortBy(_._2).list.map {
             case (id, serial, reserved, used) => {
             	val status = (reserved, used) match {
             		case (false, _) => SemiproductStatus.Available

@@ -11,6 +11,9 @@ import resource._
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import play.api.libs.concurrent._
+import scala.concurrent.duration._
+import play.api.libs.concurrent.Execution.Implicits._
 
 object TemporaryFileStorage {
 	private val hm = new HashMap[String, TemporaryFile]
@@ -21,8 +24,10 @@ object TemporaryFileStorage {
 	} 
 	def addFile(file:TemporaryFile) = synchronized {
 		val ref = nextId
-		println(file)
 		hm(ref) = file
+		Akka.system.scheduler.scheduleOnce(10.minutes) {
+			deleteFile(ref)
+		}
 		ref
 	}
 	
@@ -62,7 +67,6 @@ object TemporaryFileManager extends Controller {
 	}
   
     def download(ref:String) = Action{
-    	println("adf")
         TemporaryFileStorage.getFile(ref).map{
     		Ok(_).withHeaders("Content-Disposition" -> "attachment; filename=file.txt")
     	}.getOrElse(NotFound)

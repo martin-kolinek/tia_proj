@@ -39,7 +39,6 @@ trait ObjectController[ObjectType] {
 		    val binding = form.bindFromRequest
 		    binding.fold(
 			    errFrm => { 
-			    	println(errFrm.errors)
 			    	BadRequest(template(errFrm, saveRoute, "Add"))
 			    },
 			    obj => {

@@ -56,8 +56,13 @@ object CuttingPlans extends Controller with ObjectController[CuttingPlanDesc]
     			case None => NotFound("Cutting plan not found")
     			case Some(cp) => Ok(Json.obj("desc" -> cp.name, "filter" -> cp.fullFilter))
     		}
-    		
-    		
+    	}
+    }
+    
+    def hideCuttingPlan(id:Int) = Action {
+    	model.withTransaction { implicit s =>
+    		model.hideCuttingPlan(id)
+    		Ok("Success")
     	}
     }
 }

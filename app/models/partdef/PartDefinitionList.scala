@@ -10,7 +10,7 @@ trait PartDefinitionList extends ObjectListModel[PartDefinitionForList] {
 	import profile.simple._
 		
 	def list(u:Unit)(implicit s:Session) = {
-	    Query(PartDefinition).map(x=>(x.id, x.name, x.filter)).
+	    Query(PartDefinition).filter(_.hidden === false).map(x=>(x.id, x.name, x.filter)).
 	        list.map(PartDefinitionForList.tupled)
 	}
 	

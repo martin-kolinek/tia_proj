@@ -1,6 +1,7 @@
 package models.semiproduct
 
 import scala.util.parsing.combinator.RegexParsers
+import models.SlickExtensions._
 import models.DBAccess
 import scalaz.std.option._
 
@@ -13,24 +14,24 @@ trait ShapeFilter extends RegexParsers {
 
     type BigDecimalColParser = Parser[BigDecimal => Column[Option[BigDecimal]] => Column[Option[Boolean]]]
 
-    val atLeast:BigDecimalColParser = ">" ^^ (x => n => c => c >= some(n))
+    val atLeast:BigDecimalColParser = ">" ^^ (x => n => c => c >=?< some(n))
 
-    val atMost:BigDecimalColParser = "<" ^^ (x => n => c => c <= some(n))
+    val atMost:BigDecimalColParser = "<" ^^ (x => n => c => c <=?< some(n))
 
-    val exactly:BigDecimalColParser = "=" ^^ (x => n => c => c === some(n))
+    val exactly:BigDecimalColParser = "=" ^^ (x => n => c => c ==?< some(n))
 
     def constraint(attr:String):Parser[Column[Option[BigDecimal]] => Column[Option[Boolean]]] = attr ~> (atLeast | atMost | exactly).? ~ number <~ "mm".? ^^ {
         case Some(op) ~ num => op(num)
-        case None ~ num => col => col === some(num)
+        case None ~ num => col => col ==?< some(num)
     }
 
     type ShapeQueryParser = Parser[ShapeFilterInput => Column[Option[Boolean]]]
 
-    val sheet:ShapeQueryParser = "sheet" ^^ (str => _._2._1.isNotNull)
+    val sheet:ShapeQueryParser = "sheet" ^^ (str => shp => shp._3._1.isNull && shp._4._1.isNull)
 
-    val circPipe:ShapeQueryParser = "circle" ^^ (str => _._3._1.isNotNull)
+    val circPipe:ShapeQueryParser = "circle" ^^ (str => shp => shp._2._1.isNull && shp._4._1.isNull)
 
-    val squarePipe:ShapeQueryParser = "square" ^^ (str => _._4._1.isNotNull)
+    val squarePipe:ShapeQueryParser = "square" ^^ (str => shp => shp._2._1.isNull && shp._3._1.isNull)
 
     val thickness:ShapeQueryParser = constraint("thick") ^^ (con => shp => con(shp._2._2) || con(shp._3._3) || con(shp._4._3))
 

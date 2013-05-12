@@ -12,6 +12,6 @@ require(["common"], (common) ->
             filters = $(iddesc.id("order-def")).map ->
                 $(this).data("filter")
             filter = filters.get().join()+","+$(iddesc.id("cphandle")).data("filter")+",hasfree"
-            ss.selectSemiproduct($("#modal-sp"), $("#modal-sp-content"), $(".semiprod-id"), $(".semiproduct-desc"), filter)
+            ss.selectSemiproduct($("#modal-sp"), $("#modal-sp-content"), $(iddesc.id("sphandle")), $(iddesc.desc("sphandle")), filter)
     )
 )

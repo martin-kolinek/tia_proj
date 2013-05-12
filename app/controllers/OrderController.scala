@@ -76,7 +76,7 @@ object OrderController extends Controller with ObjectController[OrderDesc]
     def updateStatus(id:Int) = Action{ implicit r =>
         val binding = statusForm.bindFromRequest
         binding.fold(
-            errFrm => {println(errFrm.errors);  BadRequest(views.html.order.status(errFrm, routes.OrderController.updateStatus(id)))},
+            errFrm => BadRequest(views.html.order.status(errFrm, routes.OrderController.updateStatus(id))),
             statuses => {
                 model.withTransaction { implicit s =>
                     model.updateOrderStatus(id, statuses)

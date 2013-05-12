@@ -3,8 +3,6 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
-
 GET     /pack/              controllers.Semiproducts.list(filter?="", template ?= "")
 
 GET		/pack/add/			controllers.Semiproducts.add
@@ -15,7 +13,7 @@ GET		/pack/:pack/edit/	controllers.Semiproducts.edit(pack:Int)
 
 POST	/pack/:pack/edit/	controllers.Semiproducts.update(pack:Int)
 
-GET     /pack/:pack/semiproducts/  controllers.Semiproducts.listSemiproducts(pack:Int, template ?= "")
+GET     /pack/:pack/semiproducts/  controllers.Semiproducts.listSemiproducts(pack:Int, onlyFree:Boolean ?= false, template ?= "")
 
 GET     /pack/semiproduct/:id/description/ controllers.Semiproducts.getSemiproductDescription(id:Int)
 
@@ -35,6 +33,8 @@ POST	/partdef/:id/edit/			controllers.PartDefinitions.update(id:Int)
 
 GET     /partdef/:id/description    controllers.PartDefinitions.partDefDescription(id:Int)
 
+DELETE  /partdef/:id                controllers.PartDefinitions.hidePartDefinition(id:Int)
+
 GET     /parts                      controllers.PartDefinitions.listFinishedParts(filter ?= "", template ?= "")
 
 GET     /cuttingplan/               controllers.CuttingPlans.list(filter?="", template ?= "")
@@ -48,6 +48,8 @@ GET		/cuttingplan/:id/edit/		controllers.CuttingPlans.edit(id:Int)
 POST	/cuttingplan/:id/edit/		controllers.CuttingPlans.update(id:Int)
 
 GET     /cuttingplan/:id/description/ controllers.CuttingPlans.cutPlanDescription(id:Int)
+
+DELETE  /cuttingplan/:id            controllers.CuttingPlans.hideCuttingPlan(id:Int)
 
 GET     /order/                     controllers.OrderController.list(filter?="", template ?= "")
         

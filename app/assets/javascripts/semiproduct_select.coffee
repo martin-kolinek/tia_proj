@@ -11,7 +11,7 @@ define(["jquery", "router", "bootstrap", "dataTables"], ($, router, bs, dt) ->
                     ddl = $(this)
                     ul = ddl.parent().find("ul")
                     if(ul.children().size() == 0)
-                    	router.controllers.Semiproducts.listSemiproducts(ddl.data("pack-id"), "dropdown").ajax
+                    	router.controllers.Semiproducts.listSemiproducts(ddl.data("pack-id"), true, "dropdown").ajax
                     	    error:(xhr, status, err) ->
                     	        alert("error retrieving semiproducts: "+err)
                     	    success:(data, status, xhr) ->

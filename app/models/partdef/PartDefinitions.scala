@@ -34,11 +34,6 @@ trait PartDefinitions extends Tables {
         idQuery(id).firstOption.isDefined
     }
 	
-	def listPartDefinitions(implicit session:Session) = {
-		val q = for(pd<-PartDefinition) yield (pd.id, (pd.name, pd.filter, pd.file))
-		q.list.map(x=>WithID(Some(x._1), PartDefinitionDesc.tupled(x._2)))
-	}
-	
 	def updatePartDef(id:Int, pd:PartDefinitionDesc)(implicit session:Session) {
 		val q = for {
 			dpd <- PartDefinition if dpd.id === id

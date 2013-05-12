@@ -34,10 +34,13 @@
 				</td>
 				<td>
 					<a class="btn" href="@routes.PartDefinitions.edit(pdef.id)">Edit</a>
+					<a class="btn hide_partdef" href="#" data-id="@pdef.id">Hide</a>
 				</td>
 			</tr>
 		}
 	</tbody>
 </table>
+
+@views.html.modalConfirm("confirm-modal")
 
 }

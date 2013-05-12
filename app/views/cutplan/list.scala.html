@@ -37,6 +37,7 @@
 				<td>
 					<a class="btn" href="@routes.CuttingPlans.edit(cp.id)">Edit</a>
                     <a class="btn add_cutting" href="@routes.CuttingController.addWithCP(cp.id)">Create cutting</a>
+                    <a class="btn hide_cutplan" href="#" data-id="@cp.id">Hide</a>
 				</td>
 			</tr>
 		}
@@ -44,5 +45,6 @@
 </table>
 
 @modalDiv("Choose semiproduct", "semiprod-modal", "semiprod-modal-content")
+@views.html.modalConfirm("confirm-modal")
 
 }

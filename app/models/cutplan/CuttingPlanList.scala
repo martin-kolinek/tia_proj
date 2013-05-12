@@ -15,7 +15,7 @@ trait CuttingPlanList extends Tables with ObjectListModel[CuttingPlanForList] {
 	type FilterType = Unit
 	
 	def list(u:Unit)(implicit s:Session) = {
-		Query(CuttingPlan).map(x=>(x.id, x.name, x.filter)).list.map(CuttingPlanForList.tupled)
+		Query(CuttingPlan).filter(_.hidden === false).map(x=>(x.id, x.name, x.filter)).list.map(CuttingPlanForList.tupled)
 	}
 	def parseFilter(str:String) = Success({})
 }

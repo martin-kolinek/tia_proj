@@ -60,16 +60,18 @@ trait Orders extends Tables {
     }
     
     def updateOrder(id:Int, ord:OrderDesc)(implicit session:Session) = {
-        println(s"updateOrder $ord")
     	val q = for {
     		dbo <- Order if dbo.id === id
     	} yield dbo.name ~ dbo.fillingDate ~ dbo.dueDate
     	q.update(ord.name, ord.fillingDate, ord.dueDate)
-    	(for {
+    	val toDeleteQ = for {
     		odef <- OrderDefinition
     		if odef.orderId === id
     		if !odef.id.inSet(ord.defs.map(_.id).collect{case Some(id) => id})
-    	} yield odef).delete
+    	} yield odef
+    	val toDeleteIds = toDeleteQ.map(_.id).list
+    	Query(Part).filter(_.orderDefId.inSet(toDeleteIds)).map(_.orderDefId).update(None)
+    	toDeleteQ.delete
     	for (odef <- ord.defs) {
     		odef.id match {
     			case Some(odefId) => Query(OrderDefinition).filter(_.orderId === id).
