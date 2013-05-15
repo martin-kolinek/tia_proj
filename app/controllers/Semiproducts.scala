@@ -96,7 +96,7 @@ object Semiproducts extends Controller with ObjectController[PackDesc] with Obje
     def spListTemplates: String => Seq[models.semiproduct.SemiproductForList] => Html = {
         case "table" => views.html.semiproduct.list_semiprod.apply
         case "dropdown" => views.html.semiproduct.list_semiprod_dropdown.apply
-        case "_" => views.html.semiproduct.list_semiprod_main.apply
+        case _ => views.html.semiproduct.list_semiprod_main.apply
     }
 
     def listSemiproducts(id:Int, onlyFree:Boolean, template:String) = Action {

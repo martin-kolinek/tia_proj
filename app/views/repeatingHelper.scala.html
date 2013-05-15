@@ -9,7 +9,7 @@
         @inside(fld, removeButton())
     </div>
 }
-<div id="@{handle+"_template"}" class="hide">
+<div class="hide @{handle+"_template"}">
     @inside(parent(key+"[x]"), removeButton())
 </div>
-<a class="btn input" id="@{handle+"_add"}" data-key="@key">@addCaption</a>
+<a class="btn input @{handle+"_add"}" data-key="@key">@addCaption</a>

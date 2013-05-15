@@ -13,8 +13,8 @@ require(["common"], (common) ->
                     content.find("table").dataTable()
                     content.find("tbody tr").addClass("pointer")
                     content.find("tbody tr").click ->
-                        material = $(this).data("mat-id")
-                        shape = $(this).data("shape-id")
+                        material = $(this).data("mat")
+                        shape = $(this).data("shape")
                         if(!material)
                             modal.modal("hide")
                             return
