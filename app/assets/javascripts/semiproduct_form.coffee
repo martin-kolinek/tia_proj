@@ -1,5 +1,5 @@
 require(["common"], (common) ->
-    require(["jquery", "form_repeating"], ($, rep) ->
+    require(["jquery", "form_repeating", "datepicker"], ($, rep) ->
         rep.addRepeated("sp_handle")
         typeMapping = 
             "0":""
@@ -12,8 +12,9 @@ require(["common"], (common) ->
     		    $("#"+id).hide()
     	    $("#"+div_id).show()
         $(document).ready ->
-    	    $(".type_select").change ->
-    		    fixDisplayed()
-    	    fixDisplayed()
+            $(".type_select").change ->
+                fixDisplayed()
+            fixDisplayed()
+            $("input[type=date]").datepicker({format:"yyyy-mm-dd"})
     )
 )
