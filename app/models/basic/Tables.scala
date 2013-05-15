@@ -83,10 +83,10 @@ trait Tables { this:DBAccess =>
     	def forInsert = name returning id
     }
     
-    object Shape extends Table[(Int, Int, Option[Int])]("shape") {
+    object Shape extends Table[(Int, Int, Int)]("shape") {
     	def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     	def basicShapeId = column[Int]("basic_shape_id")
-    	def extendedShapeId = column[Option[Int]]("extended_shape_id")
+    	def extendedShapeId = column[Int]("extended_shape_id")
     	def * = id ~ basicShapeId ~ extendedShapeId
     	def basicShape = foreignKey("fk_shape_basic_shape", basicShapeId, CommonShape)(_.id)
     	def extendedShape = foreignKey("fk_shape_extended_shape", extendedShapeId, CommonShape)(_.id)

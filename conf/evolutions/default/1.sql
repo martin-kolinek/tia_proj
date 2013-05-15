@@ -32,7 +32,7 @@ create table "part_def_in_cut_plan" ("cut_plan_id" INTEGER NOT NULL,"part_def_id
 alter table "part_def_in_cut_plan" add constraint "pk_part_def_in_cut_plan" primary key("cut_plan_id","part_def_id");
 create table "order_def" ("id" int NOT NULL DEFAULT nextval('order_def_seq') PRIMARY KEY, "order_id" INTEGER NOT NULL,"part_def_id" INTEGER NOT NULL,"count" INTEGER NOT NULL,"filter" VARCHAR(254) NOT NULL);
 create table "semiproduct" ("id" int NOT NULL DEFAULT nextval('semiproduct_id_seq') PRIMARY KEY, "pack_id" int NOT NULL, "serial_no" VARCHAR(254) NOT NULL);
-create table "shape" ("id" int NOT NULL DEFAULT nextval('shape_id_seq') PRIMARY KEY, "basic_shape_id" INTEGER NOT NULL, "extended_shape_id" INTEGER NULL);
+create table "shape" ("id" int NOT NULL DEFAULT nextval('shape_id_seq') PRIMARY KEY, "basic_shape_id" INTEGER NOT NULL, "extended_shape_id" INTEGER NOT NULL);
 create table "sheet" ("id" int NOT NULL DEFAULT nextval('sheet_id_seq') PRIMARY KEY,"common_shape_id" INTEGER NOT NULL,"thickness" DECIMAL(21,2) NULL);
 create table "square_pipe" ("id" int NOT NULL DEFAULT nextval('square_pipe_id_seq') PRIMARY KEY,"common_shape_id" INTEGER NOT NULL,"thickness" DECIMAL(21,2) NULL,"diameter" DECIMAL(21,2) NULL);
 create table "common_shape" ("id" int NOT NULL DEFAULT nextval('common_shape_id_seq') PRIMARY KEY);

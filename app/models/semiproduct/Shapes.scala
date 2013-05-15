@@ -90,7 +90,7 @@ trait Shapes extends Tables { this:DBAccess =>
 
     type ShapeFilterInput = (Shape.type, Projection2[Option[Int],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection3[Option[Int],Option[BigDecimal],Option[BigDecimal]], Projection2[Option[Int],Option[BigDecimal]])
 
-    type OptionShape = ((Int, Int, Option[Int]), 
+    type OptionShape = ((Int, Int, Int), 
                         OptionSheet, OptionCirclePipe, OptionSquarePipe, OptionExtendedSheet, OptionExtendedPipe)
     
     type OptionBasicShape = (Int, OptionSheet, OptionCirclePipe, OptionSquarePipe)
@@ -138,15 +138,10 @@ trait Shapes extends Tables { this:DBAccess =>
         q.firstOption
     }
 
-    private def isExtended: ShapeDesc => Boolean = {
-        case SheetDesc(_, None, None) | CirclePipeDesc(_, _, None) | SquarePipeDesc(_, _, None) => false
-        case _ => true
-    }
-
-    private def getShapeId(basicId:Int, extendedId:Option[Int])(implicit s:Session) = {
+    private def getShapeId(basicId:Int, extendedId:Int)(implicit s:Session) = {
         val q = for {
             shp <- Shape
-            if shp.basicShapeId === basicId && shp.extendedShapeId ==? extendedId
+            if shp.basicShapeId === basicId && shp.extendedShapeId === extendedId
         } yield shp.id
         q.firstOption
     }
@@ -173,17 +168,13 @@ trait Shapes extends Tables { this:DBAccess =>
     	commonId
     }
     
-    private def insertShape(basicId:Int, extId:Option[Int])(implicit session:Session) = {
+    private def insertShape(basicId:Int, extId:Int)(implicit session:Session) = {
         Shape.forInsert.insert(basicId, extId)
     }
     
     def getOrCreateShapeId(shp:ShapeDesc)(implicit session:Session) = {
     	val basicId = getBasicShapeId(shp).getOrElse(insertBasicShape(shp))
-    	val extId = 
-    	    if(isExtended(shp))
-    		    Some(getExtendedShapeId(shp).getOrElse(insertExtendedShape(shp)))
-    		else
-    			None
+    	val extId = getExtendedShapeId(shp).getOrElse(insertExtendedShape(shp))
     	getShapeId(basicId, extId).getOrElse(insertShape(basicId, extId))
     }
     
