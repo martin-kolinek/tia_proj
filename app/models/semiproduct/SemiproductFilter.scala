@@ -22,6 +22,8 @@ trait SemiproductFilter extends RegexParsers with ValidationParser {
 
     val heat:SemiproductQueryParser = "heat" ~> str ^^ (heat => _._2.heatNo === heat)
 
+    val mat:SemiproductQueryParser = "material" ~> str ^^ (mat => _._3.name === mat)
+
     val hasfree:SemiproductQueryParser = "hasfree" ^^ { x => pck =>
         (for {
         	sp <- Semiproduct if sp.packId === pck._2.id
@@ -35,7 +37,7 @@ trait SemiproductFilter extends RegexParsers with ValidationParser {
     
     val none:SemiproductQueryParser = "" ^^ {x => y => true.?}
     
-    val packParsers = List(serial, heat, hasfree) ++ packShapeParsers
+    val packParsers = List(serial, heat, hasfree, mat) ++ packShapeParsers
     
     val packElement = (packParsers.head /: packParsers.tail)(_|_) | none
     
