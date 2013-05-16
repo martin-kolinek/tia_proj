@@ -26,7 +26,7 @@ case class PartInCuttingDesc(orderDefId:Int, count:Int)
 
 case class FinishedPartInCutting(partDefId:Int, orderDefId:Option[Int], dmgCount:Int)
 
-case class CuttingForList(id:Int, cutPlan:CuttingPlanForList, semiproductSerial:String, pack:PackForList, finishTime:Option[DateTime]) {
+case class CuttingForList(id:Int, cutPlanName:String, semiproductSerial:String, pack:PackForList, finishTime:Option[DateTime]) {
 	def finished = finishTime.isDefined
 	def finishTimeString = finishTime.map(_.toString(DateTimeFormat.shortDateTime()))
 }

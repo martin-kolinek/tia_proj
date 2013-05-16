@@ -18,10 +18,10 @@ trait CuttingList extends ObjectListModel[CuttingForList] {
 			sp <- Semiproduct if cut.semiproductId === sp.id
 			pckq@(shp, pck, mat) <- packQuery  if pck.id === sp.packId
 			cp <- CuttingPlan if cut.cuttingPlanId === cp.id
-		} yield (pckq, sp.serialNo, cuttingPlanProjection(cp), cut.id, cut.finishTime)
+		} yield (pckq, sp.serialNo, cp.name, cut.id, cut.finishTime)
 		q.list.map {
 			case (pck, serial, cp, cutid, fin) => CuttingForList(cutid,
-					CuttingPlanForList.tupled(cp),
+					cp,
 					serial,
 					(extractPackForList _).tupled(pck),
 					fin)
