@@ -108,15 +108,19 @@ trait Orders extends Tables {
 
     def orderStatus(id:Int)(implicit s:Session) = {
         sql"""
-        select od.id, count(p.id), pck.material_id, shp.basic_shape_id from "order" o 
+        select od.id, coalesce(fin.count, 0) as fin_count, fin.material_id, fin.basic_shape_id from "order" o 
           inner join order_def od on o.id = od.order_id 
-          left join part p on p.order_def_id = od.id
-          left join cutting c on c.id = p.cutting_id
-          left join semiproduct sp on sp.id = c.semiproduct_id 
-          left join pack pck on pck.id = sp.pack_id 
-          left join shape shp on shp.id = pck.shape_id
-        where o.id=$id and (c.finish_time is not null or c.id is null)
-        group by shp.basic_shape_id, pck.material_id, od.id""".as[(Int, Int, Option[Int], Option[Int])].list.groupBy(_._1).map {
+          left join 
+            (select count(p.id) as count, pck.material_id, shp.basic_shape_id, p.order_def_id from 
+              part p 
+              inner join cutting c on c.id = p.cutting_id
+              inner join semiproduct sp on sp.id = c.semiproduct_id 
+              inner join pack pck on pck.id = sp.pack_id 
+              inner join shape shp on shp.id = pck.shape_id
+            where c.finish_time is not null or c.id is null
+            group by shp.basic_shape_id, pck.material_id, p.order_def_id) fin
+          on fin.order_def_id = od.id
+          where o.id=$id order by od.id""".as[(Int, Int, Option[Int], Option[Int])].list.groupBy(_._1).map {
             case (odid, lst) => OrderDefStatus(odid, lst.collect {
             	case (_, cnt, Some(mat), Some(shp)) if cnt > 0 => PartInOrder(shp, mat, cnt)
             })
