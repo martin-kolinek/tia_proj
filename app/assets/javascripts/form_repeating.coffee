@@ -10,9 +10,10 @@ define(["jquery"], ($) ->
                 btns.off("click")
             enableAdding: ->
                 btns.click ->
-                    template = $(this).parent().find("."+handle+"_template").first()
+                    template = $(this).parent().find("."+handle+"_template")
                     newItem = template.clone(true)
                     newItem.addClass(itemClass)
+                    newItem.removeClass(handle+"_template")
                     template.before(newItem)
                     
                     evnt = $.Event("added")
