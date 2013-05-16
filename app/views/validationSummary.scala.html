@@ -1,0 +1,14 @@
+@(frm:Form[_])(implicit lang: play.api.i18n.Lang)
+@if(frm.hasErrors) {
+<div class="alert alert-error">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    Errors:
+    <ul>
+    @for(err <- frm.errors) {
+        <li>
+            @Messages(err.message)
+        </li>
+    }
+    </ul>
+</div>
+}

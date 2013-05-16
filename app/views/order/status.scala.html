@@ -16,6 +16,9 @@
     <h3>
         Order status
     </h3>
+    
+    @views.html.validationSummary(frm)
+    
 	@helper.form(action = replyTo, 'class -> "form-horizontal") {
         @helper.repeat(frm("statuses"), 0) { st =>
             <div class="well odef-wrapper">

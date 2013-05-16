@@ -1,6 +1,7 @@
 package controllers
 
 import play.api._
+import scalaz.std.string._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
@@ -20,6 +21,7 @@ import models.cutting.CuttingList
 import models.cutting.FinishedPartInCutting
 import models.semiproduct.SemiproductFilter
 import models.semiproduct.ShapeFilter
+import CustomConstraints._
 
 object CuttingController extends Controller with ObjectController[CuttingDesc] 
 		with ObjectListController[CuttingForList] {
@@ -33,7 +35,8 @@ object CuttingController extends Controller with ObjectController[CuttingDesc]
         "count" -> number.verifying(_>0))(PartInCuttingDesc)(PartInCuttingDesc.unapply)
 
     def form(implicit s:scala.slick.session.Session) = Form(mapping(
-        "semiproduct" -> number.verifying(model.existsSemiproduct _),
+        "semiproduct" -> number.withError("Semiproduct required").
+            verifying("Existing semiproduct required", model.existsSemiproduct _),
         "cutting_plan" -> number.verifying(model.existsCuttingPlan _),
         "parts" -> play.api.data.Forms.list(partMapping)
     )(CuttingDesc)(CuttingDesc.unapply))

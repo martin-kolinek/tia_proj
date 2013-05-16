@@ -10,6 +10,8 @@
     Finish cutting
   </h2>
 
+@views.html.validationSummary(parts)
+
 @helper.form(action = replyTo, 'class -> "form-horizontal") {
   	<h4>Parts</h4>
 	@helper.repeat(parts("parts"), 0) { part =>

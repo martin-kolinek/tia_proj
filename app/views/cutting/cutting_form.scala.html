@@ -9,6 +9,9 @@
 <h3>
   @header cutting
 </h3>
+
+@views.html.validationSummary(frm)
+
 @helper.form(action = replyTo, 'class -> "form-horizontal") {
 	
 	@views.html.inputHfWithDesc(frm("cutting_plan"), "cphandle", '_default -> cpid.map(_.toString).getOrElse(""), '_label -> "Cutting plan", '_showConstraints -> false)

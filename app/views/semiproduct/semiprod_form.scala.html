@@ -33,6 +33,9 @@
     <h3>
       @header pack
     </h3>
+    
+    @views.html.validationSummary(frm)
+    
 	@helper.form(action = replyTo, 'class -> "form-horizontal") {
 		@helper.inputText(frm("heat"), '_label -> "Heat no.")
 		@helper.inputDate(frm("delivery"), '_label -> "Delivery date")

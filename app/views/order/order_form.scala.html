@@ -9,6 +9,9 @@
     <h3>
       @header order
     </h3>
+    
+    @views.html.validationSummary(frm)
+    
 	@helper.form(action = replyTo, 'class -> "form-horizontal") {
 		@helper.inputText(frm("name"), '_label -> "Name")
 		@helper.inputDate(frm("filling_date"), '_label -> "Filling date")

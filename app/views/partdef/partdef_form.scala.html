@@ -11,6 +11,8 @@
   @header part definition
 </h3>
 
+@views.html.validationSummary(frm)
+
 @helper.form(action = replyTo, 'class -> "form-horizontal") {
     <fieldset class="control-group">
 	    @helper.inputText(frm("name"), '_label -> "Name")
