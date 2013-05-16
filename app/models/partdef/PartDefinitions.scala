@@ -80,7 +80,7 @@ trait PartDefinitions extends Tables {
 		} yield (shp, mat, cnt)
 		
 		q.list.map {
-		    case (shp, mat, cnt) => CutPart(shp._1, extractBasicShape(shp), 0, MaterialDesc(mat.name), cnt)
+		    case (shp, mat, cnt) => CutPart(shp._1, extractBasicShape(shp), mat.id, MaterialDesc(mat.name), cnt)
 		}
 	}
 }
