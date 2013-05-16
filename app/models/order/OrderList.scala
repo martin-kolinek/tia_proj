@@ -2,6 +2,7 @@ package models.order
 
 import models.ObjectListModel
 import scalaz._
+import scalaz.std.string._
 import models.DBAccess
 
 trait OrderList extends ObjectListModel[OrderForList] {
@@ -9,12 +10,19 @@ trait OrderList extends ObjectListModel[OrderForList] {
 		
 	import profile.simple._
 		
-	def list(u:Unit)(implicit session:Session) = {
-		Query(Order).map(x=>(x.id, x.name, x.fillingDate, x.dueDate, x.status)).
+	def list(cpId:FilterType)(implicit session:Session) = {
+        val q = cpId match {
+            case None => Query(Order)
+            case Some(id) => Query(Order).filter(ord => (for{
+                odef <- OrderDefinition if odef.orderId === ord.id
+                cp <- PartDefinitionInCuttingPlan if cp.partDefId === odef.partDefId && cp.cutPlanId === id
+            } yield odef.id).exists)
+        }
+		q.map(x=>(x.id, x.name, x.fillingDate, x.dueDate, x.status)).
 		    list.map(OrderForList.tupled)
 	}
 	
-	type FilterType = Unit
+	type FilterType = Option[Int]
 	
-	def parseFilter(str:String) = Success({})
+	def parseFilter(str:String) = Success(parseInt(str).toOption)
 }

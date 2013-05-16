@@ -6,7 +6,7 @@ require(["common"], (common) ->
         iddesc.init("sphandle", router.controllers.Semiproducts.getSemiproductDescription)
         
         repHandle = rep.addRepeated("part_handle")
-        odef.register(repHandle, "order-def", $("#modal-order"), $("#modal-order-content"))
+        odef.register(repHandle, "order-def", $("#modal-order"), $("#modal-order-content"), $(iddesc.id("cphandle")).val())
             
         $("#semiprod-button").click ->
             filters = $(iddesc.id("order-def")).map ->

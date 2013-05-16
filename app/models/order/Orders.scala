@@ -143,8 +143,13 @@ trait Orders extends Tables {
     def orderDefForListProjection(odef:OrderDefinition.type, ord:Order.type, pdef:PartDefinition.type) = 
     	(odef.id, ord.name, pdef.name, odef.filter, odef.count)
     
-    def listOrderDefs(ordId:Int)(implicit s:Session) = {
-    	orderDefQuery.filter(_._2.id === ordId).map((orderDefForListProjection _).tupled).
+    def listOrderDefs(ordId:Int, cpId:Option[Int])(implicit s:Session) = {
+        val q = cpId match {
+            case None => orderDefQuery
+            case Some(cp) => orderDefQuery.filter(odef => Query(PartDefinitionInCuttingPlan).
+                                 filter(_.partDefId === odef._1.partDefId).filter(_.cutPlanId===cp).exists)
+        }
+    	q.filter(_._2.id === ordId).map((orderDefForListProjection _).tupled).
     	    list.map(OrderDefForList.tupled)
     }
     

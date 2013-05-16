@@ -65,7 +65,7 @@ GET     /order/:id/status/          controllers.OrderController.status(id:Int)
         
 POST    /order/:id/status           controllers.OrderController.updateStatus(id:Int)
         
-GET     /order/:id/definitions      controllers.OrderController.listDefinitions(id:Int, template ?= "")
+GET     /order/:id/definitions      controllers.OrderController.listDefinitions(id:Int, filter ?= "", template ?= "")
 
 GET     /order/definition/:id/description controllers.OrderController.orderDefDescription(id:Int)
         

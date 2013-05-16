@@ -24,6 +24,8 @@ import models.semiproduct.Shapes
 import models.semiproduct.ShapeFilter
 import models.semiproduct.SemiproductFilter
 import play.api.libs.json.Json
+import scalaz._
+import scalaz.std.string._
 
 object OrderController extends Controller with ObjectController[OrderDesc] 
 		with ObjectListController[OrderForList] {
@@ -91,9 +93,9 @@ object OrderController extends Controller with ObjectController[OrderDesc]
     	case _ => views.html.order.definitions.apply
     }
 
-    def listDefinitions(id:Int, template:String) = Action{
+    def listDefinitions(id:Int, filter:String, template:String) = Action{
         model.withTransaction { implicit s =>
-            Ok(listDefTemplates(template)(model.listOrderDefs(id)))
+            Ok(listDefTemplates(template)(model.listOrderDefs(id, parseInt(filter).toOption)))
         }
     }
     

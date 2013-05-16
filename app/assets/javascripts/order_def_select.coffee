@@ -1,7 +1,7 @@
 define(["jquery", "dataTables", "router", "id_desc"], ($, dt, router, iddesc) ->
-    register : (rep, handle, modal, content) ->
+    register : (rep, handle, modal, content, cutplanid) ->
         rep.added (ev) ->
-            router.controllers.OrderController.list("", "table").ajax
+            router.controllers.OrderController.list(cutplanid, "table").ajax
                 error: (xhr, status, err) ->
                     alert("Error getting orders: " +err)
                 success: (data, status, xhr) ->
@@ -15,7 +15,7 @@ define(["jquery", "dataTables", "router", "id_desc"], ($, dt, router, iddesc) ->
                         ordid = $(this).data("ord-id")
                         ordname = $(this).data("ord-name")
                         ul = $(this).parent().find("ul")
-                        router.controllers.OrderController.listDefinitions(ordid,"dropdown").ajax
+                        router.controllers.OrderController.listDefinitions(ordid, cutplanid, "dropdown").ajax
                             error: (xhr, status, err) ->
                                 alert("Error getting order definitions: "+err)
                             success: (data, status, xhr) ->
