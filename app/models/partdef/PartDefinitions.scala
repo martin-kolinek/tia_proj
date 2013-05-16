@@ -62,7 +62,7 @@ trait PartDefinitions extends Tables {
 		}
 		val join = for {
 			p <- Part if p.orderDefId.isNull
-			c <- p.cutting
+			c <- p.cutting if c.finishTime.isNotNull
 			sp <- c.semiproduct
 			pck <- sp.pack
 			shp <- pck.shape

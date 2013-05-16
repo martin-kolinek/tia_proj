@@ -85,7 +85,11 @@ trait Orders extends Tables {
     
     def updateOrderStatus(id:Int, statuses:List[OrderDefStatus])(implicit s:Session) {
     	val defs = Query(OrderDefinition).filter(_.orderId === id).map(_.id).list
-        Query(Part).filter(_.orderDefId.inSet(defs)).map(_.orderDefId).update(None)
+        val nonFreeParts = for {
+            p <- Part
+            c <- Cutting if p.cuttingId === c.id && c.finishTime.isNotNull
+        } yield p
+        nonFreeParts.map(_.id).list.foreach(pid => Query(Part).filter(_.id === pid).map(_.orderDefId).update(None))
         val partCounts = Query(OrderDefinition).filter(_.orderId === id).map(x=>x.id -> x.count).list.toMap
         for{
             status <- statuses
@@ -95,10 +99,12 @@ trait Orders extends Tables {
             val toAdd = math.min(partCounts(status.odefId) - have, partStatus.count)
             val q = for {
                 p <- Part if !p.damaged && p.orderDefId.isNull
-                c <- Cutting if p.cuttingId === c.id
-                sp <- Pack if sp.id === c.semiproductId && sp.materialId === partStatus.materialId
-                shp <- Shape if shp.id === sp.shapeId && shp.basicShapeId === partStatus.basicShapeId
+                c <- Cutting if p.cuttingId === c.id && c.finishTime.isNotNull
+                sp <- c.semiproduct
+                pck <- sp.pack if pck.materialId === partStatus.materialId
+                shp <- Shape if shp.id === pck.shapeId && shp.basicShapeId === partStatus.basicShapeId
             } yield p.id
+            
             q.take(toAdd).list.foreach { id =>
                 Query(Part).filter(_.id === id).map(_.orderDefId).update(some(status.odefId))
             }
@@ -128,7 +134,8 @@ trait Orders extends Tables {
     }
 
     def tryFinishOrders[E](orders:Query[Order.type, E])(implicit s:Session) {
-        val partQ = Query(Part).groupBy(_.orderDefId).map(x=> x._1 -> x._2.length)
+        val partQ = Query(Part).filter(p => !Query(Cutting).filter(_.id === p.cuttingId).filter(_.finishTime.isNull).exists).
+            groupBy(_.orderDefId).map(x=> x._1 -> x._2.length)
         val unFinished = Query(OrderDefinition).
             filter(odef => partQ.filter(_._1 === odef.id).filter(_._2 < odef.count).exists || !partQ.filter(_._1 === odef.id).exists)
         val toFinish = orders.filter(ord => !unFinished.filter(_.orderId === ord.id).exists).map(_.id)

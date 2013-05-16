@@ -106,6 +106,7 @@ trait Shapes extends Tables { this:DBAccess =>
     	case (_, (Some(_), thick), _, _) => SheetDesc(thick, None, None)
     	case (_, _, (Some(_), thick, rad), _) => CirclePipeDesc(thick, rad, None)
     	case (_, _, _, (Some(_), thick, diam)) => SquarePipeDesc(thick, diam, None)
+        case _ => UnknownShapeDesc
     } 
     
     private val nextval = SimpleFunction.unary[String, Int]("nextval")
