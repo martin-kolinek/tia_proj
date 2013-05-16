@@ -3,6 +3,7 @@ requirejs.config
         "dataTables" : "jquery.dataTables"
         "router" : "jsRoutes"
         "datepicker" : "bootstrap-datepicker"
+    waitSeconds : 20
     shim:
         "dataTables" : ["jquery"]
         "bootstrap" : ["jquery"]
