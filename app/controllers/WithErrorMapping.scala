@@ -4,15 +4,14 @@ import play.api.data.Forms._
 import play.api.data._
 import play.api.data.validation.Constraint
 
-class WithErrorMapping[T](under:Mapping[T], msg:String) extends Mapping[T] {
-	def bind(data: Map[String, String]) = under.bind(data) match {
-		case r@Right(x) => r
-		case Left(errors) => Left(formErrors)
-	}
-	
+class WithErrorMapping[T](under:Mapping[T], msg:String, val constraints:List[Constraint[T]] = Nil) extends Mapping[T] {
+	def bind(data: Map[String, String]) = 
+        under.bind(data) match {
+		    case Right(x) => applyConstraints(x)
+		    case Left(errors) => Left(formErrors)
+        }
+
 	private def formErrors = Seq(new FormError(under.key, msg))
-	
-	val constraints = under.constraints
 	
 	val key = under.key
 	
@@ -23,7 +22,7 @@ class WithErrorMapping[T](under:Mapping[T], msg:String) extends Mapping[T] {
 		(a, if(b.isEmpty) b else formErrors)
 	}
 	
-	def verifying(constraints: Constraint[T]*) = under.verifying(constraints:_*)
+	def verifying(cstrs: Constraint[T]*) = new WithErrorMapping[T](under, msg, constraints++cstrs)
 	
 	def withPrefix(prefix:String) = new WithErrorMapping(under.withPrefix(prefix), msg)
 }
