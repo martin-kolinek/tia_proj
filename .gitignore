@@ -14,6 +14,7 @@ bin
 /.project
 /.cache
 /.settings
+/.history
 
 #emacs stuff
 *\~
